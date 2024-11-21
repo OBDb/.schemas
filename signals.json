@@ -41,6 +41,7 @@
                   "properties": {
                     "bix": { "type": "integer" },
                     "len": { "type": "integer" },
+                    "blsb": { "type": "boolean" },
                     "sign": { "type": "boolean" },
                     "min": { "type": "number" },
                     "max": { "type": "number" },
