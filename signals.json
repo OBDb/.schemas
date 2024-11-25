@@ -159,6 +159,7 @@
         "additionalProperties": false,
         "properties": {
           "id": { "type": "string" },
+          "path": { "type": "string" },
           "matchingRegex": { "type": "string" },
           "suggestedMetricGroup": { "enum": [
             "batteryModulesStateOfCharge",
