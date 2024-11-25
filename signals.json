@@ -1,6 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema",
   "type": "object",
+  "additionalProperties": false,
   "properties": {
     "diagnosticLevel": {
       "type": "string",
@@ -13,6 +14,7 @@
       "minItems": 0,
       "items": {
         "type": "object",
+        "additionalProperties": false,
         "properties": {
           "hdr": { "type": "string", "minLength": 3, "maxLength": 4 },
           "rax": { "type": "string", "minLength": 2, "maxLength": 3 },
@@ -20,6 +22,7 @@
           "fcm1": { "type": "boolean" },
           "cmd": {
             "type": "object",
+            "additionalProperties": false,
             "properties": {
               "01": { "type": "string", "minLength": 2, "maxLength": 2 },
               "21": { "type": "string", "minLength": 2, "maxLength": 2 },
@@ -33,11 +36,13 @@
             "minItems": 1,
             "items": {
               "type": "object",
+              "additionalProperties": false,
               "properties": {
                 "id": { "type": "string" },
                 "name": { "type": "string" },
                 "fmt": {
                   "type": "object",
+                  "additionalProperties": false,
                   "properties": {
                     "bix": { "type": "integer" },
                     "len": { "type": "integer" },
@@ -151,6 +156,7 @@
       "minItems": 1,
       "items": {
         "type": "object",
+        "additionalProperties": false,
         "properties": {
           "id": { "type": "string" },
           "matchingRegex": { "type": "string" },
