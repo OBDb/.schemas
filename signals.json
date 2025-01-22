@@ -41,6 +41,8 @@
               "properties": {
                 "id": { "type": "string" },
                 "name": { "type": "string" },
+                "hidden": { "type": "boolean" },
+                "description": { "type": "string" },
                 "fmt": {
                   "type": "object",
                   "additionalProperties": false,
