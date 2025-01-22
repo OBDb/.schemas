@@ -130,6 +130,7 @@
                   "rearLeftTirePressure",
                   "rearRightTirePressure",
                   "speed",
+                  "starterBatteryVoltage",
                   "stateOfCharge",
                   "stateOfHealth"
                 ]},
