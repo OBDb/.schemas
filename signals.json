@@ -114,6 +114,8 @@
                       "yards",
                       "yesno"
                     ]},
+                    "nullmin": { "type": "number" },
+                    "nullmax": { "type": "number" },
                     "omin": { "type": "number" },
                     "omax": { "type": "number" },
                     "oval": { "type": "number" },
