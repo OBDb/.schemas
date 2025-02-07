@@ -124,6 +124,7 @@
                 },
                 "path": { "type": "string" },
                 "suggestedMetric": { "enum": [
+                  "distanceSinceDTCsCleared",
                   "electricRange",
                   "frontLeftTirePressure",
                   "frontRightTirePressure",
