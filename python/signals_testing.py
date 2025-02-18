@@ -1,8 +1,9 @@
 import pytest
 from typing import Dict, Any, Optional
-from can_frame import CANIDFormat
-from command_registry import decode_obd_response
-from signals import SignalSet, Command, Signal, Scaling
+
+from .can_frame import CANIDFormat
+from .command_registry import decode_obd_response
+from .signals import SignalSet, Command, Signal, Scaling
 
 def obd_testrunner(
         signalset_json: str,

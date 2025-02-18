@@ -2,8 +2,8 @@ from dataclasses import dataclass
 from typing import Dict, List, Optional, Set, Any, Tuple
 from enum import Enum
 
-from can_frame import CANFrame, CANPacket, CANFrameScanner, CANIDFormat
-from signals import Command, Scaling
+from .can_frame import CANFrame, CANPacket, CANFrameScanner, CANIDFormat
+from .signals import Command, Scaling
 
 class ServiceType(Enum):
     SERVICE_21 = 0x21

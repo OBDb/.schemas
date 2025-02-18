@@ -1,7 +1,8 @@
 import pytest
-from signals_testing import obd_testrunner
 import json
 import os
+
+from .signals_testing import obd_testrunner
 
 REPO_ROOT = os.path.abspath(os.path.dirname(__file__))
 
