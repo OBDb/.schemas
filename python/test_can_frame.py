@@ -1,5 +1,5 @@
 import pytest
-from can_frame import (
+from .can_frame import (
     CANFrame, CANFrameScanner, CANIDFormat, CANFrameError,
     DataFrameType, DataFrameHeader
 )
