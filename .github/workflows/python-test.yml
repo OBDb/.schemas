@@ -1,0 +1,60 @@
+name: Python Tests
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  pytest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run pytest
+        run: |
+          pytest python/ --cov=python --cov-report=term --cov-report=html --cov-report=json
+
+      - name: Post coverage comment
+        if: github.event_name == 'pull_request'
+        run: |
+          TOTAL=$(python -c "import json;print(json.load(open('coverage.json'))['totals']['percent_covered_display'])")
+          echo "Coverage: $TOTAL%" >> $GITHUB_STEP_SUMMARY
+
+          echo 'COVERAGE_COMMENT<<EOF' >> $GITHUB_ENV
+          echo '## Coverage Report' >> $GITHUB_ENV
+          echo '📊 Total coverage: '"$TOTAL"'%' >> $GITHUB_ENV
+          echo '```' >> $GITHUB_ENV
+          coverage report >> $GITHUB_ENV
+          echo '```' >> $GITHUB_ENV
+          echo 'EOF' >> $GITHUB_ENV
+
+      - name: Comment on PR
+        if: github.event_name == 'pull_request'
+        uses: thollander/actions-comment-pull-request@v2
+        with:
+          message: ${{ env.COVERAGE_COMMENT }}
+          comment_tag: coverage
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: htmlcov/
+          retention-days: 14
