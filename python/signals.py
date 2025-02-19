@@ -141,13 +141,21 @@ class EnumerationValue:
 @dataclass(frozen=True)
 class Enumeration:
     bit_length: int
-    map: Dict[int, EnumerationValue]
+    map: Dict[str, EnumerationValue]
     bit_offset: int = 0
+
+    def __hash__(self) -> int:
+        # Convert the map to a tuple of sorted items to make it hashable
+        map_items = tuple(sorted(
+            (k, hash(v))
+            for k, v in self.map.items()
+        ))
+        return hash((self.bit_length, map_items, self.bit_offset))
 
     @staticmethod
     def from_json(data: Dict) -> 'Enumeration':
         value_map = {
-            k: EnumerationValue(**v) if isinstance(v, dict) else EnumerationValue(str(v), str(v))
+            str(k): EnumerationValue(**v) if isinstance(v, dict) else EnumerationValue(str(v), str(v))
             for k, v in data['map'].items()
         }
         return Enumeration(
@@ -155,6 +163,22 @@ class Enumeration:
             bit_length=data['len'],
             map=value_map
         )
+
+    def decode_value(self, data: bytes) -> str:
+        """Decode an enumerated value from bytes."""
+        # First extract the raw value as an integer
+        raw_value = 0
+        for i in range(self.bit_length):
+            byte_idx = (self.bit_offset + i) // 8
+            bit_idx = 7 - ((self.bit_offset + i) % 8)  # MSB format
+            if byte_idx < len(data) and (data[byte_idx] & (1 << bit_idx)) != 0:
+                raw_value |= 1 << (self.bit_length - i - 1)
+
+        # Convert to string and look up in map
+        str_value = str(raw_value)
+        if str_value in self.map:
+            return self.map[str_value].value
+        return str_value  # Return raw value as string if no mapping exists
 
 @dataclass(frozen=True)
 class Signal:

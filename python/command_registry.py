@@ -3,7 +3,7 @@ from typing import Dict, List, Optional, Set, Any, Tuple
 from enum import Enum
 
 from .can_frame import CANFrame, CANPacket, CANFrameScanner, CANIDFormat
-from .signals import Command, Scaling
+from .signals import Command, Enumeration, Scaling, SignalSet
 
 class ServiceType(Enum):
     SERVICE_21 = 0x21
@@ -71,12 +71,14 @@ class CommandRegistry:
                 values = {}
                 remaining_data = data
                 for signal in command.signals:
-                    if isinstance(signal.format, Scaling):
-                        try:
+                    try:
+                        if isinstance(signal.format, Scaling):
                             value = signal.format.decode_value(remaining_data)
-                            values[signal.id] = value
-                        except Exception as e:
-                            print(f"Error decoding signal {signal.id}: {e}")
+                        elif isinstance(signal.format, Enumeration):
+                            value = signal.format.decode_value(remaining_data)
+                        values[signal.id] = value
+                    except Exception as e:
+                        print(f"Error decoding signal {signal.id}: {e}")
 
                 responses.append(CommandResponse(command, remaining_data, values))
 
@@ -110,7 +112,10 @@ class CommandRegistry:
                 for signal in command.signals:
                     if isinstance(signal.format, Scaling):
                         try:
-                            value = signal.format.decode_value(remaining_data)
+                            if isinstance(signal.format, Scaling):
+                                value = signal.format.decode_value(remaining_data)
+                            elif isinstance(signal.format, Enumeration):
+                                value = signal.format.decode_value(remaining_data)
                             values[signal.id] = value
                         except Exception as e:
                             print(f"Error decoding signal {signal.id}: {e}")

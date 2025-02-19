@@ -7,6 +7,10 @@ from .signals_testing import obd_testrunner
 REPO_ROOT = os.path.abspath(os.path.dirname(__file__))
 
 TEST_CASES = [
+    # 2024 model years
+    # Gear
+    ("7E804621E1203", {"F150_GEAR": "3"}),
+
     # 2021 model year
     # Target vehicle speed - -61.2 km/h
     ("76C0562A224FF56", {"F150_CC_TGT_VSS": -61.2}),
