@@ -1,55 +1,55 @@
 { "commands": [
-    { "hdr": "720", "rax": "728", "cmd": {"22": "404C"}, "freq": 5,
-      "signals": [
-        {"id": "F150_ODO", "path": "Trips", "fmt": { "len": 24, "max": 1677721, "div": 10, "unit": "kilometers" }, "name": "Odometer (Instrument panel)", "suggestedMetric": "odometer"}
-      ]},
-    { "hdr": "726", "rax": "72E", "cmd": {"22": "2813"}, "freq": 5,
-      "signals": [
-        {"id": "F150_TP_FL", "path": "Tires", "fmt": { "len": 16, "max": 3276, "div": 20, "unit": "psi" }, "name": "Front left tire pressure", "suggestedMetric": "frontLeftTirePressure"}
-      ]},
-    { "hdr": "726", "rax": "72E", "cmd": {"22": "2814"}, "freq": 5,
-      "signals": [
-        {"id": "F150_TP_FR", "path": "Tires", "fmt": { "len": 16, "max": 3276, "div": 20, "unit": "psi" }, "name": "Front right tire pressure", "suggestedMetric": "frontRightTirePressure"}
-      ]},
-    { "hdr": "726", "rax": "72E", "cmd": {"22": "2815"}, "freq": 5,
-      "signals": [
-        {"id": "F150_TP_RRO", "path": "Tires", "fmt": { "len": 16, "max": 3276, "div": 20, "unit": "psi" }, "name": "Rear right outer tire pressure", "suggestedMetric": "rearRightTirePressure"}
-      ]},
-    { "hdr": "726", "rax": "72E", "cmd": {"22": "2816"}, "freq": 5,
-      "signals": [
-        {"id": "F150_TP_RLO", "path": "Tires", "fmt": { "len": 16, "max": 3276, "div": 20, "unit": "psi" }, "name": "Rear left outer tire pressure", "suggestedMetric": "rearLeftTirePressure"}
-      ]},
-    { "hdr": "726", "rax": "72E", "cmd": {"22": "2817"}, "freq": 5,
-      "signals": [
-        {"id": "F150_TP_RRI", "path": "Tires", "fmt": { "len": 16, "max": 3276, "div": 20, "unit": "psi" }, "name": "Rear right inner tire pressure"}
-      ]},
-    { "hdr": "726", "rax": "72E", "cmd": {"22": "2818"}, "freq": 5,
-      "signals": [
-        {"id": "F150_TP_RLI", "path": "Tires", "fmt": { "len": 16, "max": 3276, "div": 20, "unit": "psi" }, "name": "Rear left inner tire pressure"}
-      ]},
-    { "hdr": "760", "rax": "768", "cmd": {"22": "3201"}, "freq": 0.25,
-      "signals": [
-        {"id": "F150_STEER_ANGLE", "path": "Control", "fmt": { "len": 16, "max": 1638, "min": -1638, "div": 20, "add": -1638.4, "unit": "degrees" }, "name": "Steering wheel angle (ABS)", "description": "Positive is rotated to the left, negative is rotated to the right."}
-      ]},
-    { "hdr": "764", "cmd": {"22": "A224"}, "freq": 0.25,
-      "signals": [
-        {"id": "F150_CC_TGT_VSS", "path": "Cruise control", "fmt": { "len": 16, "max": 736, "min": -736, "mul": 3.6, "div": 10, "sign": true, "unit": "kilometersPerHour" }, "name": "Target vehicle speed", "description": "The speed of the vehicle ahead of you."}
-      ]},
-    { "hdr": "7DF", "cmd": {"22": "1E12"}, "freq": 2,
-      "signals": [
-        {"id": "F150_GEAR", "path": "Engine", "fmt": { "len": 8, "max": 255, "unit": "scalar" }, "name": "Current gear", "description": "The automatic transmission gear. Numbers aren't yet mapped to named gears."}
-      ]},
-    { "hdr": "7DF", "cmd": {"22": "1E1C"}, "freq": 1,
-      "signals": [
-        {"id": "F150_TOT", "path": "Engine", "fmt": { "len": 16, "max": 255, "div": 16, "unit": "celsius" }, "name": "Transmission oil temperature"}
-      ]},
-    { "hdr": "7DF", "cmd": {"22": "1E23"}, "freq": 2,
-      "signals": [
-        {"id": "F150_GEAR_SHFT", "path": "Engine", "fmt": { "len": 8, "max": 255, "unit": "scalar" }, "name": "Shift gear"}
-      ]},
-    { "hdr": "7E0", "rax": "7E8", "cmd": {"22": "F42F"}, "freq": 1,
-      "signals": [
-        {"id": "F150_FLI", "path": "Fuel", "fmt": { "len": 8, "max": 255, "mul": 100, "div": 255, "unit": "percent" }, "name": "Fuel level", "suggestedMetric": "fuelTankLevel"}
-      ]}
-    ]
-    }
+  { "hdr": "720", "rax": "728", "cmd": {"22": "404C"}, "freq": 5,
+    "signals": [
+      {"id": "F150_ODO", "path": "Trips", "fmt": { "len": 24, "max": 1677721, "div": 10, "unit": "kilometers" }, "name": "Odometer (Instrument panel)", "suggestedMetric": "odometer"}
+    ]},
+  { "hdr": "726", "rax": "72E", "cmd": {"22": "2813"}, "freq": 5,
+    "signals": [
+      {"id": "F150_TP_FL", "path": "Tires", "fmt": { "len": 16, "max": 3276, "div": 20, "unit": "psi" }, "name": "Front left tire pressure", "suggestedMetric": "frontLeftTirePressure"}
+    ]},
+  { "hdr": "726", "rax": "72E", "cmd": {"22": "2814"}, "freq": 5,
+    "signals": [
+      {"id": "F150_TP_FR", "path": "Tires", "fmt": { "len": 16, "max": 3276, "div": 20, "unit": "psi" }, "name": "Front right tire pressure", "suggestedMetric": "frontRightTirePressure"}
+    ]},
+  { "hdr": "726", "rax": "72E", "cmd": {"22": "2815"}, "freq": 5,
+    "signals": [
+      {"id": "F150_TP_RRO", "path": "Tires", "fmt": { "len": 16, "max": 3276, "div": 20, "unit": "psi" }, "name": "Rear right outer tire pressure", "suggestedMetric": "rearRightTirePressure"}
+    ]},
+  { "hdr": "726", "rax": "72E", "cmd": {"22": "2816"}, "freq": 5,
+    "signals": [
+      {"id": "F150_TP_RLO", "path": "Tires", "fmt": { "len": 16, "max": 3276, "div": 20, "unit": "psi" }, "name": "Rear left outer tire pressure", "suggestedMetric": "rearLeftTirePressure"}
+    ]},
+  { "hdr": "726", "rax": "72E", "cmd": {"22": "2817"}, "freq": 5,
+    "signals": [
+      {"id": "F150_TP_RRI", "path": "Tires", "fmt": { "len": 16, "max": 3276, "div": 20, "unit": "psi" }, "name": "Rear right inner tire pressure"}
+    ]},
+  { "hdr": "726", "rax": "72E", "cmd": {"22": "2818"}, "freq": 5,
+    "signals": [
+      {"id": "F150_TP_RLI", "path": "Tires", "fmt": { "len": 16, "max": 3276, "div": 20, "unit": "psi" }, "name": "Rear left inner tire pressure"}
+    ]},
+  { "hdr": "760", "rax": "768", "cmd": {"22": "3201"}, "freq": 0.25,
+    "signals": [
+      {"id": "F150_STEER_ANGLE", "path": "Control", "fmt": { "len": 16, "max": 1638, "min": -1638, "div": 20, "add": -1638.4, "unit": "degrees" }, "name": "Steering wheel angle (ABS)", "description": "Positive is rotated to the left, negative is rotated to the right."}
+    ]},
+  { "hdr": "764", "cmd": {"22": "A224"}, "freq": 0.25,
+    "signals": [
+      {"id": "F150_CC_TGT_VSS", "path": "Cruise control", "fmt": { "len": 16, "max": 736, "min": -736, "mul": 3.6, "div": 10, "sign": true, "unit": "kilometersPerHour" }, "name": "Target vehicle speed", "description": "The speed of the vehicle ahead of you."}
+    ]},
+  { "hdr": "7DF", "cmd": {"22": "1E1C"}, "freq": 1,
+    "signals": [
+      {"id": "F150_TOT", "path": "Engine", "fmt": { "len": 16, "max": 255, "div": 16, "unit": "celsius" }, "name": "Transmission oil temperature"}
+    ]},
+  { "hdr": "7DF", "cmd": {"22": "1E23"}, "freq": 2,
+    "signals": [
+      {"id": "F150_GEAR_SHFT", "path": "Engine", "fmt": { "len": 8, "max": 255, "unit": "scalar" }, "name": "Shift gear"}
+    ]},
+  { "hdr": "7E0", "rax": "7E8", "cmd": {"22": "1E12"}, "freq": 2,
+    "signals": [
+      {"id": "F150_GEAR", "path": "Engine", "fmt": { "len": 8, "map": {"1":{"description":"First gear","value":"1"},"10":{"description":"Manual","value":"Manul"},"2":{"description":"Second gear","value":"2"},"3":{"description":"Third gear","value":"3"},"4":{"description":"Fourth gear","value":"4"},"46":{"description":"Drive","value":"DRIVE"},"5":{"description":"Fifth gear","value":"5"},"50":{"description":"Neutral","value":"NEUTRAL"},"6":{"description":"Sixth gear","value":"6"},"60":{"description":"Reverse","value":"REVERSE"},"7":{"description":"Seventh gear","value":"7"},"70":{"description":"Park","value":"PARK"},"8":{"description":"Eighth gear","value":"8"},"9":{"description":"Ninth gear","value":"9"}} }, "name": "Current gear", "description": "The automatic transmission gear."}
+    ]},
+  { "hdr": "7E0", "rax": "7E8", "cmd": {"22": "F42F"}, "freq": 1,
+    "signals": [
+      {"id": "F150_FLI", "path": "Fuel", "fmt": { "len": 8, "max": 255, "mul": 100, "div": 255, "unit": "percent" }, "name": "Fuel level", "suggestedMetric": "fuelTankLevel"}
+    ]}
+  ]
+  }
