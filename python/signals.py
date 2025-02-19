@@ -141,7 +141,7 @@ class EnumerationValue:
 @dataclass(frozen=True)
 class Enumeration:
     bit_length: int
-    map: Dict[str, EnumerationValue]  # Changed from Dict[int, EnumerationValue]
+    map: Dict[str, EnumerationValue]
     bit_offset: int = 0
 
     def __hash__(self) -> int:
