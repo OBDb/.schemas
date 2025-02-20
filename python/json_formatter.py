@@ -59,30 +59,132 @@ def format_command_json(command: Dict[str, Any]) -> str:
     preamble.append(f'"cmd": {format_parameter_json(command["cmd"])}')
     preamble.append(f'"freq": {format_number(command["freq"])}')
     
-    # Format signals
-    # Group signals by their format.bit_offset (equivalent to format.groupId in Swift)
+    # Separate signals into scalings and enumerations
     signals = command.get("signals", [])
-    grouped_signals = {}
+    scaling_signals = []
+    enum_signals = []
+    
     for signal in signals:
-        offset = signal.get("fmt", {}).get("bix", 0)
-        if offset not in grouped_signals:
-            grouped_signals[offset] = []
-        grouped_signals[offset].append(signal)
+        if 'map' in signal.get('fmt', {}):
+            enum_signals.append(signal)
+        else:
+            scaling_signals.append(signal)
     
-    # Sort groups by offset and format each group
-    sorted_groups = sorted(grouped_signals.items(), key=lambda x: x[0])
-    formatted_groups = []
-    for _, group in sorted_groups:
-        signal_parts = [format_signal_json(signal) for signal in group]
-        formatted_groups.append(tabularize(signal_parts))
+    # Build the signals section
+    signals_lines = ['  "signals": [']
     
-    scalings = ",\n".join(formatted_groups)
+    # Format scaling signals (if any) using tabularization
+    if scaling_signals:
+        signal_parts = [format_scaling_signal_json(signal) for signal in scaling_signals]
+        tabularized = tabularize(signal_parts)
+        if tabularized:
+            signals_lines.extend(['    ' + line for line in tabularized.split('\n')])
     
-    # Return final formatted string with proper indentation
+    # Add enumeration signals (if any)
+    if enum_signals:
+        # Add comma after scaling signals if needed
+        if scaling_signals and signals_lines[-1][-1] != ',':
+            signals_lines[-1] += ','
+        
+        # Format each enumeration signal
+        for i, signal in enumerate(enum_signals):
+            enum_lines = format_enum_signal_json(signal)
+            
+            # Add comma if not the last signal
+            if i < len(enum_signals) - 1 or scaling_signals:
+                enum_lines[-1] += ','
+                
+            signals_lines.extend(['    ' + line for line in enum_lines])
+    
+    signals_lines.append('  ]')
+    
+    # Combine all parts
     return f"""{{ {", ".join(preamble)},
-  "signals": [
-{scalings}
-  ]}}"""
+{chr(10).join(signals_lines)}}}"""
+
+def format_scaling_signal_json(signal: Dict[str, Any]) -> List[str]:
+    """Format a scaling signal for tabularization."""
+    result = [f'{{"id": "{signal["id"]}",']
+    
+    if "path" in signal:
+        result.append(f'"path": "{signal["path"]}",')
+    
+    result.append('"fmt":')
+    
+    # Format scaling
+    result.extend(_format_scaling(signal["fmt"]))
+    
+    # Add name and optional fields
+    result.append(f'"name": "{signal["name"]}"')
+    
+    if "suggestedMetric" in signal:
+        result[-1] += ","
+        result.append(f'"suggestedMetric": "{signal["suggestedMetric"]}"')
+    
+    if description := signal.get("description"):
+        result[-1] += ","
+        result.append(f'"description": "{description}"')
+    
+    if signal.get("hidden", False):
+        result[-1] += ","
+        result.append('"hidden": true')
+    
+    result[-1] += "}"
+    
+    return result
+
+def format_enum_signal_json(signal: Dict[str, Any]) -> List[str]:
+    """Format an enumeration signal with multi-line map values."""
+    lines = []
+    
+    # Start signal object with id, path, name, description, and fmt opening on one line
+    opening_line = '{'
+    opening_line += f'"id": "{signal["id"]}"'
+    
+    if "path" in signal:
+        opening_line += f', "path": "{signal["path"]}"'
+    
+    opening_line += f', "name": "{signal["name"]}"'
+    
+    if description := signal.get("description"):
+        opening_line += f', "description": "{description}"'
+    
+    if "suggestedMetric" in signal:
+        opening_line += f', "suggestedMetric": "{signal["suggestedMetric"]}"'
+    
+    if signal.get("hidden", False):
+        opening_line += ', "hidden": true'
+    
+    opening_line += f', "fmt": {{'
+    
+    # Handle bit offset if present
+    if 'bix' in signal['fmt']:
+        opening_line += f'"bix": {signal["fmt"]["bix"]}, '
+        
+    opening_line += f'"len": {signal["fmt"]["len"]}, "map": {{'
+    lines.append(opening_line)
+    
+    # Format map entries
+    map_items = sorted(signal["fmt"]["map"].items(), key=lambda x: int(x[0]))
+    for i, (key, value) in enumerate(map_items):
+        if isinstance(value, dict):
+            description = value.get('description', '')
+            value_str = value.get('value', '')
+            entry = f'      "{key}": {{"description": "{description}", "value": "{value_str}"}}'
+        else:
+            entry = f'      "{key}": {{"description": "{value}", "value": "{value}"}}'
+            
+        if i < len(map_items) - 1:
+            entry += ','
+        lines.append(entry)
+    
+    # Close map and format sections
+    lines.append('    }}')
+    
+    # Just close the object
+    lines.append('}')
+    
+    return lines
 
 def format_signal_json(signal: Dict[str, Any]) -> List[str]:
     """Format a signal dictionary into a list of strings for tabular formatting.
@@ -154,7 +256,14 @@ def format_signal_format(fmt: dict) -> list[str]:
         return _format_scaling(fmt)
 
 def _format_enumeration(fmt: dict) -> list[str]:
-    """Format enumeration signal format."""
+    """Format enumeration signal format with multi-line map values.
+    
+    Args:
+        fmt: Dictionary containing enumeration format data
+        
+    Returns:
+        List of strings representing the formatted enumeration parts
+    """
     keys = []
     
     # Handle bit offset
@@ -166,12 +275,33 @@ def _format_enumeration(fmt: dict) -> list[str]:
     # Add bit length
     keys.append(f'"len": {fmt["len"]},')
     
-    # Format map with sorted keys
-    import json
-    # Ensure map keys are properly sorted and formatted
-    sorted_map = {str(k): v for k, v in sorted(fmt['map'].items(), key=lambda x: int(x[0]))}
-    map_json = json.dumps(sorted_map)
-    keys.append(f'"map": {map_json}')
+    # Format map with each value on its own line
+    map_items = []
+    sorted_items = sorted(fmt['map'].items(), key=lambda x: int(x[0]))
+    
+    # Start map object
+    map_lines = ['"map": {']
+    
+    # Format each map entry
+    for key, value in sorted_items:
+        # Handle both dictionary and string value formats
+        if isinstance(value, dict):
+            description = value.get('description', '')
+            value_str = value.get('value', '')
+            map_lines.append(f'      "{key}": {{"description": "{description}", "value": "{value_str}"}},')
+        else:
+            # For simple string values, use the value as both description and value
+            map_lines.append(f'      "{key}": {{"description": "{value}", "value": "{value}"}},')
+    
+    # Remove trailing comma from last entry
+    if map_lines[-1].endswith(','):
+        map_lines[-1] = map_lines[-1][:-1]
+    
+    # Close map object
+    map_lines.append('    }')
+    
+    # Add formatted map to keys
+    keys.extend(map_lines)
     
     # Close the format object
     keys.append("},")
