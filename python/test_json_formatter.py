@@ -139,24 +139,19 @@ def test_format_command_with_optional_fields():
   ]}
 """.strip()
 
-def test_ford_f150_signals():
-    """Test Ford F-150 signal formatting."""
-    signalset_path = os.path.join(REPO_ROOT, 'testdata', 'ford-f-150.json')
-
+@pytest.mark.parametrize("test_file", [
+    "ford-f-150.json",
+    "saej1979.json", 
+    "porsche-taycan.json"
+], ids=lambda x: x.split('.')[0].replace('-', '_'))  # Create readable test IDs
+def test_signal_formatting(test_file):
+    """Test signal set formatting for various vehicle models."""
+    signalset_path = os.path.join(REPO_ROOT, 'testdata', test_file)
+    
     formatted = format_file(signalset_path)
-
+    
     with open(signalset_path) as f:
         assert f.read() == formatted
-
-def test_saej1979_signals():
-    """Test Ford F-150 signal formatting."""
-    signalset_path = os.path.join(REPO_ROOT, 'testdata', 'saej1979.json')
-
-    formatted = format_file(signalset_path)
-
-    with open(signalset_path) as f:
-        assert f.read() == formatted
-
 
 if __name__ == '__main__':
     pytest.main([__file__])
