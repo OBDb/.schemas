@@ -2,16 +2,19 @@ from typing import Dict, List, Any, Optional
 import json
 
 def format_commands(commands: List[Dict[str, Any]]) -> str:
-    """Format a list of commands, sorting them by header value.
+    """Format a list of commands, sorting them by header value and removing duplicates.
     
     Args:
         commands: List of command dictionaries to format
         
     Returns:
-        Formatted string with commands sorted and formatted
+        Formatted string with unique commands sorted and formatted
     """
+    # Remove duplicates before sorting
+    unique_commands = remove_duplicate_commands(commands)
+    
     # Sort commands by their header value ("hdr" field)
-    sorted_commands = sorted(commands, key=lambda cmd: cmd.get('hdr', ''))
+    sorted_commands = sorted(unique_commands, key=lambda cmd: cmd.get('hdr', ''))
     
     # Map each command through the formatter and join with commas and newlines
     formatted_commands = [format_command_json(cmd) for cmd in sorted_commands]
@@ -21,6 +24,47 @@ def format_commands(commands: List[Dict[str, Any]]) -> str:
     return f"""[
 {commands_str}
 ]"""
+
+def get_command_signature(cmd: Dict[str, Any]) -> tuple:
+    """Create a unique signature for a command based on all fields except signals.
+    
+    Args:
+        cmd: Command dictionary
+        
+    Returns:
+        Tuple containing all relevant fields that define uniqueness
+    """
+    return (
+        cmd.get('hdr'),
+        cmd.get('rax'),
+        cmd.get('eax'),
+        cmd.get('tst'),
+        cmd.get('tmo'),
+        cmd.get('fcm1', False),
+        cmd.get('dbg', False),
+        json.dumps(cmd.get('cmd')),  # Convert dict to stable string representation
+        cmd.get('freq')
+    )
+
+def remove_duplicate_commands(commands: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    """Remove duplicate commands based on their full configuration (excluding signals).
+    
+    Args:
+        commands: List of command dictionaries
+        
+    Returns:
+        List of commands with duplicates removed, keeping the first occurrence
+    """
+    seen_signatures = set()
+    unique_commands = []
+    
+    for cmd in commands:
+        signature = get_command_signature(cmd)
+        if signature not in seen_signatures:
+            seen_signatures.add(signature)
+            unique_commands.append(cmd)
+            
+    return unique_commands
 
 def format_command_json(command: Dict[str, Any]) -> str:
     """Format a command dictionary in a human-friendly way.
