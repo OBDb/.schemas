@@ -134,10 +134,17 @@ def format_scaling_signal_json(signal: Dict[str, Any]) -> List[str]:
     return result
 
 def format_enum_signal_json(signal: Dict[str, Any]) -> List[str]:
-    """Format an enumeration signal with multi-line map values."""
+    """Format an enumeration signal with column-aligned map values.
+    
+    Args:
+        signal: Dictionary containing signal data including enumeration mapping
+        
+    Returns:
+        List of strings representing the formatted enumeration signal
+    """
     lines = []
     
-    # Start signal object with id, path, name, description, and fmt opening on one line
+    # Start signal object with id, path, name, description, and fmt opening
     opening_line = '{'
     opening_line += f'"id": "{signal["id"]}"'
     
@@ -164,24 +171,33 @@ def format_enum_signal_json(signal: Dict[str, Any]) -> List[str]:
     opening_line += f'"len": {signal["fmt"]["len"]}, "map": {{'
     lines.append(opening_line)
     
-    # Format map entries
+    # Prepare map entries for tabularization
+    map_rows = []
     map_items = sorted(signal["fmt"]["map"].items(), key=lambda x: int(x[0]))
-    for i, (key, value) in enumerate(map_items):
+    
+    for key, value in map_items:
         if isinstance(value, dict):
             description = value.get('description', '')
             value_str = value.get('value', '')
-            entry = f'      "{key}": {{"description": "{description}", "value": "{value_str}"}}'
         else:
-            entry = f'      "{key}": {{"description": "{value}", "value": "{value}"}}'
+            description = str(value)
+            value_str = str(value)
             
-        if i < len(map_items) - 1:
-            entry += ','
-        lines.append(entry)
+        row = [
+            f'      "{key}":',
+            '{',
+            f'"description": "{description}",',
+            f'"value": "{value_str}"' + ' }',
+        ]
+        map_rows.append(row)
+    
+    # Tabularize the map entries
+    tabularized_map = tabularize(map_rows)
+    if tabularized_map:
+        lines.extend(tabularized_map.split('\n'))
     
     # Close map and format sections
     lines.append('    }}')
-    
-    # Just close the object
     lines.append('}')
     
     return lines
