@@ -1,0 +1,11 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Format Signals",
+            "type": "shell",
+            "command": "find python/testdata -type f -exec python cli.py '{}' --output '{}' \\;",
+            "problemMatcher": []
+        }
+    ]
+}

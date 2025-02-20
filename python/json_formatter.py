@@ -521,7 +521,7 @@ def format_json_data(data) -> str:
     output.append('}')
     
     # Join all parts with appropriate newlines
-    formatted = '\n'.join(output)
+    formatted = '\n'.join(output) + '\n'
 
     return formatted
 
