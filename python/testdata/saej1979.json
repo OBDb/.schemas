@@ -502,4 +502,4 @@
     {"id": "ODO_ENG", "path": "Trips.Generic", "fmt": { "len": 32, "max": 429496729.5, "div": 10, "unit": "kilometers" }, "name": "Engine odometer"}
   ]}
 ]
-}git
+}
