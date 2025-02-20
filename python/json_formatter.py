@@ -441,7 +441,7 @@ def format_signal_groups(groups: List[Dict[str, Any]]) -> str:
     aligned_groups = tabularize(formatted_rows)
     
     # Return the formatted string with proper comma and newlines
-    return f',\n"signalGroups": [\n{aligned_groups}\n]'
+    return f'"signalGroups": [\n{aligned_groups}\n]'
 
 def format_number(n: float) -> str:
     """Format a number without trailing zeros after decimal point."""
@@ -501,6 +501,30 @@ def tabularize(rows: list[list[str]]) -> str:
     # Join all rows with comma and newline
     return ',\n'.join(formatted_rows)
 
+def format_json_data(data) -> str:
+    # Start building the formatted output
+    output = []
+    
+    # Handle diagnostic level if present
+    if 'diagnosticLevel' in data:
+        output.append('{ "diagnosticLevel": "' + data['diagnosticLevel'] + '",')
+        output.append('  "commands": ' + format_commands(data['commands']))
+    else:
+        output.append('{ "commands": ' + format_commands(data['commands']))
+    
+    # Handle signal groups if present
+    if 'signalGroups' in data:
+        output[-1] += ','
+        output.append(format_signal_groups(data['signalGroups']))
+    
+    # Close the JSON object
+    output.append('}')
+    
+    # Join all parts with appropriate newlines
+    formatted = '\n'.join(output)
+
+    return formatted
+
 def format_file(input_path: str, output_path: Optional[str] = None) -> str:
     """Format a signal set JSON file in a human-friendly way.
     
@@ -515,25 +539,7 @@ def format_file(input_path: str, output_path: Optional[str] = None) -> str:
     with open(input_path, 'r') as f:
         data = json.load(f)
     
-    # Start building the formatted output
-    output = []
-    
-    # Handle diagnostic level if present
-    if 'diagnosticLevel' in data:
-        output.append('{ "diagnosticLevel": "' + data['diagnosticLevel'] + '",')
-        output.append('  "commands": ' + format_commands(data['commands']))
-    else:
-        output.append('{ "commands": ' + format_commands(data['commands']))
-    
-    # Handle signal groups if present
-    if 'signalGroups' in data:
-        output.append(format_signal_groups(data['signalGroups']))
-    
-    # Close the JSON object
-    output.append('}')
-    
-    # Join all parts with appropriate newlines
-    formatted = '\n'.join(output)
+    formatted = format_json_data(data)
     
     # Write to output file if specified
     if output_path:

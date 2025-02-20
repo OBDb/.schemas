@@ -1,6 +1,15 @@
+import os
 import pytest
 
-from .json_formatter import tabularize
+from .json_formatter import (
+    tabularize,
+    format_number,
+    format_parameter_json,
+    format_command_json,
+    format_file
+)
+
+REPO_ROOT = os.path.abspath(os.path.dirname(__file__))
 
 def test_basic_alignment():
     rows = [
@@ -57,6 +66,97 @@ def test_mixed_content_types():
         '1   abcdef x'
     )
     assert tabularize(rows) == ',\n'.join(expected)
+
+def test_format_number():
+    assert format_number(123) == "123"
+    assert format_number(123.0) == "123"
+    assert format_number(123.456) == "123.456"
+    assert format_number(123.45600) == "123.456"
+    assert format_number(0.0) == "0"
+    assert format_number(-123.456) == "-123.456"
+
+def test_format_parameter_json():
+    # Test Service 21 parameter
+    param21 = {"21": "1E"}
+    assert format_parameter_json(param21) == '{"21": "1E"}'
+
+    # Test Service 22 parameter
+    param22 = {"22": "404C"}
+    assert format_parameter_json(param22) == '{"22": "404C"}'
+
+    # Test AT command parameter
+    param_at = {"AT": "Z"}
+    assert format_parameter_json(param_at) == '{"AT": "Z"}'
+
+def test_format_command_json():
+    basic_command = {
+        "hdr": "720",
+        "rax": "728",
+        "cmd": {"22": "404C"},
+        "freq": 5,
+        "signals": [
+            {
+                "id": "F150_ODO",
+                "path": "Trips",
+                "fmt": {
+                    "len": 24,
+                    "max": 1677721,
+                    "div": 10,
+                    "unit": "kilometers"
+                },
+                "name": "Odometer",
+                "suggestedMetric": "odometer"
+            }
+        ]
+    }
+    
+    result = format_command_json(basic_command)
+    assert result == """
+{ "hdr": "720", "rax": "728", "cmd": {"22": "404C"}, "freq": 5,
+  "signals": [
+    {"id": "F150_ODO", "path": "Trips", "fmt": { "len": 24, "max": 1677721, "div": 10, "unit": "kilometers" }, "name": "Odometer", "suggestedMetric": "odometer"}
+  ]}
+""".strip()
+
+def test_format_command_with_optional_fields():
+    command_with_options = {
+        "hdr": "720",
+        "rax": "728",
+        "eax": "F1",
+        "tst": "01",
+        "tmo": "32",
+        "fcm1": True,
+        "dbg": True,
+        "cmd": {"22": "404C"},
+        "freq": 5,
+        "signals": []
+    }
+    
+    result = format_command_json(command_with_options)
+    assert result == """
+{ "hdr": "720", "rax": "728", "eax": "F1", "tst": "01", "tmo": "32", "fcm1": true, "dbg": true, "cmd": {"22": "404C"}, "freq": 5,
+  "signals": [
+  ]}
+""".strip()
+
+def test_ford_f150_signals():
+    """Test Ford F-150 signal formatting."""
+    signalset_path = os.path.join(REPO_ROOT, 'testdata', 'ford-f-150.json')
+
+    formatted = format_file(signalset_path)
+
+    with open(signalset_path) as f:
+        assert f.read() == formatted
+
+def test_saej1979_signals():
+    """Test Ford F-150 signal formatting."""
+    signalset_path = os.path.join(REPO_ROOT, 'testdata', 'saej1979.json')
+
+    formatted = format_file(signalset_path)
+
+    with open(signalset_path) as f:
+        assert f.read() == formatted
+
 
 if __name__ == '__main__':
     pytest.main([__file__])
