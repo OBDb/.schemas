@@ -91,7 +91,7 @@ def format_command_json(command: Dict[str, Any]) -> str:
             enum_lines = format_enum_signal_json(signal)
             
             # Add comma if not the last signal
-            if i < len(enum_signals) - 1 or scaling_signals:
+            if i < len(enum_signals) - 1:
                 enum_lines[-1] += ','
                 
             signals_lines.extend(['    ' + line for line in enum_lines])
