@@ -507,11 +507,7 @@ def format_parameter_json(param: Dict[str, str]) -> str:
     key = next(iter(param))
     value = param[key]
 
-    # Convert hex values to uppercase if they begin with "0x"
-    if value.lower().startswith("0x"):
-        value = "0x" + value[2:].upper()
-
-    return f'{{"{key}": "{value}"}}'
+    return f'{{"{key}": "{value.upper()}"}}'
 
 def tabularize(rows: list[list[str]]) -> str:
     """
