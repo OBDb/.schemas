@@ -496,17 +496,18 @@ def format_number(n: float) -> str:
     return s
 
 def format_parameter_json(param: Dict[str, str]) -> str:
-    """Format a parameter dictionary (cmd field).
-    
+    """Format a parameter dictionary (cmd field) with uppercase hex values.
+
     Args:
         param: Dictionary with single key-value pair (e.g. {"21": "value"} or {"22": "value"})
-        
+
     Returns:
-        Formatted JSON string for the parameter
+        Formatted JSON string for the parameter with uppercase hex values
     """
     key = next(iter(param))
     value = param[key]
-    return f'{{"{key}": "{value}"}}'
+
+    return f'{{"{key}": "{value.upper()}"}}'
 
 def tabularize(rows: list[list[str]]) -> str:
     """
