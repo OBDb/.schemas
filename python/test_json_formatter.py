@@ -86,6 +86,10 @@ def test_format_parameter_json():
     param22 = {"22": "404C"}
     assert format_parameter_json(param22) == '{"22": "404C"}'
 
+    # Test uppercasing
+    param22 = {"22": "404c"}
+    assert format_parameter_json(param22) == '{"22": "404C"}'
+
     # Test AT command parameter
     param_at = {"AT": "Z"}
     assert format_parameter_json(param_at) == '{"AT": "Z"}'
