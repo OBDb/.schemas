@@ -131,6 +131,7 @@
                   "frontRightTirePressure",
                   "fuelRange",
                   "fuelTankLevel",
+                  "fuelVolumeRemaining",
                   "isCharging",
                   "odometer",
                   "pluggedIn",
