@@ -164,8 +164,12 @@ class Enumeration:
             map=value_map
         )
 
-    def decode_value(self, data: bytes) -> str:
-        """Decode an enumerated value from bytes."""
+    def decode_value(self, data: bytes) -> Optional[str]:
+        """Decode an enumerated value from bytes.
+
+        Returns:
+            The string value for the mapped enum, or None if no mapping exists
+        """
         # First extract the raw value as an integer
         raw_value = 0
         for i in range(self.bit_length):
@@ -178,7 +182,7 @@ class Enumeration:
         str_value = str(raw_value)
         if str_value in self.map:
             return self.map[str_value].value
-        return str_value  # Return raw value as string if no mapping exists
+        return None  # Return None when no mapping exists instead of raw value
 
 @dataclass(frozen=True)
 class Signal:
