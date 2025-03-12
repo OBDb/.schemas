@@ -1,3 +1,5 @@
+import pytest
+from typing import Any, Dict, Optional, Union
 import glob
 import os
 import re
@@ -5,7 +7,7 @@ from pathlib import Path
 from typing import Dict, Any, Optional, Set, Tuple, Union, List
 
 from .can_frame import CANIDFormat
-from .signals_testing import obd_testrunner as original_obd_testrunner
+from .command_registry import decode_obd_response
 from .signals import SignalSet
 
 class YearRange:
@@ -234,8 +236,7 @@ def obd_testrunner_by_year(
         else:
             raise e
 
-    # Use the original testrunner with the loaded signalset
-    original_obd_testrunner(
+    obd_testrunner(
         signalset_json,
         response_hex,
         expected_values,
