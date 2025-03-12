@@ -1,20 +1,18 @@
 {
     "name": "Python Development",
-    "image": "mcr.microsoft.com/devcontainers/python:3.10",
-
+    "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
     "customizations": {
         "vscode": {
             "extensions": [
                 "ms-python.python",
-                "ms-python.vscode-pylance"
+                "ms-python.vscode-pylance",
+                "GitHub.vscode-github-actions"
             ],
             "settings": {
                 "task.quickOpen.skip": false
             }
         }
     },
-
-    "postCreateCommand": "pip install pytest",
-
+    "postCreateCommand": "sudo apt-get update && sudo apt-get install -y python3 python3-pip python3-venv && pip install pytest",
     "remoteUser": "vscode"
 }
