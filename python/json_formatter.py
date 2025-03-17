@@ -137,10 +137,14 @@ def format_command_json(command: Dict[str, Any]) -> str:
 
     # Separate signals into scalings and enumerations
     signals = command.get("signals", [])
+
+    # Sort signals by bix value (default 0 if not present)
+    sorted_signals = sorted(signals, key=lambda s: s.get("fmt", {}).get("bix", 0))
+
     scaling_signals = []
     enum_signals = []
 
-    for signal in signals:
+    for signal in sorted_signals:
         if 'map' in signal.get('fmt', {}):
             enum_signals.append(signal)
         else:
