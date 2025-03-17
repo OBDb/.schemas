@@ -115,7 +115,7 @@ def test_format_command_json():
             }
         ]
     }
-    
+
     result = format_command_json(basic_command)
     assert result == """
 { "hdr": "720", "rax": "728", "cmd": {"22": "404C"}, "freq": 5,
@@ -137,7 +137,7 @@ def test_format_command_with_optional_fields():
         "freq": 5,
         "signals": []
     }
-    
+
     result = format_command_json(command_with_options)
     assert result == """
 { "hdr": "720", "rax": "728", "eax": "F1", "tst": "01", "tmo": "32", "fcm1": true, "dbg": true, "cmd": {"22": "404C"}, "freq": 5,
@@ -171,7 +171,7 @@ def test_strips_duplicate_commands():
 ]
 }
 """
-    
+
     result = format_json_data(json.loads(with_duplicates))
     assert result == """{ "commands": [
 { "hdr": "7E0", "rax": "7E8", "cmd": {"22": "1E12"}, "freq": 2,
@@ -196,17 +196,109 @@ def test_strips_duplicate_commands():
 
 @pytest.mark.parametrize("test_file", [
     "ford-f-150.json",
-    "saej1979.json", 
+    "saej1979.json",
     "porsche-taycan.json"
 ], ids=lambda x: x.split('.')[0].replace('-', '_'))  # Create readable test IDs
 def test_signal_formatting(test_file):
     """Test signal set formatting for various vehicle models."""
     signalset_path = os.path.join(REPO_ROOT, 'testdata', test_file)
-    
+
     formatted = format_file(signalset_path)
-    
+
     with open(signalset_path) as f:
         assert f.read() == formatted
+
+def test_format_command_signals_sorted_by_bix():
+    """Test that signals are sorted by their bix value with default of 0 when not provided."""
+    command_with_mixed_bix = {
+        "hdr": "720",
+        "rax": "728",
+        "cmd": {"22": "404C"},
+        "freq": 5,
+        "signals": [
+            # Signal with bix=5
+            {
+                "id": "SIGNAL_BIX_5",
+                "fmt": {
+                    "bix": 5,
+                    "len": 8,
+                    "max": 100,
+                    "unit": "km/h"
+                },
+                "name": "Signal with bix 5"
+            },
+            # Signal with no bix (defaults to 0)
+            {
+                "id": "SIGNAL_NO_BIX",
+                "fmt": {
+                    "len": 16,
+                    "max": 1000,
+                    "unit": "rpm"
+                },
+                "name": "Signal with no bix"
+            },
+            # Signal with bix=2
+            {
+                "id": "SIGNAL_BIX_2",
+                "fmt": {
+                    "bix": 2,
+                    "len": 10,
+                    "max": 50,
+                    "unit": "celsius"
+                },
+                "name": "Signal with bix 2"
+            },
+            # Enum signal with bix=1
+            {
+                "id": "SIGNAL_ENUM_BIX_1",
+                "fmt": {
+                    "bix": 1,
+                    "len": 4,
+                    "map": {
+                        "0": "Off",
+                        "1": "On"
+                    }
+                },
+                "name": "Enum signal with bix 1"
+            },
+            # Enum signal with bix=10
+            {
+                "id": "SIGNAL_ENUM_BIX_10",
+                "fmt": {
+                    "bix": 10,
+                    "len": 2,
+                    "map": {
+                        "0": "Low",
+                        "1": "Medium",
+                        "2": "High"
+                    }
+                },
+                "name": "Enum signal with bix 10"
+            }
+        ]
+    }
+
+    result = format_command_json(command_with_mixed_bix)
+
+    # Extract the signal IDs in the order they appear in the formatted result
+    signal_order = []
+    for line in result.split('\n'):
+        if '"id": "' in line:
+            id_start = line.find('"id": "') + 7
+            id_end = line.find('"', id_start)
+            signal_id = line[id_start:id_end]
+            signal_order.append(signal_id)
+
+    expected_order = [
+        "SIGNAL_NO_BIX",      # bix=0 (default)
+        "SIGNAL_BIX_2",       # bix=2
+        "SIGNAL_BIX_5",       # bix=5
+        "SIGNAL_ENUM_BIX_1",  # bix=1 (maps are placed at the end)
+        "SIGNAL_ENUM_BIX_10"  # bix=10
+    ]
+
+    assert signal_order == expected_order, f"Signals not sorted by bix. Got: {signal_order}, Expected: {expected_order}"
+
 
 if __name__ == '__main__':
     pytest.main([__file__])
