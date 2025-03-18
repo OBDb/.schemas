@@ -37,6 +37,92 @@ def create_test_signal(
         format=Scaling(**scaling_params)
     )
 
+def test_ecu_prioritization():
+    """Test that commands with specific receive addresses are prioritized over generic commands."""
+    # Create two different signals for the same PID but different ECUs
+    signal_7ec = create_test_signal(
+        "KONAEV_HVBAT_SOC",
+        "HV battery charge (7EC)",
+        {
+            "bit_length": 8,
+            "max_value": 255,
+            "unit": "scalar"
+        }
+    )
+
+    signal_7b3 = create_test_signal(
+        "KONAEV_IAT_PASS",
+        "Passenger temperature (7B3)",
+        {
+            "bit_length": 8,
+            "max_value": 127,
+            "divisor": 2,
+            "unit": "scalar"
+        }
+    )
+
+    # Create a command for 7EC ECU (specific)
+    command_7ec = create_test_command(
+        pid=0x0101,
+        service_type=ServiceType.SERVICE_22,
+        receive_address="7EC",
+        signals=[signal_7ec]
+    )
+
+    # Create a generic command (no receive filter)
+    command_generic = create_test_command(
+        pid=0x0101,
+        service_type=ServiceType.SERVICE_22,
+        receive_address=None,
+        signals=[signal_7b3]
+    )
+
+    # Create the registry with both commands
+    registry = CommandRegistry([command_7ec, command_generic])
+
+    # Create a response from 7EC ECU
+    packet = CANPacket(
+        can_identifier="7EC",
+        extended_receive_address=None,
+        data=bytes.fromhex("6201010A")
+    )
+
+    # Process the response
+    responses = registry.identify_commands(packet)
+
+    # Verify the correct command was selected
+    assert len(responses) == 1
+    response = responses[0]
+
+    # Check that we got the 7EC-specific command
+    assert response.command == command_7ec
+
+    # Verify the correct signal was decoded
+    assert "KONAEV_HVBAT_SOC" in response.values
+    assert "KONAEV_IAT_PASS" not in response.values
+    assert pytest.approx(response.values["KONAEV_HVBAT_SOC"]) == 10
+
+    # Test with a generic packet
+    packet_generic = CANPacket(
+        can_identifier="7FF",  # Some other ECU not matching any specific command
+        extended_receive_address=None,
+        data=bytes.fromhex("6201010A")
+    )
+
+    responses_generic = registry.identify_commands(packet_generic)
+
+    # Verify we fall back to the generic command
+    assert len(responses_generic) == 1
+    response_generic = responses_generic[0]
+
+    # Check that we got the generic command
+    assert response_generic.command == command_generic
+
+    # Verify the correct signal was decoded
+    assert "KONAEV_IAT_PASS" in response_generic.values
+    assert "KONAEV_HVBAT_SOC" not in response_generic.values
+    assert pytest.approx(response_generic.values["KONAEV_IAT_PASS"]) == 5.0
+
 def test_identify_service_22_command():
     """Test identifying and decoding a Service 22 command response."""
     # Create test signal for battery voltage

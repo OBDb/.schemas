@@ -1,3 +1,4 @@
+# python/command_registry.py
 from dataclasses import dataclass
 from typing import Dict, List, Optional, Set, Any, Tuple
 from enum import Enum
@@ -60,17 +61,30 @@ class CommandRegistry:
             param_key = (ServiceType.SERVICE_22.value, pid)
             commands = self.commands_by_parameter.get(param_key, [])
 
-            command = next(
-                (cmd for cmd in commands
-                 if cmd.receive_address is None or
-                 f"{cmd.receive_address:03X}" == can_id),
-                None
-            )
+            # First try to find command with matching receive address
+            matched_command = None
 
-            if command:
+            # Sort commands to prioritize those with a specific receive address matching the CAN ID
+            # before falling back to commands without a receive address filter
+            matching_commands = []
+            generic_commands = []
+
+            for cmd in commands:
+                if cmd.receive_address is not None and f"{cmd.receive_address:X}" == can_id:
+                    matching_commands.append(cmd)
+                elif cmd.receive_address is None:
+                    generic_commands.append(cmd)
+
+            # Use the first matching command if available, otherwise use generic command
+            if matching_commands:
+                matched_command = matching_commands[0]
+            elif generic_commands:
+                matched_command = generic_commands[0]
+
+            if matched_command:
                 values = {}
                 remaining_data = data
-                for signal in command.signals:
+                for signal in matched_command.signals:
                     try:
                         if isinstance(signal.format, Scaling):
                             value = signal.format.decode_value(remaining_data)
@@ -80,7 +94,7 @@ class CommandRegistry:
                     except Exception as e:
                         print(f"Error decoding signal {signal.id}: {e}")
 
-                responses.append(CommandResponse(command, remaining_data, values))
+                responses.append(CommandResponse(matched_command, remaining_data, values))
 
             # Move to next parameter's data
             data = data[4:]  # Typical data length for service 22
@@ -99,28 +113,38 @@ class CommandRegistry:
             param_key = (ServiceType.SERVICE_21.value, offset)
             commands = self.commands_by_parameter.get(param_key, [])
 
-            command = next(
-                (cmd for cmd in commands
-                 if cmd.receive_address is None or
-                 f"{cmd.receive_address:03X}" == can_id),
-                None
-            )
+            # Sort commands to prioritize those with a specific receive address matching the CAN ID
+            # before falling back to commands without a receive address filter
+            matching_commands = []
+            generic_commands = []
 
-            if command:
+            for cmd in commands:
+                if cmd.receive_address is not None and f"{cmd.receive_address:X}" == can_id:
+                    matching_commands.append(cmd)
+                elif cmd.receive_address is None:
+                    generic_commands.append(cmd)
+
+            # Use the first matching command if available, otherwise use generic command
+            matched_command = None
+            if matching_commands:
+                matched_command = matching_commands[0]
+            elif generic_commands:
+                matched_command = generic_commands[0]
+
+            if matched_command:
                 values = {}
                 remaining_data = data
-                for signal in command.signals:
-                    if isinstance(signal.format, Scaling):
-                        try:
-                            if isinstance(signal.format, Scaling):
-                                value = signal.format.decode_value(remaining_data)
-                            elif isinstance(signal.format, Enumeration):
-                                value = signal.format.decode_value(remaining_data)
-                            values[signal.id] = value
-                        except Exception as e:
-                            print(f"Error decoding signal {signal.id}: {e}")
+                for signal in matched_command.signals:
+                    try:
+                        if isinstance(signal.format, Scaling):
+                            value = signal.format.decode_value(remaining_data)
+                        elif isinstance(signal.format, Enumeration):
+                            value = signal.format.decode_value(remaining_data)
+                        values[signal.id] = value
+                    except Exception as e:
+                        print(f"Error decoding signal {signal.id}: {e}")
 
-                responses.append(CommandResponse(command, remaining_data, values))
+                responses.append(CommandResponse(matched_command, remaining_data, values))
 
             # Move to next parameter's data
             data = data[2:]  # Typical data length for service 21
