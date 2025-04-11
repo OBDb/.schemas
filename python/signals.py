@@ -5,6 +5,7 @@ import json
 import math
 
 class ParameterType(Enum):
+    SERVICE_01 = "01"
     SERVICE_21 = "21"
     SERVICE_22 = "22"
 
@@ -15,7 +16,7 @@ class Parameter:
 
     @staticmethod
     def from_json(data: Dict) -> 'Parameter':
-        for param_type in [ParameterType.SERVICE_21, ParameterType.SERVICE_22]:
+        for param_type in [ParameterType.SERVICE_21, ParameterType.SERVICE_22, ParameterType.SERVICE_01]:
             if param_type.value in data:
                 # Handle both string and integer representations
                 value = data[param_type.value]

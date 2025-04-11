@@ -1,0 +1,23 @@
+{ "commands": [
+{ "hdr": "DA10", "dbg": true, "cmd": {"22": "2660"}, "freq": 5,
+  "signals": [
+    {"id": "CIVIC_ODO",   "path": "Trips",  "fmt": {"bix": 344, "len": 24, "max": 4294967295, "unit": "kilometers" }, "name": "Odometer",                "suggestedMetric": "odometer"},
+    {"id": "CIVIC_RUNTM", "path": "Clocks", "fmt": {"bix": 368, "len": 16, "max": 65535,      "unit": "seconds"    }, "name": "Time since engine start", "description": "How long it's been since the engine started."}
+  ]},
+{ "hdr": "DA26", "dbg": true, "cmd": {"22": "6001"}, "freq": 30,
+  "signals": [
+    {"id": "CIVIC_TP_FR", "path": "Tires", "fmt": {"bix": 64,  "len": 16, "max": 65535, "unit": "kilopascal" }, "name": "Front right tire pressure", "suggestedMetric": "frontRightTirePressure"},
+    {"id": "CIVIC_TP_FL", "path": "Tires", "fmt": {"bix": 80,  "len": 16, "max": 65535, "unit": "kilopascal" }, "name": "Front left tire pressure",  "suggestedMetric": "frontLeftTirePressure"},
+    {"id": "CIVIC_TP_RR", "path": "Tires", "fmt": {"bix": 96,  "len": 16, "max": 65535, "unit": "kilopascal" }, "name": "Rear right tire pressure",  "suggestedMetric": "rearRightTirePressure"},
+    {"id": "CIVIC_TP_RL", "path": "Tires", "fmt": {"bix": 112, "len": 16, "max": 65535, "unit": "kilopascal" }, "name": "Rear left tire pressure",   "suggestedMetric": "rearLeftTirePressure"}
+  ]},
+{ "hdr": "DA60", "dbg": true, "cmd": {"22": "7028"}, "freq": 5,
+  "signals": [
+    {"id": "CIVIC_AAT", "path": "Climate", "fmt": {"bix": 136, "len": 8, "max": 215, "min": -40, "add": -40, "unit": "celsius" }, "name": "Outside air temperature"}
+  ]},
+{ "hdr": "DB33", "dbg": true, "cmd": {"01": "05"}, "freq": 5,
+  "signals": [
+    {"id": "CIVIC_ECT", "path": "Engine", "fmt": { "len": 8, "max": 215, "min": -40, "add": -40, "unit": "celsius" }, "name": "Engine coolant temperature"}
+  ]}
+]
+}
