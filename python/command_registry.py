@@ -2,11 +2,64 @@
 from dataclasses import dataclass
 from typing import Dict, List, Optional, Set, Any, Tuple
 from enum import Enum
+import os
+import json
+import time
+import urllib.request
+import hashlib
+from pathlib import Path
 
 from .can_frame import CANFrame, CANPacket, CANFrameScanner, CANIDFormat
 from .signals import Command, Enumeration, Scaling, SignalSet
 
+# Cache directory for downloaded signal definitions
+CACHE_DIR = Path(__file__).parent / ".cache"
+SAEJ1979_URL = "https://raw.githubusercontent.com/OBDb/SAEJ1979/refs/heads/main/signalsets/v3/default.json"
+
+def _strip_rax_values(json_data: str) -> str:
+    """Remove 'rax' fields from the JSON data before parsing."""
+    data = json.loads(json_data)
+    for command in data.get('commands', []):
+        command.pop('rax', None)
+    return json.dumps(data)
+
+def get_cached_saej1979_signals() -> List['Command']:
+    """Fetch and cache the SAEJ1979 signal definitions."""
+    os.makedirs(CACHE_DIR, exist_ok=True)
+    cache_file = CACHE_DIR / "saej1979_signals.json"
+
+    try:
+        # If cache exists and is less than 24 hours old, use it
+        if cache_file.exists() and (time.time() - cache_file.stat().st_mtime) < 86400:
+            with open(cache_file) as f:
+                json_data = f.read()
+                cleaned_data = _strip_rax_values(json_data)
+                return SignalSet.from_json(cleaned_data).commands
+    except Exception as e:
+        print(f"Warning: Error reading cache: {e}")
+
+    try:
+        # Fetch fresh data
+        with urllib.request.urlopen(SAEJ1979_URL) as response:
+            json_data = response.read().decode('utf-8')
+            cleaned_data = _strip_rax_values(json_data)
+            # Cache the cleaned data
+            os.makedirs(CACHE_DIR, exist_ok=True)
+            with open(cache_file, 'w') as f:
+                f.write(cleaned_data)
+            return SignalSet.from_json(cleaned_data).commands
+    except Exception as e:
+        print(f"Warning: Could not fetch SAEJ1979 signals: {e}")
+        # If we have a cache file, use it even if it's old
+        if cache_file.exists():
+            with open(cache_file) as f:
+                json_data = f.read()
+                cleaned_data = _strip_rax_values(json_data)
+                return SignalSet.from_json(cleaned_data).commands
+        return []
+
 class ServiceType(Enum):
+    SERVICE_01 = 0x01
     SERVICE_21 = 0x21
     SERVICE_22 = 0x22
 
@@ -42,7 +95,9 @@ class CommandRegistry:
         service = service_response - 0x40
         data = data[1:]  # Remove service byte
 
-        if service == ServiceType.SERVICE_21.value:
+        if service == ServiceType.SERVICE_01.value:
+            return self._extract_service_01_commands(packet.can_identifier, data)
+        elif service == ServiceType.SERVICE_21.value:
             return self._extract_service_21_commands(packet.can_identifier, data)
         elif service == ServiceType.SERVICE_22.value:
             return self._extract_service_22_commands(packet.can_identifier, data)
@@ -151,6 +206,56 @@ class CommandRegistry:
 
         return responses
 
+    def _extract_service_01_commands(self, can_id: str, data: bytes) -> List[CommandResponse]:
+        responses = []
+        while data:
+            if len(data) < 1:
+                break
+
+            pid = data[0]
+            data = data[1:]  # Remove PID byte
+
+            param_key = (ServiceType.SERVICE_01.value, pid)
+            commands = self.commands_by_parameter.get(param_key, [])
+
+            # Sort commands to prioritize those with a specific receive address matching the CAN ID
+            # before falling back to commands without a receive address filter
+            matching_commands = []
+            generic_commands = []
+
+            for cmd in commands:
+                if cmd.receive_address is not None and f"{cmd.receive_address:X}" == can_id:
+                    matching_commands.append(cmd)
+                elif cmd.receive_address is None:
+                    generic_commands.append(cmd)
+
+            # Use the first matching command if available, otherwise use generic command
+            matched_command = None
+            if matching_commands:
+                matched_command = matching_commands[0]
+            elif generic_commands:
+                matched_command = generic_commands[0]
+
+            if matched_command:
+                values = {}
+                remaining_data = data
+                for signal in matched_command.signals:
+                    try:
+                        if isinstance(signal.format, Scaling):
+                            value = signal.format.decode_value(remaining_data)
+                        elif isinstance(signal.format, Enumeration):
+                            value = signal.format.decode_value(remaining_data)
+                        values[signal.id] = value
+                    except Exception as e:
+                        print(f"Error decoding signal {signal.id}: {e}")
+
+                responses.append(CommandResponse(matched_command, remaining_data, values))
+
+            # Move to next parameter's data
+            data = data[2:]  # Typical data length for service 01 parameters
+
+        return responses
+
 def decode_obd_response(
         signalset: 'SignalSet',
         response_hex: str,
@@ -166,8 +271,12 @@ def decode_obd_response(
     Returns:
         Dictionary mapping signal IDs to their decoded values
     """
-    # Create command registry
-    registry = CommandRegistry(list(signalset.commands))
+    # Get SAEJ1979 base signals and combine with provided signals
+    saej1979_commands = get_cached_saej1979_signals()
+    combined_commands = list(saej1979_commands) + list(signalset.commands)
+
+    # Create command registry with combined commands
+    registry = CommandRegistry(combined_commands)
 
     # Parse CAN frames from response
     scanner = CANFrameScanner.from_ascii_string(
