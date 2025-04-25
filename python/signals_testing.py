@@ -350,7 +350,7 @@ def obd_yaml_testrunner(
     default_ext_addr = test_data.get('extended_addressing_enabled', None)
 
     for test_case in test_cases:
-        response_hex = test_case['request']
+        response_hex = test_case['response']
         expected_values = test_case['expected_values']
 
         # Get per-test case settings or use defaults
