@@ -326,8 +326,6 @@ def find_yaml_test_cases(test_cases_dir: str) -> Dict[int, str]:
 
 def obd_yaml_testrunner(
         yaml_path: str,
-        can_id_format: CANIDFormat = CANIDFormat.ELEVEN_BIT,
-        extended_addressing_enabled: Optional[bool] = None,
         signalsets_dir: Optional[str] = None
     ):
     """
@@ -335,8 +333,6 @@ def obd_yaml_testrunner(
 
     Args:
         yaml_path: Path to the YAML test case file
-        can_id_format: CAN ID format to use for parsing
-        extended_addressing_enabled: Whether extended addressing is enabled
         signalsets_dir: Optional explicit path to signalsets directory
 
     Raises:
@@ -349,17 +345,25 @@ def obd_yaml_testrunner(
     model_year = test_data['model_year']
     test_cases = test_data['test_cases']
 
+    # Get file-level defaults
+    default_can_format = getattr(CANIDFormat, test_data.get('can_id_format', 'ELEVEN_BIT'))
+    default_ext_addr = test_data.get('extended_addressing_enabled', None)
+
     for test_case in test_cases:
         response_hex = test_case['request']
         expected_values = test_case['expected_values']
+
+        # Get per-test case settings or use defaults
+        test_can_format = getattr(CANIDFormat, test_case.get('can_id_format', '')) if 'can_id_format' in test_case else default_can_format
+        test_ext_addr = test_case.get('extended_addressing_enabled', default_ext_addr)
 
         try:
             obd_testrunner_by_year(
                 model_year,
                 response_hex,
                 expected_values,
-                can_id_format=can_id_format,
-                extended_addressing_enabled=extended_addressing_enabled,
+                can_id_format=test_can_format,
+                extended_addressing_enabled=test_ext_addr,
                 signalsets_dir=signalsets_dir
             )
         except Exception as e:
