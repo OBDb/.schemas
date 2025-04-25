@@ -3,6 +3,7 @@ from typing import Any, Dict, Optional, Union
 import glob
 import os
 import re
+import yaml
 from pathlib import Path
 from typing import Dict, Any, Optional, Set, Tuple, Union, List
 
@@ -300,3 +301,69 @@ def obd_testrunner(
         else:
             assert actual_value == expected_value, \
                 f"Signal {signal_id} value mismatch: got {actual_value}, expected {expected_value}"
+
+def find_yaml_test_cases(test_cases_dir: str) -> Dict[int, str]:
+    """
+    Find all YAML test case files and group them by model year.
+
+    Args:
+        test_cases_dir: Directory containing YAML test case files
+
+    Returns:
+        Dictionary mapping model years to YAML file paths
+    """
+    yaml_files = {}
+    for ext in ('yaml', 'yml'):
+        for file_path in glob.glob(os.path.join(test_cases_dir, f'*.{ext}')):
+            try:
+                with open(file_path, 'r') as f:
+                    test_data = yaml.safe_load(f)
+                    if 'model_year' in test_data:
+                        yaml_files[test_data['model_year']] = file_path
+            except (yaml.YAMLError, KeyError):
+                continue
+    return yaml_files
+
+def obd_yaml_testrunner(
+        yaml_path: str,
+        can_id_format: CANIDFormat = CANIDFormat.ELEVEN_BIT,
+        extended_addressing_enabled: Optional[bool] = None,
+        signalsets_dir: Optional[str] = None
+    ):
+    """
+    Run OBD tests from a YAML test case file.
+
+    Args:
+        yaml_path: Path to the YAML test case file
+        can_id_format: CAN ID format to use for parsing
+        extended_addressing_enabled: Whether extended addressing is enabled
+        signalsets_dir: Optional explicit path to signalsets directory
+
+    Raises:
+        FileNotFoundError: If the YAML file or signalset cannot be found
+        yaml.YAMLError: If the YAML file is invalid
+    """
+    with open(yaml_path, 'r') as f:
+        test_data = yaml.safe_load(f)
+
+    model_year = test_data['model_year']
+    test_cases = test_data['test_cases']
+
+    for test_case in test_cases:
+        response_hex = test_case['request']
+        expected_values = test_case['expected_values']
+
+        try:
+            obd_testrunner_by_year(
+                model_year,
+                response_hex,
+                expected_values,
+                can_id_format=can_id_format,
+                extended_addressing_enabled=extended_addressing_enabled,
+                signalsets_dir=signalsets_dir
+            )
+        except Exception as e:
+            raise type(e)(
+                f"Error in test case for model year {model_year}, "
+                f"response {response_hex}: {str(e)}"
+            ) from e
