@@ -1,6 +1,6 @@
 # python/command_registry.py
 from dataclasses import dataclass
-from typing import Dict, List, Optional, Set, Any, Tuple
+from typing import Dict, List, Optional, Set, Any, Tuple, Callable, Union
 from enum import Enum
 import os
 import json
@@ -15,6 +15,9 @@ from .signals import Command, Enumeration, Scaling, SignalSet
 # Cache directory for downloaded signal definitions
 CACHE_DIR = Path(__file__).parent / ".cache"
 SAEJ1979_URL = "https://raw.githubusercontent.com/OBDb/SAEJ1979/refs/heads/main/signalsets/v3/default.json"
+
+# Global registry cache by model year
+MODEL_YEAR_REGISTRY_CACHE: Dict[int, 'CommandRegistry'] = {}
 
 def _strip_rax_values(json_data: str) -> str:
     """Remove 'rax' fields from the JSON data before parsing."""
@@ -298,3 +301,41 @@ def decode_obd_response(
             results.update(response.values)
 
     return results
+
+def get_model_year_command_registry(model_year: int) -> 'CommandRegistry':
+    """Get or create a cached CommandRegistry for a specific model year.
+
+    This function is optimized to compute the registry only once per model year and
+    reuse it for all subsequent calls, significantly improving performance for
+    test suites running many tests for the same model year.
+
+    Args:
+        model_year: The vehicle model year to get a registry for
+
+    Returns:
+        CommandRegistry instance for the specified model year
+    """
+    # Check if we already have a cached registry for this model year
+    if model_year in MODEL_YEAR_REGISTRY_CACHE:
+        return MODEL_YEAR_REGISTRY_CACHE[model_year]
+
+    # Need to create a new registry for this model year
+    # Import here to avoid circular imports
+    from .signals_testing import get_signalset_from_model_year
+
+    try:
+        # Get the appropriate signalset for this model year
+        signalset_json = get_signalset_from_model_year(model_year)
+        signalset = SignalSet.from_json(signalset_json)
+
+        # Get SAE J1979 base signals and combine with model year signals
+        saej1979_commands = get_cached_saej1979_signals()
+        combined_commands = list(saej1979_commands) + list(signalset.commands)
+
+        # Create and cache the registry
+        registry = CommandRegistry(combined_commands)
+        MODEL_YEAR_REGISTRY_CACHE[model_year] = registry
+
+        return registry
+    except Exception as e:
+        raise ValueError(f"Failed to create CommandRegistry for model year {model_year}: {str(e)}")

@@ -8,9 +8,12 @@ import yaml
 from pathlib import Path
 from typing import Dict, Any, Optional, Set, Tuple, Union, List, Callable
 
-from .can_frame import CANIDFormat
-from .command_registry import decode_obd_response
+from .can_frame import CANFrameScanner, CANIDFormat
+from .command_registry import decode_obd_response, CommandRegistry, get_cached_saej1979_signals
 from .signals import SignalSet
+
+# Global cache for CommandRegistry instances by model year
+_COMMAND_REGISTRY_CACHE = {}
 
 class YearRange:
     """A class to represent and compare year ranges from filenames."""
@@ -219,6 +222,7 @@ def obd_testrunner_by_year(
     ):
     """
     Test signal decoding against known responses using a signalset inferred from model year.
+    Uses cached CommandRegistry instances for better performance.
 
     Args:
         model_year: Model year to use for finding the appropriate signalset
@@ -228,23 +232,55 @@ def obd_testrunner_by_year(
         extended_addressing_enabled: Whether extended addressing is enabled
         signalsets_dir: Optional explicit path to signalsets directory
     """
+    from .command_registry import get_model_year_command_registry
+
     try:
-        signalset_json = get_signalset_from_model_year(model_year)
+        # Get the pre-computed registry for this model year
+        registry = get_model_year_command_registry(model_year)
+
+        # Parse CAN frames from response
+        scanner = CANFrameScanner.from_ascii_string(
+            response_hex,
+            can_id_format=can_id_format,
+            extended_addressing_enabled=extended_addressing_enabled
+        )
+        if not scanner:
+            raise ValueError(f"Could not parse response: {response_hex}")
+
+        # Process each CAN packet using the cached registry
+        actual_values = {}
+        for packet in scanner:
+            # Identify and decode commands
+            command_responses = registry.identify_commands(packet)
+
+            # Collect all decoded signal values
+            for response in command_responses:
+                actual_values.update(response.values)
+
+        # Test each expected signal value
+        for signal_id, expected_value in expected_values.items():
+            assert signal_id in actual_values, f"Signal {signal_id} not found in decoded response"
+            actual_value = actual_values[signal_id]
+            if isinstance(expected_value, (int, float)):
+                assert pytest.approx(actual_value) == expected_value, \
+                    f"Signal {signal_id} value mismatch: got {actual_value}, expected {expected_value}"
+            else:
+                assert actual_value == expected_value, \
+                    f"Signal {signal_id} value mismatch: got {actual_value}, expected {expected_value}"
     except FileNotFoundError as e:
         if signalsets_dir:
-            # Try the explicitly provided directory
+            # Use the original implementation as fallback with explicit signalsets directory
             signalset_path = find_signalset_for_year(model_year, signalsets_dir)
             signalset_json = load_signalset(signalset_path)
+            obd_testrunner(
+                signalset_json,
+                response_hex,
+                expected_values,
+                can_id_format=can_id_format,
+                extended_addressing_enabled=extended_addressing_enabled
+            )
         else:
             raise e
-
-    obd_testrunner(
-        signalset_json,
-        response_hex,
-        expected_values,
-        can_id_format=can_id_format,
-        extended_addressing_enabled=extended_addressing_enabled
-    )
 
 def list_available_signalsets(signalsets_dir: Optional[str] = None) -> List[str]:
     """
@@ -476,6 +512,7 @@ def register_test_classes(test_files_by_year: Dict[str, List[Tuple[str, str]]],
                          target_module=None):
     """
     Dynamically create and register test classes grouped by model year.
+    Precomputes CommandRegistry instances for each model year to optimize test execution.
 
     Args:
         test_files_by_year: Dictionary mapping model year keys to lists of (test_id, yaml_path) tuples
@@ -488,6 +525,23 @@ def register_test_classes(test_files_by_year: Dict[str, List[Tuple[str, str]]],
     if target_module is None:
         # Get the caller's module (usually __main__ or the importing module)
         target_module = sys.modules[sys._getframe(1).f_globals['__name__']]
+
+    # Import the command registry function here to avoid circular imports
+    from .command_registry import get_model_year_command_registry
+
+    # Precompute CommandRegistry instances for each model year
+    # This significantly improves performance for parallel test execution
+    for year_key in test_files_by_year.keys():
+        if not year_key.startswith("MY") or not year_key[2:].isdigit():
+            continue
+
+        model_year = int(year_key[2:])
+        try:
+            # This will compute and cache the registry for this model year
+            get_model_year_command_registry(model_year)
+            print(f"Precomputed CommandRegistry for {year_key}")
+        except Exception as e:
+            print(f"Warning: Failed to precompute CommandRegistry for {year_key}: {str(e)}")
 
     # Create test classes dynamically for each model year
     for year_key, test_files in test_files_by_year.items():
