@@ -328,8 +328,66 @@ def get_model_year_command_registry(model_year: int) -> 'CommandRegistry':
         signalset_json = get_signalset_from_model_year(model_year)
         signalset = SignalSet.from_json(signalset_json)
 
-        # Get SAE J1979 base signals and combine with model year signals
+        # Get SAE J1979 base signals
         saej1979_commands = get_cached_saej1979_signals()
+
+        # Check if the model-specific signalset is empty and we need to use the make repo
+        if not signalset.commands:
+            # Extract the make from the repo name (assumed to be in format Make-Model)
+            # Get the current repo name from the current working directory path
+            import os
+            from pathlib import Path
+
+            # Get the repository name from the path
+            current_repo = Path(os.getcwd()).parts[-1]
+
+            # Extract the make (everything before the first hyphen)
+            parts = current_repo.split('-')
+            if len(parts) > 1:
+                make = parts[0]
+
+                # Try to fetch the make's signalset
+                make_url = f"https://raw.githubusercontent.com/OBDb/{make}/refs/heads/main/signalsets/v3/default.json"
+
+                try:
+                    import urllib.request
+                    import time
+                    import json
+
+                    # Create cache dir if not exists
+                    os.makedirs(CACHE_DIR, exist_ok=True)
+                    cache_file = CACHE_DIR / f"{make.lower()}_signals.json"
+
+                    try:
+                        # If cache exists and is less than 24 hours old, use it
+                        if cache_file.exists() and (time.time() - cache_file.stat().st_mtime) < 86400:
+                            with open(cache_file) as f:
+                                json_data = f.read()
+                                cleaned_data = _strip_rax_values(json_data)
+                                make_signalset = SignalSet.from_json(cleaned_data)
+                                print(f"Using cached {make} signals for model year {model_year}")
+                                signalset = make_signalset
+                    except Exception as e:
+                        print(f"Warning: Error reading {make} cache: {e}")
+
+                    # If we don't have valid cached data, fetch it
+                    if not signalset.commands:
+                        with urllib.request.urlopen(make_url) as response:
+                            json_data = response.read().decode('utf-8')
+                            cleaned_data = _strip_rax_values(json_data)
+
+                            # Cache the cleaned data
+                            with open(cache_file, 'w') as f:
+                                f.write(cleaned_data)
+
+                            make_signalset = SignalSet.from_json(cleaned_data)
+                            signalset = make_signalset
+                            print(f"Fetched and using {make} signals for model year {model_year}")
+
+                except Exception as e:
+                    print(f"Warning: Could not fetch {make} signals: {e}")
+
+        # Combine signals from SAE J1979 and model-specific or make-specific signals
         combined_commands = list(saej1979_commands) + list(signalset.commands)
 
         # Create and cache the registry
