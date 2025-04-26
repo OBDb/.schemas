@@ -3,9 +3,10 @@ from typing import Any, Dict, Optional, Union
 import glob
 import os
 import re
+import sys
 import yaml
 from pathlib import Path
-from typing import Dict, Any, Optional, Set, Tuple, Union, List
+from typing import Dict, Any, Optional, Set, Tuple, Union, List, Callable
 
 from .can_frame import CANIDFormat
 from .command_registry import decode_obd_response
@@ -342,32 +343,180 @@ def obd_yaml_testrunner(
     with open(yaml_path, 'r') as f:
         test_data = yaml.safe_load(f)
 
-    model_year = test_data['model_year']
-    test_cases = test_data['test_cases']
+    # Check for new vs old format
+    if 'command_id' in test_data:
+        # This is a command-specific test file (new format)
+        model_year = None
 
-    # Get file-level defaults
-    default_can_format = getattr(CANIDFormat, test_data.get('can_id_format', 'ELEVEN_BIT'))
-    default_ext_addr = test_data.get('extended_addressing_enabled', None)
-
-    for test_case in test_cases:
-        response_hex = test_case['response']
-        expected_values = test_case['expected_values']
-
-        # Get per-test case settings or use defaults
-        test_can_format = getattr(CANIDFormat, test_case.get('can_id_format', '')) if 'can_id_format' in test_case else default_can_format
-        test_ext_addr = test_case.get('extended_addressing_enabled', default_ext_addr)
-
+        # Try to extract model year from directory structure
+        # Typical path: .../test_cases/2022/commands/0101.yaml
         try:
-            obd_testrunner_by_year(
-                model_year,
-                response_hex,
-                expected_values,
-                can_id_format=test_can_format,
-                extended_addressing_enabled=test_ext_addr,
-                signalsets_dir=signalsets_dir
-            )
-        except Exception as e:
-            raise type(e)(
-                f"Error in test case for model year {model_year}, "
-                f"response {response_hex}: {str(e)}"
-            ) from e
+            dir_path = os.path.dirname(yaml_path)
+            cmd_dir = os.path.basename(dir_path)
+            if cmd_dir == 'commands':
+                year_dir = os.path.basename(os.path.dirname(dir_path))
+                if year_dir.isdigit():
+                    model_year = int(year_dir)
+        except Exception:
+            pass
+
+        # If we couldn't extract from path, look for support file
+        if model_year is None:
+            support_path = os.path.join(os.path.dirname(os.path.dirname(yaml_path)), 'command_support.yaml')
+            try:
+                if os.path.exists(support_path):
+                    with open(support_path, 'r') as f:
+                        support_data = yaml.safe_load(f)
+                        model_year = support_data.get('model_year')
+            except Exception:
+                pass
+
+        # If we still don't have a model year, raise an error
+        if model_year is None:
+            raise ValueError(f"Could not determine model year for command file: {yaml_path}")
+
+        # Get command-specific test defaults
+        default_can_format = getattr(CANIDFormat, test_data.get('can_id_format', 'ELEVEN_BIT'))
+        default_ext_addr = test_data.get('extended_addressing_enabled', None)
+        test_cases = test_data.get('test_cases', [])
+
+        for test_case in test_cases:
+            response_hex = test_case['response']
+            expected_values = test_case['expected_values']
+
+            try:
+                obd_testrunner_by_year(
+                    model_year,
+                    response_hex,
+                    expected_values,
+                    can_id_format=default_can_format,
+                    extended_addressing_enabled=default_ext_addr,
+                    signalsets_dir=signalsets_dir
+                )
+            except Exception as e:
+                raise type(e)(
+                    f"Error in command {test_data.get('command_id')} test case for model year {model_year}, "
+                    f"response {response_hex}: {str(e)}"
+                ) from e
+    elif 'model_year' in test_data and 'test_cases' in test_data:
+        # This is either a full test case file (old format) or command_support.yaml (new format)
+        model_year = test_data['model_year']
+
+        # Check if this is a command_support file with no test cases
+        if len(test_data.get('test_cases', [])) == 0:
+            # This is a command_support file with no test cases
+            return
+
+        # Process as standard test case file
+        test_cases = test_data['test_cases']
+
+        # Get file-level defaults
+        default_can_format = getattr(CANIDFormat, test_data.get('can_id_format', 'ELEVEN_BIT'))
+        default_ext_addr = test_data.get('extended_addressing_enabled', None)
+
+        for test_case in test_cases:
+            response_hex = test_case['response']
+            expected_values = test_case['expected_values']
+
+            # Get per-test case settings or use defaults
+            test_can_format = getattr(CANIDFormat, test_case.get('can_id_format', '')) if 'can_id_format' in test_case else default_can_format
+            test_ext_addr = test_case.get('extended_addressing_enabled', default_ext_addr)
+
+            try:
+                obd_testrunner_by_year(
+                    model_year,
+                    response_hex,
+                    expected_values,
+                    can_id_format=test_can_format,
+                    extended_addressing_enabled=test_ext_addr,
+                    signalsets_dir=signalsets_dir
+                )
+            except Exception as e:
+                raise type(e)(
+                    f"Error in test case for model year {model_year}, "
+                    f"response {response_hex}: {str(e)}"
+                ) from e
+    else:
+        raise ValueError(f"Invalid test file format in {yaml_path}. Neither 'command_id' nor 'model_year'+'test_cases' found.")
+
+def find_test_yaml_files(test_cases_dir: str) -> Dict[str, List[Tuple[str, str]]]:
+    """
+    Find all test YAML files in the directory structure, grouped by model year.
+
+    Args:
+        test_cases_dir: Path to the directory containing test cases
+
+    Returns:
+        Dictionary with model year as key and a list of (test_id, yaml_path) tuples as value
+    """
+    test_files_by_year = {}
+
+    try:
+        model_year_dirs = [d for d in os.listdir(test_cases_dir)
+                         if os.path.isdir(os.path.join(test_cases_dir, d)) and d.isdigit()]
+    except (FileNotFoundError, NotADirectoryError):
+        return {}
+
+    for year_dir in model_year_dirs:
+        year_key = f"MY{year_dir}"
+        test_files_by_year[year_key] = []
+
+        # Get command files only (skip command_support.yaml)
+        commands_dir = os.path.join(test_cases_dir, year_dir, "commands")
+        if os.path.exists(commands_dir):
+            for cmd_file in glob.glob(os.path.join(commands_dir, "*.yaml")):
+                cmd_id = os.path.splitext(os.path.basename(cmd_file))[0]
+                test_id = f"cmd_{cmd_id}"
+                test_files_by_year[year_key].append((test_id, cmd_file))
+
+    return test_files_by_year
+
+def register_test_classes(test_files_by_year: Dict[str, List[Tuple[str, str]]],
+                         runner_func: Callable[[str], None] = None,
+                         target_module=None):
+    """
+    Dynamically create and register test classes grouped by model year.
+
+    Args:
+        test_files_by_year: Dictionary mapping model year keys to lists of (test_id, yaml_path) tuples
+        runner_func: Function to use for running tests (defaults to obd_yaml_testrunner)
+        target_module: Module where test classes should be registered (defaults to caller's module)
+    """
+    if runner_func is None:
+        runner_func = obd_yaml_testrunner
+
+    if target_module is None:
+        # Get the caller's module (usually __main__ or the importing module)
+        target_module = sys.modules[sys._getframe(1).f_globals['__name__']]
+
+    # Create test classes dynamically for each model year
+    for year_key, test_files in test_files_by_year.items():
+        # Skip years with no test files
+        if not test_files:
+            continue
+
+        # Define a test class for this model year
+        class_name = f"Test{year_key}"
+        test_class = type(class_name, (), {})
+
+        # Add the test method for each command file in this year
+        for idx, (test_id, yaml_path) in enumerate(test_files):
+            # Create a test method with proper name
+            test_method_name = f"test_{test_id}"
+
+            # Define a closure to capture the current yaml_path
+            def make_test_method(path, run_func):
+                def test_method(self):
+                    try:
+                        run_func(path)
+                    except Exception as e:
+                        pytest.fail(f"Failed to run tests from {path}: {e}")
+                return test_method
+
+            # Add the test method to the class
+            setattr(test_class, test_method_name, make_test_method(yaml_path, runner_func))
+
+        # Add the class to the target module
+        setattr(target_module, class_name, test_class)
+
+    return True
