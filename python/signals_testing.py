@@ -262,7 +262,7 @@ def obd_testrunner_by_year(
             assert signal_id in actual_values, f"Signal {signal_id} not found in decoded response"
             actual_value = actual_values[signal_id]
             if isinstance(expected_value, (int, float)):
-                assert pytest.approx(actual_value, rel=1e-5) == expected_value, \
+                assert abs(actual_value - expected_value) < 1e-5, \
                     f"Signal {signal_id} value mismatch: got {actual_value}, expected {expected_value}"
             else:
                 assert actual_value == expected_value, \

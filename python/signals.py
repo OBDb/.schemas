@@ -115,9 +115,23 @@ class Scaling:
         if end_bit > total_bits:
             raise ValueError(f"Not enough data: need {end_bit} bits, have {total_bits}")
 
+        # Create a mutable copy of the data
+        data_array = bytearray(data)
+
         if self.bytes_lsb and self.bit_length > 8:
-            # Reverse bytes for LSB format
-            data = bytes(reversed(data))
+            # Only reverse the bytes that contain our value
+            start_byte = start_bit // 8
+            byte_count = (self.bit_length + 7) // 8
+            end_byte = min(start_byte + byte_count, len(data_array))
+
+            # Extract the bytes we need to reverse
+            reversed_section = bytearray(reversed(data_array[start_byte:end_byte]))
+
+            # Replace the original bytes with the reversed ones
+            data_array[start_byte:end_byte] = reversed_section
+
+            # Convert back to immutable bytes
+            data = bytes(data_array)
 
         result = 0
         for i in range(start_bit, end_bit):
