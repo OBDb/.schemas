@@ -107,157 +107,143 @@ class CommandRegistry:
         return []
 
     def _extract_service_22_commands(self, can_id: str, data: bytes) -> List[CommandResponse]:
-        responses = []
-        while data:
-            if len(data) < 2:
-                break
+        if not data or len(data) < 2:
+            return []
 
-            # Service 22 uses 2-byte PIDs
-            pid = (data[0] << 8) | data[1]
-            data = data[2:]  # Remove PID bytes
+        # Service 22 uses 2-byte PIDs
+        pid = (data[0] << 8) | data[1]
+        data = data[2:]  # Remove PID bytes
 
-            param_key = (ServiceType.SERVICE_22.value, pid)
-            commands = self.commands_by_parameter.get(param_key, [])
+        param_key = (ServiceType.SERVICE_22.value, pid)
+        commands = self.commands_by_parameter.get(param_key, [])
 
-            # First try to find command with matching receive address
-            matched_command = None
+        # First try to find command with matching receive address
+        matched_command = None
 
-            # Sort commands to prioritize those with a specific receive address matching the CAN ID
-            # before falling back to commands without a receive address filter
-            matching_commands = []
-            generic_commands = []
+        # Sort commands to prioritize those with a specific receive address matching the CAN ID
+        # before falling back to commands without a receive address filter
+        matching_commands = []
+        generic_commands = []
 
-            for cmd in commands:
-                if cmd.receive_address is not None and f"{cmd.receive_address:X}" == can_id:
-                    matching_commands.append(cmd)
-                elif cmd.receive_address is None:
-                    generic_commands.append(cmd)
+        for cmd in commands:
+            if cmd.receive_address is not None and f"{cmd.receive_address:X}" == can_id:
+                matching_commands.append(cmd)
+            elif cmd.receive_address is None:
+                generic_commands.append(cmd)
 
-            # Use the first matching command if available, otherwise use generic command
-            if matching_commands:
-                matched_command = matching_commands[0]
-            elif generic_commands:
-                matched_command = generic_commands[0]
+        # Use the first matching command if available, otherwise use generic command
+        if matching_commands:
+            matched_command = matching_commands[0]
+        elif generic_commands:
+            matched_command = generic_commands[0]
 
-            if matched_command:
-                values = {}
-                remaining_data = data
-                for signal in matched_command.signals:
-                    try:
-                        if isinstance(signal.format, Scaling):
-                            value = signal.format.decode_value(remaining_data)
-                        elif isinstance(signal.format, Enumeration):
-                            value = signal.format.decode_value(remaining_data)
-                        values[signal.id] = value
-                    except Exception as e:
-                        print(f"Error decoding signal {signal.id}: {e}")
+        if not matched_command:
+            return []
 
-                responses.append(CommandResponse(matched_command, remaining_data, values))
+        values = {}
+        remaining_data = data
+        for signal in matched_command.signals:
+            try:
+                if isinstance(signal.format, Scaling):
+                    value = signal.format.decode_value(remaining_data)
+                elif isinstance(signal.format, Enumeration):
+                    value = signal.format.decode_value(remaining_data)
+                values[signal.id] = value
+            except Exception as e:
+                print(f"Error decoding signal {signal.id}: {e}")
 
-            # Move to next parameter's data
-            data = data[4:]  # Typical data length for service 22
-
-        return responses
+        return [CommandResponse(matched_command, remaining_data, values)]
 
     def _extract_service_21_commands(self, can_id: str, data: bytes) -> List[CommandResponse]:
-        responses = []
-        while data:
-            if len(data) < 1:
-                break
+        if not data:
+            return []
 
-            offset = data[0]
-            data = data[1:]  # Remove offset byte
+        offset = data[0]
+        data = data[1:]  # Remove offset byte
 
-            param_key = (ServiceType.SERVICE_21.value, offset)
-            commands = self.commands_by_parameter.get(param_key, [])
+        param_key = (ServiceType.SERVICE_21.value, offset)
+        commands = self.commands_by_parameter.get(param_key, [])
 
-            # Sort commands to prioritize those with a specific receive address matching the CAN ID
-            # before falling back to commands without a receive address filter
-            matching_commands = []
-            generic_commands = []
+        # Sort commands to prioritize those with a specific receive address matching the CAN ID
+        # before falling back to commands without a receive address filter
+        matching_commands = []
+        generic_commands = []
 
-            for cmd in commands:
-                if cmd.receive_address is not None and f"{cmd.receive_address:X}" == can_id:
-                    matching_commands.append(cmd)
-                elif cmd.receive_address is None:
-                    generic_commands.append(cmd)
+        for cmd in commands:
+            if cmd.receive_address is not None and f"{cmd.receive_address:X}" == can_id:
+                matching_commands.append(cmd)
+            elif cmd.receive_address is None:
+                generic_commands.append(cmd)
 
-            # Use the first matching command if available, otherwise use generic command
-            matched_command = None
-            if matching_commands:
-                matched_command = matching_commands[0]
-            elif generic_commands:
-                matched_command = generic_commands[0]
+        # Use the first matching command if available, otherwise use generic command
+        matched_command = None
+        if matching_commands:
+            matched_command = matching_commands[0]
+        elif generic_commands:
+            matched_command = generic_commands[0]
 
-            if matched_command:
-                values = {}
-                remaining_data = data
-                for signal in matched_command.signals:
-                    try:
-                        if isinstance(signal.format, Scaling):
-                            value = signal.format.decode_value(remaining_data)
-                        elif isinstance(signal.format, Enumeration):
-                            value = signal.format.decode_value(remaining_data)
-                        values[signal.id] = value
-                    except Exception as e:
-                        print(f"Error decoding signal {signal.id}: {e}")
+        if not matched_command:
+            return []
 
-                responses.append(CommandResponse(matched_command, remaining_data, values))
+        values = {}
+        remaining_data = data
+        for signal in matched_command.signals:
+            try:
+                if isinstance(signal.format, Scaling):
+                    value = signal.format.decode_value(remaining_data)
+                elif isinstance(signal.format, Enumeration):
+                    value = signal.format.decode_value(remaining_data)
+                values[signal.id] = value
+            except Exception as e:
+                print(f"Error decoding signal {signal.id}: {e}")
 
-            # Move to next parameter's data
-            data = data[2:]  # Typical data length for service 21
-
-        return responses
+        return [CommandResponse(matched_command, remaining_data, values)]
 
     def _extract_service_01_commands(self, can_id: str, data: bytes) -> List[CommandResponse]:
-        responses = []
-        while data:
-            if len(data) < 1:
-                break
+        if not data:
+            return []
 
-            pid = data[0]
-            data = data[1:]  # Remove PID byte
+        pid = data[0]
+        data = data[1:]  # Remove PID byte
 
-            param_key = (ServiceType.SERVICE_01.value, pid)
-            commands = self.commands_by_parameter.get(param_key, [])
+        param_key = (ServiceType.SERVICE_01.value, pid)
+        commands = self.commands_by_parameter.get(param_key, [])
 
-            # Sort commands to prioritize those with a specific receive address matching the CAN ID
-            # before falling back to commands without a receive address filter
-            matching_commands = []
-            generic_commands = []
+        # Sort commands to prioritize those with a specific receive address matching the CAN ID
+        # before falling back to commands without a receive address filter
+        matching_commands = []
+        generic_commands = []
 
-            for cmd in commands:
-                if cmd.receive_address is not None and f"{cmd.receive_address:X}" == can_id:
-                    matching_commands.append(cmd)
-                elif cmd.receive_address is None:
-                    generic_commands.append(cmd)
+        for cmd in commands:
+            if cmd.receive_address is not None and f"{cmd.receive_address:X}" == can_id:
+                matching_commands.append(cmd)
+            elif cmd.receive_address is None:
+                generic_commands.append(cmd)
 
-            # Use the first matching command if available, otherwise use generic command
-            matched_command = None
-            if matching_commands:
-                matched_command = matching_commands[0]
-            elif generic_commands:
-                matched_command = generic_commands[0]
+        # Use the first matching command if available, otherwise use generic command
+        matched_command = None
+        if matching_commands:
+            matched_command = matching_commands[0]
+        elif generic_commands:
+            matched_command = generic_commands[0]
 
-            if matched_command:
-                values = {}
-                remaining_data = data
-                for signal in matched_command.signals:
-                    try:
-                        if isinstance(signal.format, Scaling):
-                            value = signal.format.decode_value(remaining_data)
-                        elif isinstance(signal.format, Enumeration):
-                            value = signal.format.decode_value(remaining_data)
-                        values[signal.id] = value
-                    except Exception as e:
-                        print(f"Error decoding signal {signal.id}: {e}")
+        if not matched_command:
+            return []
 
-                responses.append(CommandResponse(matched_command, remaining_data, values))
+        values = {}
+        remaining_data = data
+        for signal in matched_command.signals:
+            try:
+                if isinstance(signal.format, Scaling):
+                    value = signal.format.decode_value(remaining_data)
+                elif isinstance(signal.format, Enumeration):
+                    value = signal.format.decode_value(remaining_data)
+                values[signal.id] = value
+            except Exception as e:
+                print(f"Error decoding signal {signal.id}: {e}")
 
-            # Move to next parameter's data
-            data = data[2:]  # Typical data length for service 01 parameters
+        return [CommandResponse(matched_command, remaining_data, values)]
 
-        return responses
 
 def decode_obd_response(
         signalset: 'SignalSet',
