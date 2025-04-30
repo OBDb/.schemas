@@ -115,7 +115,8 @@ class CommandRegistry:
         data = data[2:]  # Remove PID bytes
 
         param_key = (ServiceType.SERVICE_22.value, pid)
-        commands = self.commands_by_parameter.get(param_key, [])
+        # Prioritize the most recently-registered command by reversing the array.
+        commands = reversed(self.commands_by_parameter.get(param_key, []))
 
         # First try to find command with matching receive address
         matched_command = None
@@ -162,7 +163,8 @@ class CommandRegistry:
         data = data[1:]  # Remove offset byte
 
         param_key = (ServiceType.SERVICE_21.value, offset)
-        commands = self.commands_by_parameter.get(param_key, [])
+        # Prioritize the most recently-registered command by reversing the array.
+        commands = reversed(self.commands_by_parameter.get(param_key, []))
 
         # Sort commands to prioritize those with a specific receive address matching the CAN ID
         # before falling back to commands without a receive address filter
@@ -207,7 +209,8 @@ class CommandRegistry:
         data = data[1:]  # Remove PID byte
 
         param_key = (ServiceType.SERVICE_01.value, pid)
-        commands = self.commands_by_parameter.get(param_key, [])
+        # Prioritize the most recently-registered command by reversing the array.
+        commands = reversed(self.commands_by_parameter.get(param_key, []))
 
         # Sort commands to prioritize those with a specific receive address matching the CAN ID
         # before falling back to commands without a receive address filter
