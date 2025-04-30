@@ -33,7 +33,7 @@
             }
           },
           "freq": { "type": "number", "exclusiveMinimum": 0 },
-          "signals": { 
+          "signals": {
             "type": "array",
             "uniqueItems": true,
             "minItems": 1,
@@ -138,7 +138,10 @@
                     "map": { "type": "object" }
                   }
                 },
-                "path": { "type": "string" },
+                "path": {
+                  "type": "string",
+                  "pattern": "^(Airbags|Battery|Brakes|Climate|Clocks|Control|Cruise|Drivetrain|Doors|DTCs|Electrical|ECU|Emissions|Engine|Fluids|Fuel|Keys|Lights|Mirrors|Monitors|Movement|OBD|Seats|Seatbelts|Stats|Suspension|Tires|Transmission|Trips|Windows|Windshield)(\\.|$)"
+                },
                 "suggestedMetric": { "enum": [
                   "distanceSinceDTCsCleared",
                   "electricRange",
@@ -155,8 +158,7 @@
                   "starterBatteryVoltage",
                   "stateOfCharge",
                   "stateOfHealth"
-                ]},
-                "description": { "type": "string" }
+                ]}
               },
               "required": [
                 "id",
@@ -187,7 +189,7 @@
           "matchingRegex": { "type": "string" },
           "suggestedMetricGroup": { "enum": [
             "batteryModulesStateOfCharge",
-            "batteryModulesVoltage" 
+            "batteryModulesVoltage"
           ]},
           "name": { "type": "string" }
         },
