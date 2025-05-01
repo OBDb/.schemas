@@ -34,6 +34,9 @@ def get_command_sort_key(cmd: Dict[str, Any]) -> tuple:
     Returns:
         Tuple containing header, receive address, service type and parameter ID for sorting
     """
+    # Get the protocol value
+    proto = cmd.get('proto', '')
+    
     # Get the header (hdr) value
     hdr = cmd.get('hdr', '')
 
@@ -55,7 +58,7 @@ def get_command_sort_key(cmd: Dict[str, Any]) -> tuple:
     except (ValueError, TypeError):
         param_id_int = 0  # Default if conversion fails
 
-    return (hdr, rax, service_type, param_id_int)
+    return (proto, hdr, rax, service_type, param_id_int)
 
 def get_command_signature(cmd: Dict[str, Any]) -> tuple:
     """Create a unique signature for a command based on all fields except signals.
@@ -67,6 +70,7 @@ def get_command_signature(cmd: Dict[str, Any]) -> tuple:
         Tuple containing all relevant fields that define uniqueness
     """
     return (
+        cmd.get('proto', ''),
         cmd.get('hdr'),
         cmd.get('rax'),
         cmd.get('eax'),
@@ -116,6 +120,9 @@ def format_command_json(command: Dict[str, Any]) -> str:
     if "rax" in command:
         preamble.append(f'"rax": "{command["rax"]}"')
 
+    if "proto" in command:
+        preamble.append(f'"proto": "{command["proto"]}"')
+        
     if "eax" in command:
         preamble.append(f'"eax": "{command["eax"]}"')
 
