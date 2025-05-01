@@ -140,7 +140,7 @@
                 },
                 "path": {
                   "type": "string",
-                  "pattern": "^(Airbags|Battery|Brakes|Climate|Clocks|Control|Cruise|Drivetrain|Doors|DTCs|Electrical|ECU|Emissions|Engine|Fluids|Fuel|Keys|Lights|Mirrors|Monitors|Movement|OBD|Seats|Seatbelts|Stats|Suspension|Tires|Transmission|Trips|Windows|Windshield)(\\.|$)"
+                  "pattern": "^(Airbags|Battery|Brakes|Climate|Clocks|Cruise control|Drivetrain|Doors|DTCs|Electrical|ECU|Emissions|Engine|Fluids|Fuel|Keys|Lights|Mirrors|Monitors|Movement|OBD|Seats|Seatbelts|Suspension|Tires|Transmission|Trips|Windows|Windshield)(\\.|$)"
                 },
                 "suggestedMetric": { "enum": [
                   "distanceSinceDTCsCleared",
