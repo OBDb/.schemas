@@ -33,6 +33,11 @@
             }
           },
           "freq": { "type": "number", "exclusiveMinimum": 0 },
+          "proto": { "enum": [
+            "9141-2",
+            "15765-4-11bit",
+            "15765-4-29bit"
+          ]},
           "signals": {
             "type": "array",
             "uniqueItems": true,
