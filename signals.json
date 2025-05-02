@@ -143,8 +143,7 @@
                     "map": { "type": "object" }
                   },
                   "required": [
-                    "len",
-                    "max"
+                    "len"
                   ]
                 },
                 "path": {
