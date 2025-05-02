@@ -141,7 +141,11 @@
                     "omax": { "type": "number" },
                     "oval": { "type": "number" },
                     "map": { "type": "object" }
-                  }
+                  },
+                  "required": [
+                    "len",
+                    "max"
+                  ]
                 },
                 "path": {
                   "type": "string",
