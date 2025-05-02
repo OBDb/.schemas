@@ -11,6 +11,7 @@ a 'suggestedMetric' property from each file, and creates a mapping where:
 import argparse
 import json
 import os
+import re
 import sys
 from pathlib import Path
 from typing import Dict, Any
@@ -67,10 +68,14 @@ def process_directory(directory_path: str) -> Dict[str, Dict[str, str]]:
     results = {}
     base_dir = Path(directory_path)
 
+    # Regex pattern to match YYYY-YYYY.json (where YYYY is a 4-digit year)
+    year_range_pattern = re.compile(r'^\d{4}-\d{4}\.json$', re.IGNORECASE)
+
     # Walk the directory tree to find all JSON files
     for root, _, files in os.walk(directory_path):
         for file in files:
-            if file.lower().endswith('.json'):
+            # Only include json files that match either default.json or YYYY-YYYY.json
+            if file.lower() == 'default.json' or year_range_pattern.match(file):
                 file_path = os.path.join(root, file)
 
                 # Get the relative path to use as the key
