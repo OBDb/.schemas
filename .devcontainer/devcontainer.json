@@ -13,6 +13,6 @@
             }
         }
     },
-    "postCreateCommand": "sudo apt-get update && sudo apt-get install -y python3 python3-pip python3-venv && pip install pytest",
+    "postCreateCommand": "sudo apt-get update && sudo apt-get install -y python3 python3-pip python3-venv && pip install pytest pyyaml",
     "remoteUser": "vscode"
 }
