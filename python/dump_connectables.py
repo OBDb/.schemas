@@ -17,10 +17,12 @@ from pathlib import Path
 from typing import Dict, Any
 
 # Add the parent directory to the path so we can import the signalsets module
-sys.path.insert(0, str(Path(__file__).parent.parent))
+sys.path.insert(0, str(Path(__file__).parent))
+
+from repo_utils import extract_make_from_repo_name
 
 try:
-    from python.signalsets.loader import load_signalset
+    from signalsets.loader import load_signalset
 except ImportError:
     print("Error: Could not import signalsets module. Make sure you're running this from the root directory.")
     sys.exit(1)
@@ -90,6 +92,24 @@ def process_directory(directory_path: str) -> Dict[str, Dict[str, str]]:
                         # If the signalset loader fails, try loading as a regular JSON file
                         with open(file_path, 'r') as f:
                             signalset_data = json.load(f)
+
+                    if "commands" not in signalset_data:
+                        print(f"Skipping {file_path}: no commands found")
+                        continue  # Not a signalset file, skip it
+
+                    if not signalset_data["commands"]:
+                        if "-" not in root:
+                            continue  # This is already a root vehicle repo, so skip it.
+                        make = extract_make_from_repo_name(file_path)
+                        print(f"Falling back from {file_path} to the make repo: {make}")
+
+                        try:
+                            signalset_content = load_signalset(make + '/signalsets/v3/default.json')
+                            signalset_data = json.loads(signalset_content)
+                        except Exception:
+                            # If the signalset loader fails, try loading as a regular JSON file
+                            with open(file_path, 'r') as f:
+                                signalset_data = json.load(f)
 
                     # Extract connectables
                     connectables = extract_connectables(signalset_data)

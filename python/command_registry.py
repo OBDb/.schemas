@@ -11,6 +11,7 @@ from pathlib import Path
 
 from .can_frame import CANFrame, CANPacket, CANFrameScanner, CANIDFormat
 from .signals import Command, Enumeration, Scaling, SignalSet
+from .repo_utils import extract_make_from_repo_name
 
 # Cache directory for downloaded signal definitions
 CACHE_DIR = Path(__file__).parent / ".cache"
@@ -322,19 +323,10 @@ def get_model_year_command_registry(model_year: int) -> 'CommandRegistry':
 
         # Check if the model-specific signalset is empty and we need to use the make repo
         if not signalset.commands:
-            # Extract the make from the repo name (assumed to be in format Make-Model)
-            # Get the current repo name from the current working directory path
-            import os
-            from pathlib import Path
+            # Extract the make from the repo name using our utility function
+            make = extract_make_from_repo_name()
 
-            # Get the repository name from the path
-            current_repo = Path(os.getcwd()).parts[-1]
-
-            # Extract the make (everything before the first hyphen)
-            parts = current_repo.split('-')
-            if len(parts) > 1:
-                make = parts[0]
-
+            if make:
                 # Try to fetch the make's signalset
                 make_url = f"https://raw.githubusercontent.com/OBDb/{make}/refs/heads/main/signalsets/v3/default.json"
 
