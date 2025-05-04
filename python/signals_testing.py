@@ -6,7 +6,11 @@ import re
 import sys
 import yaml
 from pathlib import Path
-from typing import Dict, Any, Optional, Tuple, Union, List, Callable
+from typing import Dict, Any, Optional, Tuple, Union, List, Callable, Set
+import yaml.composer
+import yaml.parser
+import yaml.scanner
+import yaml.tokens
 
 # Add the parent directory to the path so we can import modules
 sys.path.insert(0, str(Path(__file__).parent))
@@ -20,13 +24,96 @@ from signalsets.loader import find_signalset_for_year, load_signalset
 # Global cache for CommandRegistry instances by model year
 _COMMAND_REGISTRY_CACHE = {}
 
+class LineNumberPreservingLoader(yaml.SafeLoader):
+    """
+    A YAML Loader that preserves line numbers for mappings and sequences.
+    This allows us to find the exact line number of a specific key-value in a YAML file.
+    """
+    def compose_node(self, parent, index):
+        # The line number where the current node begins
+        line = self.line
+        node = super().compose_node(parent, index)
+        node.__line__ = line + 1
+        return node
+
+    def construct_mapping(self, node, deep=False):
+        mapping = super().construct_mapping(node, deep=deep)
+        # Store the line number on the mapping
+        mapping['__line__'] = node.__line__
+        return mapping
+
+    def construct_sequence(self, node, deep=False):
+        sequence = super().construct_sequence(node, deep=deep)
+        # Store the line number at which the sequence begins
+        for idx, item in enumerate(sequence):
+            if isinstance(item, dict) and '__line__' not in item:
+                item['__line__'] = node.__line__
+        return sequence
+
+
+def find_signal_line_numbers(yaml_path: str) -> Dict[str, Dict[str, int]]:
+    """
+    Parse a YAML file and extract line numbers for all signal IDs within test cases.
+
+    Args:
+        yaml_path: Path to the YAML file
+
+    Returns:
+        Dictionary mapping test case index to a dictionary of signal IDs to line numbers
+    """
+    signal_line_numbers = {}
+
+    try:
+        with open(yaml_path, 'r') as f:
+            yaml_content = f.read()
+
+        # Parse the YAML with line number preservation
+        data = yaml.load(yaml_content, Loader=LineNumberPreservingLoader)
+
+        # Process test cases
+        if 'test_cases' in data:
+            for test_idx, test_case in enumerate(data['test_cases']):
+                if 'expected_values' in test_case:
+                    expected_values = test_case['expected_values']
+                    test_line = test_case.get('__line__', 0)
+
+                    # Create a dictionary for line numbers in this test case
+                    signal_lines = {}
+
+                    # Extract line numbers for each signal ID
+                    for signal_id, _ in expected_values.items():
+                        # Find the line by searching in the content
+                        pattern = re.compile(r'(\s+)' + re.escape(signal_id) + r':', re.MULTILINE)
+
+                        # Search in the content, but limit the search to lines after the test case start
+                        lines = yaml_content.split('\n')
+                        test_content = '\n'.join(lines[test_line-1:])
+                        match = pattern.search(test_content)
+
+                        if match:
+                            # Calculate the real line number in the file
+                            line_number = test_line + test_content[:match.end()].count('\n')
+                            signal_lines[signal_id] = line_number
+
+                    # Store the line numbers for this test case
+                    signal_line_numbers[test_idx] = signal_lines
+
+    except Exception as e:
+        # If anything goes wrong, log it but don't break the tests
+        print(f"Warning: Could not extract line numbers from {yaml_path}: {e}")
+
+    return signal_line_numbers
+
 def obd_testrunner_by_year(
         model_year: int,
         response_hex: str,
         expected_values: Dict[str, Any],
         can_id_format: CANIDFormat = CANIDFormat.ELEVEN_BIT,
         extended_addressing_enabled: Optional[bool] = None,
-        signalsets_dir: Optional[str] = None
+        signalsets_dir: Optional[str] = None,
+        yaml_file: Optional[str] = None,
+        test_case_idx: Optional[int] = None,
+        signal_line_numbers: Optional[Dict[int, Dict[str, int]]] = None
     ):
     """
     Test signal decoding against known responses using a signalset inferred from model year.
@@ -39,6 +126,9 @@ def obd_testrunner_by_year(
         can_id_format: CAN ID format to use for parsing
         extended_addressing_enabled: Whether extended addressing is enabled
         signalsets_dir: Optional explicit path to signalsets directory
+        yaml_file: Path to the YAML file containing the test case
+        test_case_idx: Index of the test case within the YAML file
+        signal_line_numbers: Dictionary mapping test case indices to dictionaries of signal IDs to line numbers
     """
     try:
         # Get the pre-computed registry for this model year
@@ -65,14 +155,21 @@ def obd_testrunner_by_year(
 
         # Test each expected signal value
         for signal_id, expected_value in expected_values.items():
-            assert signal_id in actual_values, f"Signal {signal_id} not found in decoded response"
+            # Get line number for more detailed error message
+            line_info = ""
+            if yaml_file and signal_line_numbers and test_case_idx is not None:
+                if test_case_idx in signal_line_numbers and signal_id in signal_line_numbers[test_case_idx]:
+                    line_number = signal_line_numbers[test_case_idx][signal_id]
+                    line_info = f" (defined in {yaml_file}:{line_number})"
+
+            assert signal_id in actual_values, f"Signal {signal_id} not found in decoded response{line_info}"
             actual_value = actual_values[signal_id]
             if isinstance(expected_value, (int, float)):
                 assert abs(actual_value - expected_value) < 1e-5, \
-                    f"Signal {signal_id} value mismatch: got {actual_value}, expected {expected_value}"
+                    f"Signal {signal_id} value mismatch{line_info}: got {actual_value}, expected {expected_value}"
             else:
                 assert actual_value == expected_value, \
-                    f"Signal {signal_id} value mismatch: got {actual_value}, expected {expected_value}"
+                    f"Signal {signal_id} value mismatch{line_info}: got {actual_value}, expected {expected_value}"
     except FileNotFoundError as e:
         if signalsets_dir:
             # Use the original implementation as fallback with explicit signalsets directory
@@ -83,7 +180,10 @@ def obd_testrunner_by_year(
                 response_hex,
                 expected_values,
                 can_id_format=can_id_format,
-                extended_addressing_enabled=extended_addressing_enabled
+                extended_addressing_enabled=extended_addressing_enabled,
+                yaml_file=yaml_file,
+                test_case_idx=test_case_idx,
+                signal_line_numbers=signal_line_numbers
             )
         else:
             raise e
@@ -91,9 +191,12 @@ def obd_testrunner_by_year(
 def obd_testrunner(
         signalset_json: str,
         response_hex: str,
-        expected_values: Dict[str, Union[float, str]],  # Updated type hint
+        expected_values: Dict[str, Union[float, str]],
         can_id_format: CANIDFormat = CANIDFormat.ELEVEN_BIT,
-        extended_addressing_enabled: Optional[bool] = None
+        extended_addressing_enabled: Optional[bool] = None,
+        yaml_file: Optional[str] = None,
+        test_case_idx: Optional[int] = None,
+        signal_line_numbers: Optional[Dict[int, Dict[str, int]]] = None
     ):
     """Test decoding an OBD response against expected values.
 
@@ -101,6 +204,9 @@ def obd_testrunner(
         signalset_json: JSON string containing the signal set definition
         response_hex: Hex string of the OBD response
         expected_values: Dictionary mapping signal IDs to their expected values (numbers or strings)
+        yaml_file: Path to the YAML file containing the test case
+        test_case_idx: Index of the test case within the YAML file
+        signal_line_numbers: Dictionary mapping test case indices to dictionaries of signal IDs to line numbers
     """
     signalset = SignalSet.from_json(signalset_json)
     actual_values = decode_obd_response(
@@ -112,36 +218,21 @@ def obd_testrunner(
 
     # Test each expected signal value
     for signal_id, expected_value in expected_values.items():
-        assert signal_id in actual_values, f"Signal {signal_id} not found in decoded response"
+        # Get line number for more detailed error message
+        line_info = ""
+        if yaml_file and signal_line_numbers and test_case_idx is not None:
+            if test_case_idx in signal_line_numbers and signal_id in signal_line_numbers[test_case_idx]:
+                line_number = signal_line_numbers[test_case_idx][signal_id]
+                line_info = f" (defined in {yaml_file}:{line_number})"
+
+        assert signal_id in actual_values, f"Signal {signal_id} not found in decoded response{line_info}"
         actual_value = actual_values[signal_id]
         if isinstance(expected_value, (int, float)):
             assert pytest.approx(actual_value) == expected_value, \
-                f"Signal {signal_id} value mismatch: got {actual_value}, expected {expected_value}"
+                f"Signal {signal_id} value mismatch{line_info}: got {actual_value}, expected {expected_value}"
         else:
             assert actual_value == expected_value, \
-                f"Signal {signal_id} value mismatch: got {actual_value}, expected {expected_value}"
-
-def find_yaml_test_cases(test_cases_dir: str) -> Dict[int, str]:
-    """
-    Find all YAML test case files and group them by model year.
-
-    Args:
-        test_cases_dir: Directory containing YAML test case files
-
-    Returns:
-        Dictionary mapping model years to YAML file paths
-    """
-    yaml_files = {}
-    for ext in ('yaml', 'yml'):
-        for file_path in glob.glob(os.path.join(test_cases_dir, f'*.{ext}')):
-            try:
-                with open(file_path, 'r') as f:
-                    test_data = yaml.safe_load(f)
-                    if 'model_year' in test_data:
-                        yaml_files[test_data['model_year']] = file_path
-            except (yaml.YAMLError, KeyError):
-                continue
-    return yaml_files
+                f"Signal {signal_id} value mismatch{line_info}: got {actual_value}, expected {expected_value}"
 
 def obd_yaml_testrunner(
         yaml_path: str,
@@ -160,6 +251,9 @@ def obd_yaml_testrunner(
     """
     with open(yaml_path, 'r') as f:
         test_data = yaml.safe_load(f)
+
+    # Extract line numbers for each signal ID in each test case
+    signal_line_numbers = find_signal_line_numbers(yaml_path)
 
     # Check for new vs old format
     if 'command_id' in test_data:
@@ -198,24 +292,21 @@ def obd_yaml_testrunner(
         default_ext_addr = test_data.get('extended_addressing_enabled', None)
         test_cases = test_data.get('test_cases', [])
 
-        for test_case in test_cases:
+        for test_idx, test_case in enumerate(test_cases):
             response_hex = test_case['response']
             expected_values = test_case['expected_values']
 
-            # try:
             obd_testrunner_by_year(
                 model_year,
                 response_hex,
                 expected_values,
                 can_id_format=default_can_format,
                 extended_addressing_enabled=default_ext_addr,
-                signalsets_dir=signalsets_dir
+                signalsets_dir=signalsets_dir,
+                yaml_file=yaml_path,
+                test_case_idx=test_idx,
+                signal_line_numbers=signal_line_numbers
             )
-            # except Exception as e:
-            #     raise type(e)(
-            #         f"Error in command {test_data.get('command_id')} test case for model year {model_year}, "
-            #         f"response {response_hex}: {str(e)}"
-            #     ) from e
     elif 'model_year' in test_data and 'test_cases' in test_data:
         # This is either a full test case file (old format) or command_support.yaml (new format)
         model_year = test_data['model_year']
@@ -232,7 +323,7 @@ def obd_yaml_testrunner(
         default_can_format = getattr(CANIDFormat, test_data.get('can_id_format', 'ELEVEN_BIT'))
         default_ext_addr = test_data.get('extended_addressing_enabled', None)
 
-        for test_case in test_cases:
+        for test_idx, test_case in enumerate(test_cases):
             response_hex = test_case['response']
             expected_values = test_case['expected_values']
 
@@ -247,11 +338,14 @@ def obd_yaml_testrunner(
                     expected_values,
                     can_id_format=test_can_format,
                     extended_addressing_enabled=test_ext_addr,
-                    signalsets_dir=signalsets_dir
+                    signalsets_dir=signalsets_dir,
+                    yaml_file=yaml_path,
+                    test_case_idx=test_idx,
+                    signal_line_numbers=signal_line_numbers
                 )
             except Exception as e:
                 raise type(e)(
-                    f"Error in test case for model year {model_year}, "
+                    f"Error in test case {test_idx} for model year {model_year}, "
                     f"response {response_hex}: {str(e)}"
                 ) from e
     else:
