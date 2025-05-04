@@ -6,15 +6,16 @@ import re
 import sys
 import yaml
 from pathlib import Path
-from typing import Dict, Any, Optional, Set, Tuple, Union, List, Callable
+from typing import Dict, Any, Optional, Tuple, Union, List, Callable
 
-from .can_frame import CANFrameScanner, CANIDFormat
-from .command_registry import decode_obd_response, CommandRegistry, get_cached_saej1979_signals
-from .signals import SignalSet
-from .signalsets.loader import (
-    YearRange, find_signalsets_directory, find_signalset_for_year,
-    load_signalset, get_signalset_from_model_year, list_available_signalsets
-)
+# Add the parent directory to the path so we can import modules
+sys.path.insert(0, str(Path(__file__).parent))
+
+from can.can_frame import CANFrameScanner, CANIDFormat
+from can.command_registry import decode_obd_response, get_model_year_command_registry
+from can.signals import SignalSet
+from signalsets.loader import find_signalset_for_year, load_signalset
+
 
 # Global cache for CommandRegistry instances by model year
 _COMMAND_REGISTRY_CACHE = {}
@@ -39,8 +40,6 @@ def obd_testrunner_by_year(
         extended_addressing_enabled: Whether extended addressing is enabled
         signalsets_dir: Optional explicit path to signalsets directory
     """
-    from .command_registry import get_model_year_command_registry
-
     try:
         # Get the pre-computed registry for this model year
         registry = get_model_year_command_registry(model_year)
@@ -203,20 +202,20 @@ def obd_yaml_testrunner(
             response_hex = test_case['response']
             expected_values = test_case['expected_values']
 
-            try:
-                obd_testrunner_by_year(
-                    model_year,
-                    response_hex,
-                    expected_values,
-                    can_id_format=default_can_format,
-                    extended_addressing_enabled=default_ext_addr,
-                    signalsets_dir=signalsets_dir
-                )
-            except Exception as e:
-                raise type(e)(
-                    f"Error in command {test_data.get('command_id')} test case for model year {model_year}, "
-                    f"response {response_hex}: {str(e)}"
-                ) from e
+            # try:
+            obd_testrunner_by_year(
+                model_year,
+                response_hex,
+                expected_values,
+                can_id_format=default_can_format,
+                extended_addressing_enabled=default_ext_addr,
+                signalsets_dir=signalsets_dir
+            )
+            # except Exception as e:
+            #     raise type(e)(
+            #         f"Error in command {test_data.get('command_id')} test case for model year {model_year}, "
+            #         f"response {response_hex}: {str(e)}"
+            #     ) from e
     elif 'model_year' in test_data and 'test_cases' in test_data:
         # This is either a full test case file (old format) or command_support.yaml (new format)
         model_year = test_data['model_year']
@@ -308,9 +307,6 @@ def register_test_classes(test_files_by_year: Dict[str, List[Tuple[str, str]]],
     if target_module is None:
         # Get the caller's module (usually __main__ or the importing module)
         target_module = sys.modules[sys._getframe(1).f_globals['__name__']]
-
-    # Import the command registry function here to avoid circular imports
-    from .command_registry import get_model_year_command_registry
 
     # Precompute CommandRegistry instances for each model year
     # This significantly improves performance for parallel test execution

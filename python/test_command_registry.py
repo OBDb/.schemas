@@ -1,10 +1,9 @@
 import pytest
-from typing import Dict, Any, List
-import json
+from typing import Any, Dict, List
 
-from .command_registry import CommandRegistry, CommandResponse, ServiceType
-from .signals import SignalSet, Command, Signal, Scaling, Parameter, ParameterType
-from .can_frame import CANPacket
+from can.command_registry import CommandRegistry, ServiceType
+from can.signals import Command, Signal, Scaling, Parameter, ParameterType
+from can.can_frame import CANPacket
 
 def create_test_command(
     pid: int,

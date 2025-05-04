@@ -19,7 +19,7 @@ from typing import Dict, Any
 # Add the parent directory to the path so we can import the signalsets module
 sys.path.insert(0, str(Path(__file__).parent))
 
-from repo_utils import extract_make_from_repo_name
+from can.repo_utils import extract_make_from_repo_name
 
 try:
     from signalsets.loader import load_signalset

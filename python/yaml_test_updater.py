@@ -6,10 +6,10 @@ This is useful when signals are removed from signalsets and tests need to be upd
 import os
 import glob
 import yaml
-from typing import Dict, List, Any, Union, Tuple, Optional, Set
+from typing import Dict, List, Any, Tuple, Optional
 
-from .signals_testing import find_signalset_for_year, CANIDFormat, CANFrameScanner
-from .command_registry import get_model_year_command_registry
+from .signals_testing import CANIDFormat, CANFrameScanner
+from can.command_registry import get_model_year_command_registry
 
 # Custom YAML formatting for multi-line strings
 class LiteralString(str):

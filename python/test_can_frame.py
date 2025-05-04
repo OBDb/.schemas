@@ -1,7 +1,12 @@
 import pytest
-from .can_frame import (
-    CANFrame, CANFrameScanner, CANIDFormat, CANFrameError,
-    DataFrameType, DataFrameHeader
+from pathlib import Path
+import sys
+
+# Add the parent directory to the path so we can import modules
+sys.path.insert(0, str(Path(__file__).parent))
+
+from can.can_frame import (
+    CANFrame, CANFrameScanner, CANIDFormat, CANFrameError
 )
 
 def test_single_frame():
