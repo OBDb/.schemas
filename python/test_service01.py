@@ -1,10 +1,12 @@
-import glob
 import os
-import pytest
 from pathlib import Path
-from typing import Dict, Any
+import pytest
+import sys
 
-from .can_frame import CANIDFormat
+# Add the parent directory to the path so we can import modules
+sys.path.insert(0, str(Path(__file__).parent))
+
+from can.can_frame import CANIDFormat
 from .signals_testing import obd_testrunner
 
 REPO_ROOT = os.path.abspath(os.path.dirname(__file__))

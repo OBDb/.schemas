@@ -1,5 +1,4 @@
 import pytest
-import json
 import os
 
 from .signals_testing import obd_testrunner

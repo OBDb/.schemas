@@ -1,15 +1,15 @@
-# python/command_registry.py
 from dataclasses import dataclass
-from typing import Dict, List, Optional, Set, Any, Tuple, Callable, Union
+from typing import Dict, List, Optional, Any
 from enum import Enum
 import os
 import json
 import time
 import urllib.request
-import hashlib
 from pathlib import Path
 
-from .can_frame import CANFrame, CANPacket, CANFrameScanner, CANIDFormat
+from signalsets.loader import get_signalset_from_model_year
+
+from .can_frame import CANPacket, CANFrameScanner, CANIDFormat
 from .signals import Command, Enumeration, Scaling, SignalSet
 from .repo_utils import extract_make_from_repo_name
 
@@ -308,10 +308,6 @@ def get_model_year_command_registry(model_year: int) -> 'CommandRegistry':
     # Check if we already have a cached registry for this model year
     if model_year in MODEL_YEAR_REGISTRY_CACHE:
         return MODEL_YEAR_REGISTRY_CACHE[model_year]
-
-    # Need to create a new registry for this model year
-    # Import here to avoid circular imports
-    from .signals_testing import get_signalset_from_model_year
 
     try:
         # Get the appropriate signalset for this model year
