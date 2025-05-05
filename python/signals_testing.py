@@ -164,7 +164,10 @@ def obd_testrunner_by_year(
 
             assert signal_id in actual_values, f"Signal {signal_id} not found in decoded response{line_info}"
             actual_value = actual_values[signal_id]
-            if isinstance(expected_value, (int, float)):
+            if isinstance(actual_value, (str)):
+                assert actual_value == str(expected_value), \
+                    f"Signal {signal_id} value mismatch{line_info}: got {actual_value}, expected {expected_value}"
+            elif isinstance(expected_value, (int, float)):
                 assert abs(actual_value - expected_value) < 1e-5, \
                     f"Signal {signal_id} value mismatch{line_info}: got {actual_value}, expected {expected_value}"
             else:
