@@ -340,8 +340,7 @@ def get_model_year_command_registry(model_year: int) -> 'CommandRegistry':
                         if cache_file.exists() and (time.time() - cache_file.stat().st_mtime) < 86400:
                             with open(cache_file) as f:
                                 json_data = f.read()
-                                cleaned_data = _strip_rax_values(json_data)
-                                make_signalset = SignalSet.from_json(cleaned_data)
+                                make_signalset = SignalSet.from_json(json_data)
                                 print(f"Using cached {make} signals for model year {model_year}")
                                 signalset = make_signalset
                     except Exception as e:
@@ -351,13 +350,11 @@ def get_model_year_command_registry(model_year: int) -> 'CommandRegistry':
                     if not signalset.commands:
                         with urllib.request.urlopen(make_url) as response:
                             json_data = response.read().decode('utf-8')
-                            cleaned_data = _strip_rax_values(json_data)
 
-                            # Cache the cleaned data
                             with open(cache_file, 'w') as f:
-                                f.write(cleaned_data)
+                                f.write(json_data)
 
-                            make_signalset = SignalSet.from_json(cleaned_data)
+                            make_signalset = SignalSet.from_json(json_data)
                             signalset = make_signalset
                             print(f"Fetched and using {make} signals for model year {model_year}")
 
