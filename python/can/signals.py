@@ -248,6 +248,9 @@ class Command:
             key=lambda x: x.id
         ))
 
+        if len(data['hdr']) == 4:
+            receive_address = 0x18DAF100 | (receive_address & 0xFF)
+
         return Command(
             parameter=Parameter.from_json(data['cmd']),
             header=header,
