@@ -135,26 +135,29 @@ class CommandRegistry:
 
         # Use the first matching command if available, otherwise use generic command
         if matching_commands:
-            matched_command = matching_commands[0]
+            matched_commands = [matching_commands[0]]
         elif generic_commands:
-            matched_command = generic_commands[0]
+            matched_commands = generic_commands
 
-        if not matched_command:
+        if not matched_commands:
             return []
 
         values = {}
         remaining_data = data
-        for signal in matched_command.signals:
-            try:
-                if isinstance(signal.format, Scaling):
-                    value = signal.format.decode_value(remaining_data)
-                elif isinstance(signal.format, Enumeration):
-                    value = signal.format.decode_value(remaining_data)
-                values[signal.id] = value
-            except Exception as e:
-                print(f"Error decoding signal {signal.id}: {e}")
+        responses = []
+        for matched_command in matched_commands:
+            for signal in matched_command.signals:
+                try:
+                    if isinstance(signal.format, Scaling):
+                        value = signal.format.decode_value(remaining_data)
+                    elif isinstance(signal.format, Enumeration):
+                        value = signal.format.decode_value(remaining_data)
+                    values[signal.id] = value
+                except Exception as e:
+                    print(f"Error decoding signal {signal.id}: {e}")
+            responses.append(CommandResponse(matched_command, remaining_data, values))
 
-        return [CommandResponse(matched_command, remaining_data, values)]
+        return responses
 
     def _extract_service_21_commands(self, can_id: str, data: bytes) -> List[CommandResponse]:
         if not data:
@@ -179,28 +182,30 @@ class CommandRegistry:
                 generic_commands.append(cmd)
 
         # Use the first matching command if available, otherwise use generic command
-        matched_command = None
         if matching_commands:
-            matched_command = matching_commands[0]
+            matched_commands = [matching_commands[0]]
         elif generic_commands:
-            matched_command = generic_commands[0]
+            matched_commands = generic_commands
 
-        if not matched_command:
+        if not matched_commands:
             return []
 
         values = {}
         remaining_data = data
-        for signal in matched_command.signals:
-            try:
-                if isinstance(signal.format, Scaling):
-                    value = signal.format.decode_value(remaining_data)
-                elif isinstance(signal.format, Enumeration):
-                    value = signal.format.decode_value(remaining_data)
-                values[signal.id] = value
-            except Exception as e:
-                print(f"Error decoding signal {signal.id}: {e}")
+        responses = []
+        for matched_command in matched_commands:
+            for signal in matched_command.signals:
+                try:
+                    if isinstance(signal.format, Scaling):
+                        value = signal.format.decode_value(remaining_data)
+                    elif isinstance(signal.format, Enumeration):
+                        value = signal.format.decode_value(remaining_data)
+                    values[signal.id] = value
+                except Exception as e:
+                    print(f"Error decoding signal {signal.id}: {e}")
+            responses.append(CommandResponse(matched_command, remaining_data, values))
 
-        return [CommandResponse(matched_command, remaining_data, values)]
+        return responses
 
     def _extract_service_01_commands(self, can_id: str, data: bytes) -> List[CommandResponse]:
         if not data:
