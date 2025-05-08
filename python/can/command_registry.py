@@ -119,11 +119,7 @@ class CommandRegistry:
         # Prioritize the most recently-registered command by reversing the array.
         commands = reversed(self.commands_by_parameter.get(param_key, []))
 
-        # First try to find command with matching receive address
-        matched_command = None
-
-        # Sort commands to prioritize those with a specific receive address matching the CAN ID
-        # before falling back to commands without a receive address filter
+        matched_commands = []
         matching_commands = []
         generic_commands = []
 
@@ -170,8 +166,7 @@ class CommandRegistry:
         # Prioritize the most recently-registered command by reversing the array.
         commands = reversed(self.commands_by_parameter.get(param_key, []))
 
-        # Sort commands to prioritize those with a specific receive address matching the CAN ID
-        # before falling back to commands without a receive address filter
+        matched_commands = []
         matching_commands = []
         generic_commands = []
 
