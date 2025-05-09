@@ -72,7 +72,8 @@ def get_command_signature(cmd: Dict[str, Any]) -> tuple:
     return (
         cmd.get('hdr'),
         cmd.get('rax'),
-        json.dumps(cmd.get('cmd'))  # Convert dict to stable string representation
+        json.dumps(cmd.get('cmd')),     # Convert dict to stable string representation
+        json.dumps(cmd.get('filter'))   # Convert dict to stable string representation
     )
 
 def remove_duplicate_commands(commands: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
