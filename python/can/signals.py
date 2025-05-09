@@ -227,6 +227,38 @@ class Signal:
         )
 
 @dataclass(frozen=True)
+class Filter:
+    from_year: Optional[int] = None
+    to_year: Optional[int] = None
+    years: Optional[Set[int]] = None
+
+    def matches(self, model_year: Optional[int]) -> bool:
+        if model_year is not None:
+            if self.from_year is not None and self.to_year is not None:
+                if self.from_year < self.to_year:
+                    if self.from_year <= model_year <= self.to_year:
+                        return True
+                elif model_year >= self.from_year or model_year <= self.to_year:
+                    return True
+            elif self.to_year is not None:
+                if model_year <= self.to_year:
+                    return True
+            elif self.from_year is not None:
+                if model_year >= self.from_year:
+                    return True
+            if self.years is not None and model_year in self.years:
+                return True
+        return False
+
+    @staticmethod
+    def from_json(data: Dict) -> 'Filter':
+        return Filter(
+            from_year=data.get('from'),
+            to_year=data.get('to'),
+            years=set(data['years']) if 'years' in data and data['years'] else None
+        )
+
+@dataclass(frozen=True)
 class Command:
     parameter: Parameter
     header: int
@@ -238,6 +270,7 @@ class Command:
     timeout: Optional[int] = None
     force_flow_control: bool = False
     debug: bool = False
+    filter: Optional[Filter] = None
 
     @staticmethod
     def from_json(data: Dict) -> 'Command':
@@ -251,6 +284,9 @@ class Command:
         if receive_address and len(data['hdr']) == 4:
             receive_address = 0x18DAF100 | (receive_address & 0xFF)
 
+        filter_data = data.get('filter')
+        command_filter = Filter.from_json(filter_data) if filter_data else None
+
         return Command(
             parameter=Parameter.from_json(data['cmd']),
             header=header,
@@ -261,7 +297,8 @@ class Command:
             tester_address=int(data['tst'], 16) if 'tst' in data else None,
             timeout=int(data['tmo'], 16) if 'tmo' in data else None,
             force_flow_control=data.get('fcm1', False),
-            debug=data.get('dbg', False)
+            debug=data.get('dbg', False),
+            filter=command_filter
         )
 
 @dataclass

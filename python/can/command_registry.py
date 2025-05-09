@@ -10,7 +10,7 @@ from pathlib import Path
 from signalsets.loader import get_signalset_from_model_year
 
 from .can_frame import CANPacket, CANFrameScanner, CANIDFormat
-from .signals import Command, Enumeration, Scaling, SignalSet
+from .signals import Command, Enumeration, Scaling, SignalSet, Filter
 from .repo_utils import extract_make_from_repo_name
 
 # Cache directory for downloaded signal definitions
@@ -363,6 +363,14 @@ def get_model_year_command_registry(model_year: int) -> 'CommandRegistry':
 
         # Combine signals from SAE J1979 and model-specific or make-specific signals
         combined_commands = list(saej1979_commands) + list(signalset.commands)
+
+        # Filter combined_commands by each command's optional .filter property.
+        if model_year is not None:
+            filtered_commands = []
+            for cmd in combined_commands:
+                if cmd.filter is None or cmd.filter.matches(model_year):
+                    filtered_commands.append(cmd)
+            combined_commands = filtered_commands
 
         # Create and cache the registry
         registry = CommandRegistry(combined_commands)
