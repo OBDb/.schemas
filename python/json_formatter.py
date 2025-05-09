@@ -36,7 +36,7 @@ def get_command_sort_key(cmd: Dict[str, Any]) -> tuple:
     """
     # Get the protocol value
     proto = cmd.get('proto', '')
-    
+
     # Get the header (hdr) value
     hdr = cmd.get('hdr', '')
 
@@ -70,16 +70,9 @@ def get_command_signature(cmd: Dict[str, Any]) -> tuple:
         Tuple containing all relevant fields that define uniqueness
     """
     return (
-        cmd.get('proto', ''),
         cmd.get('hdr'),
         cmd.get('rax'),
-        cmd.get('eax'),
-        cmd.get('tst'),
-        cmd.get('tmo'),
-        cmd.get('fcm1', False),
-        cmd.get('dbg', False),
-        json.dumps(cmd.get('cmd')),  # Convert dict to stable string representation
-        cmd.get('freq')
+        json.dumps(cmd.get('cmd'))  # Convert dict to stable string representation
     )
 
 def remove_duplicate_commands(commands: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
@@ -102,6 +95,27 @@ def remove_duplicate_commands(commands: List[Dict[str, Any]]) -> List[Dict[str, 
 
     return unique_commands
 
+def format_filter_json(filter_obj: Dict[str, Any]) -> str:
+    """Format a filter object into a single line JSON string.
+
+    Args:
+        filter_obj: Dictionary containing filter data (from, to, years)
+
+    Returns:
+        Formatted JSON string for the filter object
+    """
+    parts = []
+    if "from" in filter_obj:
+        parts.append(f'"from": {filter_obj["from"]}')
+    if "to" in filter_obj:
+        parts.append(f'"to": {filter_obj["to"]}')
+    if "years" in filter_obj and filter_obj["years"]:
+        # Sort years for consistent output
+        sorted_years = sorted(list(filter_obj["years"]))
+        parts.append(f'"years": {json.dumps(sorted_years)}')
+
+    return f'{{ {", ".join(parts)} }}'
+
 def format_command_json(command: Dict[str, Any]) -> str:
     """Format a command dictionary in a human-friendly way.
 
@@ -122,7 +136,7 @@ def format_command_json(command: Dict[str, Any]) -> str:
 
     if "proto" in command:
         preamble.append(f'"proto": "{command["proto"]}"')
-        
+
     if "eax" in command:
         preamble.append(f'"eax": "{command["eax"]}"')
 
@@ -141,6 +155,12 @@ def format_command_json(command: Dict[str, Any]) -> str:
     # Add command and frequency
     preamble.append(f'"cmd": {format_parameter_json(command["cmd"])}')
     preamble.append(f'"freq": {format_number(command["freq"])}')
+
+    if "filter" in command:
+        preamble.append(f'"filter": {format_filter_json(command["filter"])}')
+
+    if "dbgfilter" in command:
+        preamble.append(f'"dbgfilter": {format_filter_json(command["dbgfilter"])}')
 
     # Separate signals into scalings and enumerations
     signals = command.get("signals", [])
@@ -510,6 +530,12 @@ def format_signal_groups(groups: List[Dict[str, Any]]) -> str:
         # Add matching regex, escaping backslashes
         matching_regex = group['matchingRegex'].replace('\\', '\\\\')
         row_parts.append(f'"matchingRegex": "{matching_regex}",')
+
+        if "filter" in group:
+            row_parts.append(f'"filter": {format_filter_json(commgroupand["filter"])}')
+
+        if "dbgfilter" in group:
+            row_parts.append(f'"dbgfilter": {format_filter_json(group["dbgfilter"])}')
 
         # Add required name
         row_parts.append(f'"name": "{group["name"]}"')
