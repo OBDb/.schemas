@@ -91,7 +91,7 @@ def test_filter_matches(filter_params, model_year: Optional[int], expected: bool
 
 def test_filter_from_json_empty_years():
     f = Filter.from_json({"years": []})
-    assert f.years == set()
+    assert f.years == None
     assert not f.matches(2000)
 
 def test_filter_from_json_none_values():
