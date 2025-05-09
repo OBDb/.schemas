@@ -1,0 +1,148 @@
+{ "commands": [
+{ "hdr": "770", "rax": "778", "dbg": true, "cmd": {"22": "BC03"}, "freq": 1, "filter": { "from": 2021 }, "dbgfilter": { "from": 2022, "to": 2023, "years": [2025]},
+  "signals": [
+    {"id": "ELANTRA_TRUNK",     "path": "Doors",     "fmt": {"bix": 32, "len": 1, "max": 1, "unit": "noyes" }, "name": "Trunk open?"},
+    {"id": "ELANTRA_DOOR_FL",   "path": "Doors",     "fmt": {"bix": 34, "len": 1, "max": 1, "unit": "noyes" }, "name": "Front left door open?"},
+    {"id": "ELANTRA_DOOR_FR",   "path": "Doors",     "fmt": {"bix": 35, "len": 1, "max": 1, "unit": "noyes" }, "name": "Front right door open?"},
+    {"id": "ELANTRA_HANDBRAKE", "path": "Control",   "fmt": {"bix": 36, "len": 1, "max": 1, "unit": "noyes" }, "name": "Handbrake engaged?"},
+    {"id": "ELANTRA_DOOR_RR",   "path": "Doors",     "fmt": {"bix": 37, "len": 1, "max": 1, "unit": "noyes" }, "name": "Rear right door open?"},
+    {"id": "ELANTRA_DOOR_RL",   "path": "Doors",     "fmt": {"bix": 39, "len": 1, "max": 1, "unit": "noyes" }, "name": "Rear left door open?"},
+    {"id": "ELANTRA_BELT_PASS", "path": "Seatbelts", "fmt": {"bix": 45, "len": 1, "max": 1, "unit": "noyes" }, "name": "Passenger seatbelt latched?"},
+    {"id": "ELANTRA_BELT_DRIV", "path": "Seatbelts", "fmt": {"bix": 46, "len": 1, "max": 1, "unit": "noyes" }, "name": "Driver seatbelt latched?"},
+    {"id": "ELANTRA_HOOD",      "path": "Doors",     "fmt": {"bix": 47, "len": 1, "max": 1, "unit": "noyes" }, "name": "Hood latched?"},
+    {"id": "ELANTRA_DEFOG_SW",  "path": "Climate",   "fmt": {"bix": 62, "len": 1, "max": 1, "unit": "noyes" }, "name": "Defogging?"}
+  ]},
+{ "hdr": "770", "rax": "778", "dbg": true, "cmd": {"22": "BC04"}, "freq": 1, "filter": { "from": 2021 },
+  "signals": [
+    {"id": "ELANTRA_GEAR_R",  "path": "Transmission", "fmt": {"bix": 35, "len": 1, "max": 1, "unit": "noyes"  }, "name": "Reverse gear selected"},
+    {"id": "ELANTRA_LOCK_FL", "path": "Doors",        "fmt": {"bix": 36, "len": 1, "max": 1, "unit": "scalar" }, "name": "Front left door locked?"},
+    {"id": "ELANTRA_LOCK_FR", "path": "Doors",        "fmt": {"bix": 37, "len": 1, "max": 1, "unit": "scalar" }, "name": "Front right door locked?"},
+    {"id": "ELANTRA_BELT_RM", "path": "Seatbelts",    "fmt": {"bix": 52, "len": 1, "max": 1, "unit": "noyes"  }, "name": "Rear middle seatbelt latched?"},
+    {"id": "ELANTRA_BELT_RL", "path": "Seatbelts",    "fmt": {"bix": 53, "len": 1, "max": 1, "unit": "noyes"  }, "name": "Rear left seatbelt latched?"},
+    {"id": "ELANTRA_BELT_RR", "path": "Seatbelts",    "fmt": {"bix": 54, "len": 1, "max": 1, "unit": "noyes"  }, "name": "Rear right seatbelt latched?"}
+  ]},
+{ "hdr": "770", "rax": "778", "dbg": true, "cmd": {"22": "BC05"}, "freq": 1, "filter": { "from": 2021 },
+  "signals": [
+    {"id": "ELANTRA_HAZARD_SW", "path": "Lights", "fmt": {"bix": 32, "len": 8, "max": 255,                             "unit": "scalar" }, "name": "Hazard switch"},
+    {"id": "ELANTRA_HL_SW",     "path": "Lights", "fmt": {"bix": 48, "len": 8, "max": 1,   "nullmin": 0, "nullmax": 2, "unit": "noyes"  }, "name": "Headlight switch (raw >2)"}
+  ]},
+{ "hdr": "770", "rax": "778", "dbg": true, "cmd": {"22": "BC07"}, "freq": 1, "filter": { "from": 2021 },
+  "signals": [
+    {"id": "ELANTRA_DEFOG_LIGHT", "path": "Climate", "fmt": {"bix": 40, "len": 8, "max": 1, "unit": "noyes" }, "name": "Defog light on"}
+  ]},
+{ "hdr": "770", "rax": "778", "dbg": true, "cmd": {"22": "BC08"}, "freq": 2, "filter": { "from": 2021 },
+  "signals": [
+    {"id": "ELANTRA_TURN_L", "path": "Lights", "fmt": {"bix": 32, "len": 8, "max": 1, "nullmin": 0, "nullmax": 1, "unit": "noyes" }, "name": "Left turn signal on? (raw >1)"},
+    {"id": "ELANTRA_TURN_R", "path": "Lights", "fmt": {"bix": 32, "len": 8, "max": 1, "nullmin": 0, "nullmax": 3, "unit": "noyes" }, "name": "Right turn signal on? (raw >3)"}
+  ]},
+{ "hdr": "770", "rax": "778", "dbg": true, "cmd": {"22": "BC09"}, "freq": 1, "filter": { "from": 2021 },
+  "signals": [
+    {"id": "ELANTRA_HL_HIGH", "path": "Lights", "fmt": {"bix": 48, "len": 8, "max": 1, "div": 12, "unit": "noyes" }, "name": "Headlight high beam on"},
+    {"id": "ELANTRA_HL_LOW",  "path": "Lights", "fmt": {"bix": 56, "len": 8, "max": 1, "div": 12, "unit": "noyes" }, "name": "Headlight low beam on"}
+  ]},
+{ "hdr": "7A0", "rax": "7A8", "cmd": {"22": "C00B"}, "freq": 15,
+  "signals": [
+    {"id": "ELANTRA_TP_FL", "path": "Tires", "fmt": {"bix": 32,  "len": 8, "max": 51,              "div": 5,             "unit": "psi"     }, "name": "Tire pressure front left",     "suggestedMetric": "frontLeftTirePressure"},
+    {"id": "ELANTRA_TT_FL", "path": "Tires", "fmt": {"bix": 40,  "len": 8, "max": 100, "min": -50,           "add": -50, "unit": "celsius" }, "name": "Tire temperature front left"},
+    {"id": "ELANTRA_TW_FL", "path": "Tires", "fmt": {"bix": 56,  "len": 8, "max": 1,                                     "unit": "noyes"   }, "name": "Tire alert front left"},
+    {"id": "ELANTRA_TP_FR", "path": "Tires", "fmt": {"bix": 72,  "len": 8, "max": 51,              "div": 5,             "unit": "psi"     }, "name": "Tire pressure front right",    "suggestedMetric": "frontRightTirePressure"},
+    {"id": "ELANTRA_TT_FR", "path": "Tires", "fmt": {"bix": 80,  "len": 8, "max": 100, "min": -50,           "add": -50, "unit": "celsius" }, "name": "Tire temperature front right"},
+    {"id": "ELANTRA_TW_FR", "path": "Tires", "fmt": {"bix": 96,  "len": 8, "max": 1,                                     "unit": "noyes"   }, "name": "Tire alert front right"},
+    {"id": "ELANTRA_TP_RR", "path": "Tires", "fmt": {"bix": 112, "len": 8, "max": 51,              "div": 5,             "unit": "psi"     }, "name": "Tire pressure rear right",     "suggestedMetric": "rearRightTirePressure"},
+    {"id": "ELANTRA_TT_RR", "path": "Tires", "fmt": {"bix": 120, "len": 8, "max": 100, "min": -50,           "add": -50, "unit": "celsius" }, "name": "Tire temperature rear right"},
+    {"id": "ELANTRA_TW_RR", "path": "Tires", "fmt": {"bix": 136, "len": 8, "max": 1,                                     "unit": "noyes"   }, "name": "Tire alert rear right"},
+    {"id": "ELANTRA_TP_RL", "path": "Tires", "fmt": {"bix": 152, "len": 8, "max": 51,              "div": 5,             "unit": "psi"     }, "name": "Tire pressure rear left",      "suggestedMetric": "rearLeftTirePressure"},
+    {"id": "ELANTRA_TT_RL", "path": "Tires", "fmt": {"bix": 160, "len": 8, "max": 100, "min": -50,           "add": -50, "unit": "celsius" }, "name": "Tire temperature rear left"},
+    {"id": "ELANTRA_TW_RL", "path": "Tires", "fmt": {"bix": 176, "len": 8, "max": 1,                                     "unit": "noyes"   }, "name": "Tire alert rear left"},
+    {"id": "ELANTRA_TB_FL", "path": "Tires", "name": "Tire battery front left", "fmt": {"bix": 48, "len": 8, "map": {
+          "0": { "description": ">3 V",        "value": "3V+" },
+          "1": { "description": "2.7 - 3 V",   "value": "27_3V" },
+          "2": { "description": "2.4 - 2.7 V", "value": "2_4_2_7V" },
+          "3": { "description": "< 2.4",       "value": "2_4-" }
+        }}
+    },
+    {"id": "ELANTRA_TB_FR", "path": "Tires", "name": "Tire battery front right", "fmt": {"bix": 88, "len": 8, "map": {
+          "0": { "description": ">3 V",        "value": "3V+" },
+          "1": { "description": "2.7 - 3 V",   "value": "27_3V" },
+          "2": { "description": "2.4 - 2.7 V", "value": "2_4_2_7V" },
+          "3": { "description": "< 2.4",       "value": "2_4-" }
+        }}
+    },
+    {"id": "ELANTRA_TB_RR", "path": "Tires", "name": "Tire battery rear right", "fmt": {"bix": 128, "len": 8, "map": {
+          "0": { "description": ">3 V",        "value": "3V+" },
+          "1": { "description": "2.7 - 3 V",   "value": "27_3V" },
+          "2": { "description": "2.4 - 2.7 V", "value": "2_4_2_7V" },
+          "3": { "description": "< 2.4",       "value": "2_4-" }
+        }}
+    },
+    {"id": "ELANTRA_TB_RL", "path": "Tires", "name": "Tire battery rear left", "fmt": {"bix": 168, "len": 8, "map": {
+          "0": { "description": ">3 V",        "value": "3V+" },
+          "1": { "description": "2.7 - 3 V",   "value": "27_3V" },
+          "2": { "description": "2.4 - 2.7 V", "value": "2_4_2_7V" },
+          "3": { "description": "< 2.4",       "value": "2_4-" }
+        }}
+    }
+  ]},
+{ "hdr": "7B3", "rax": "7BB", "fcm1": true, "dbg": true, "cmd": {"22": "0100"}, "freq": 0.5,
+  "signals": [
+    {"id": "ELANTRA_VSS", "path": "Movement", "fmt": {"bix": 232, "len": 8, "max": 255, "unit": "kilometersPerHour" }, "name": "Vehicle speed", "suggestedMetric": "speed"}
+  ]},
+{ "hdr": "7C6", "rax": "7CE", "cmd": {"22": "B002"}, "freq": 1,
+  "signals": [
+    {"id": "ELANTRA_FLI_VOL",         "path": "Fuel",       "fmt": {"bix": 32, "len": 8,  "max": 255,                   "unit": "liters"     }, "name": "Fuel level (volume)"},
+    {"id": "ELANTRA_CLUSTER_VOLTAGE", "path": "Electrical", "fmt": {"bix": 40, "len": 8,  "max": 18,       "div": 12.8, "unit": "volts"      }, "name": "Cluster voltage"},
+    {"id": "ELANTRA_ODO_KM",          "path": "Trips",      "fmt": {"bix": 48, "len": 24, "max": 16777215,              "unit": "kilometers" }, "name": "Odometer (metric)",   "suggestedMetric": "odometer"},
+    {"id": "ELANTRA_ODO_MI",          "path": "Trips",      "fmt": {"bix": 72, "len": 24, "max": 16777215,              "unit": "miles"      }, "name": "Odometer (imperial)", "suggestedMetric": "odometer"}
+  ]},
+{ "hdr": "7D1", "rax": "7D9", "dbg": true, "cmd": {"22": "0104"}, "freq": 1,
+  "signals": [
+    {"id": "ELANTRA_VSS_AVG",     "path": "Movement", "fmt": {"bix": 48,  "len": 8,  "max": 255,                                               "unit": "kilometersPerHour" }, "name": "ABS speed (avg)"},
+    {"id": "ELANTRA_TIRE_FL_VSS", "path": "Movement", "fmt": {"bix": 88,  "len": 8,  "max": 255,                                               "unit": "kilometersPerHour" }, "name": "ABS speed front left"},
+    {"id": "ELANTRA_TIRE_FR_VSS", "path": "Movement", "fmt": {"bix": 96,  "len": 8,  "max": 255,                                               "unit": "kilometersPerHour" }, "name": "ABS speed front right"},
+    {"id": "ELANTRA_TIRE_RR_VSS", "path": "Movement", "fmt": {"bix": 104, "len": 8,  "max": 255,                                               "unit": "kilometersPerHour" }, "name": "ABS speed rear right"},
+    {"id": "ELANTRA_TIRE_RL_VSS", "path": "Movement", "fmt": {"bix": 112, "len": 8,  "max": 255,                                               "unit": "kilometersPerHour" }, "name": "ABS speed rear left"},
+    {"id": "ELANTRA_TC_SWITCH",   "path": "Movement", "fmt": {"bix": 150, "len": 1,  "max": 1,                                                 "unit": "noyes"             }, "name": "ABS traction control switch (raw)"},
+    {"id": "ELANTRA_STEER_ANGLE", "path": "Control",  "fmt": {"bix": 200, "len": 16, "max": 3276.7, "min": -3276.8, "div": 10,   "sign": true, "unit": "degrees"           }, "name": "Steering wheel angle"},
+    {"id": "ELANTRA_BRAKE_P",     "path": "Control",  "fmt": {"bix": 256, "len": 16, "max": 100,                    "div": 86.7, "sign": true, "unit": "percent"           }, "name": "Brake pressure"}
+  ]},
+{ "hdr": "7D4", "rax": "7DC", "dbg": true, "cmd": {"22": "0101"}, "freq": 5,
+  "signals": [
+    {"id": "ELANTRA_BMS_SOC",        "path": "Battery", "fmt": {"bix": 32,  "len": 8,  "max": 100,                "div": 2,                 "unit": "percent"   }, "name": "BMS state of charge"},
+    {"id": "ELANTRA_BMS_CHG_PWR",    "path": "Battery", "fmt": {"bix": 40,  "len": 16, "max": 655.35,             "div": 100,               "unit": "kilowatts" }, "name": "BMS available charge power"},
+    {"id": "ELANTRA_BMS_DISCHG_PWR", "path": "Battery", "fmt": {"bix": 56,  "len": 16, "max": 655.35,             "div": 100,               "unit": "kilowatts" }, "name": "BMS available discharge power"},
+    {"id": "ELANTRA_BMS_MIN_TEMP",   "path": "Battery", "fmt": {"bix": 120, "len": 8,  "max": 80,     "min": -40,             "sign": true, "unit": "celsius"   }, "name": "BMS battery min temp"},
+    {"id": "ELANTRA_BMS_MOD1_TEMP",  "path": "Battery", "fmt": {"bix": 128, "len": 8,  "max": 80,     "min": -40,             "sign": true, "unit": "celsius"   }, "name": "BMS battery mod 1 temp"},
+    {"id": "ELANTRA_BMS_MOD2_TEMP",  "path": "Battery", "fmt": {"bix": 136, "len": 8,  "max": 80,     "min": -40,             "sign": true, "unit": "celsius"   }, "name": "BMS battery mod 2 temp"},
+    {"id": "ELANTRA_BMS_MOD3_TEMP",  "path": "Battery", "fmt": {"bix": 144, "len": 8,  "max": 80,     "min": -40,             "sign": true, "unit": "celsius"   }, "name": "BMS battery mod 3 temp"},
+    {"id": "ELANTRA_BMS_MOD4_TEMP",  "path": "Battery", "fmt": {"bix": 152, "len": 8,  "max": 80,     "min": -40,             "sign": true, "unit": "celsius"   }, "name": "BMS battery mod 4 temp"}
+  ]},
+{ "hdr": "7E0", "rax": "7E8", "dbg": true, "cmd": {"22": "E001"}, "freq": 5,
+  "signals": [
+    {"id": "ELANTRA_EIT", "path": "Engine", "fmt": {"bix": 264, "len": 8, "max": 143, "min": -48, "mul": 3, "div": 4, "add": -48, "unit": "celsius" }, "name": "Intake air temperature"},
+    {"id": "ELANTRA_EOT", "path": "Engine", "fmt": {"bix": 272, "len": 8, "max": 143, "min": -48, "mul": 3, "div": 4, "add": -48, "unit": "celsius" }, "name": "Engine oil temperature"}
+  ]},
+{ "hdr": "7E0", "rax": "7E8", "dbg": true, "cmd": {"22": "E002"}, "freq": 5,
+  "signals": [
+    {"id": "ELANTRA_INJ_DUR_1", "path": "Engine", "fmt": {"bix": 176, "len": 16, "blsb": true, "max": 53, "div": 1220.7, "unit": "seconds" }, "name": "Injection duration cyl 1"},
+    {"id": "ELANTRA_INJ_DUR_2", "path": "Engine", "fmt": {"bix": 192, "len": 16, "blsb": true, "max": 53, "div": 1220.7, "unit": "seconds" }, "name": "Injection duration cyl 2"},
+    {"id": "ELANTRA_INJ_DUR_3", "path": "Engine", "fmt": {"bix": 208, "len": 16, "blsb": true, "max": 53, "div": 1220.7, "unit": "seconds" }, "name": "Injection duration cyl 3"},
+    {"id": "ELANTRA_INJ_DUR_4", "path": "Engine", "fmt": {"bix": 224, "len": 16, "blsb": true, "max": 53, "div": 1220.7, "unit": "seconds" }, "name": "Injection duration cyl 4"}
+  ]},
+{ "hdr": "7E0", "rax": "7E8", "dbg": true, "cmd": {"22": "E004"}, "freq": 5,
+  "signals": [
+    {"id": "ELANTRA_AUX_SOC", "path": "Battery", "fmt": {"bix": 320, "len": 8, "max": 100, "unit": "percent" }, "name": "Aux battery state of charge"},
+    {"id": "ELANTRA_AUX_SOH", "path": "Battery", "fmt": {"bix": 328, "len": 8, "max": 100, "unit": "percent" }, "name": "Aux battery state of health"}
+  ]},
+{ "hdr": "7E0", "rax": "7E8", "dbg": true, "cmd": {"22": "E00A"}, "freq": 1,
+  "signals": [
+    {"id": "ELANTRA_KNOCK_RETARD_1", "path": "Engine", "fmt": {"bix": 96,  "len": 8, "max": 25, "min": -25, "div": 5, "sign": true, "unit": "degrees" }, "name": "Knock retard cyl 1"},
+    {"id": "ELANTRA_KNOCK_RETARD_2", "path": "Engine", "fmt": {"bix": 104, "len": 8, "max": 25, "min": -25, "div": 5, "sign": true, "unit": "degrees" }, "name": "Knock retard cyl 2"},
+    {"id": "ELANTRA_KNOCK_RETARD_3", "path": "Engine", "fmt": {"bix": 112, "len": 8, "max": 25, "min": -25, "div": 5, "sign": true, "unit": "degrees" }, "name": "Knock retard cyl 3"},
+    {"id": "ELANTRA_KNOCK_RETARD_4", "path": "Engine", "fmt": {"bix": 120, "len": 8, "max": 25, "min": -25, "div": 5, "sign": true, "unit": "degrees" }, "name": "Knock retard cyl 4"},
+    {"id": "ELANTRA_KNOCK_LEARN_1",  "path": "Engine", "fmt": {"bix": 160, "len": 8, "max": 25, "min": -25, "div": 5, "sign": true, "unit": "degrees" }, "name": "Knock learn cyl 1"},
+    {"id": "ELANTRA_KNOCK_LEARN_2",  "path": "Engine", "fmt": {"bix": 168, "len": 8, "max": 25, "min": -25, "div": 5, "sign": true, "unit": "degrees" }, "name": "Knock learn cyl 2"},
+    {"id": "ELANTRA_KNOCK_LEARN_3",  "path": "Engine", "fmt": {"bix": 176, "len": 8, "max": 25, "min": -25, "div": 5, "sign": true, "unit": "degrees" }, "name": "Knock learn cyl 3"},
+    {"id": "ELANTRA_KNOCK_LEARN_4",  "path": "Engine", "fmt": {"bix": 184, "len": 8, "max": 25, "min": -25, "div": 5, "sign": true, "unit": "degrees" }, "name": "Knock learn cyl 4"}
+  ]}
+]
+}

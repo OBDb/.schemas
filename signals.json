@@ -1,5 +1,16 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema",
+  "definitions": {
+    "filterObject": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "from": { "type": "integer" },
+        "to": { "type": "integer" },
+        "years": { "type": "array", "items": { "type": "integer" }, "uniqueItems": true }
+      }
+    }
+  },
   "type": "object",
   "additionalProperties": false,
   "properties": {
@@ -38,6 +49,8 @@
             "15765-4-11bit",
             "15765-4-29bit"
           ]},
+          "filter": { "$ref": "#/definitions/filterObject" },
+          "dbgfilter": { "$ref": "#/definitions/filterObject" },
           "signals": {
             "type": "array",
             "uniqueItems": true,
