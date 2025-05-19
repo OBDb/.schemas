@@ -30,6 +30,7 @@
           "hdr": { "type": "string", "minLength": 3, "maxLength": 4 },
           "rax": { "type": "string", "minLength": 2, "maxLength": 3 },
           "eax": { "type": "string", "minLength": 2, "maxLength": 2 },
+          "pri": { "type": "string", "minLength": 2, "maxLength": 2 },
           "tst": { "type": "string", "minLength": 2, "maxLength": 2 },
           "tmo": { "type": "string", "minLength": 2, "maxLength": 2 },
           "fcm1": { "type": "boolean" },
