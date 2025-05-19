@@ -141,6 +141,9 @@ def format_command_json(command: Dict[str, Any]) -> str:
     if "eax" in command:
         preamble.append(f'"eax": "{command["eax"]}"')
 
+    if "pri" in command:
+        preamble.append(f'"pri": "{command["pri"]}"')
+
     if "tst" in command:
         preamble.append(f'"tst": "{command["tst"]}"')
 
