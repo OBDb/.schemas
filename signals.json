@@ -5,12 +5,13 @@
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "from": { "type": "integer" },
-        "to": { "type": "integer" },
-        "years": { "type": "array", "items": { "type": "integer" }, "uniqueItems": true }
+        "from": { "type": "integer", "description": "Starting year in a range, inclusive" },
+        "to": { "type": "integer", "description": "Ending year in a range, inclusive" },
+        "years": { "type": "array", "description": "Specific years to include", "items": { "type": "integer" }, "uniqueItems": true }
       }
     },
     "unitEnum": {
+      "description": "Supported measurement units",
       "enum": [
         "ampereHours",
         "amps",
@@ -88,6 +89,7 @@
       ]
     },
     "suggestedMetricEnum": {
+      "description": "User interface elements that can be connected to a signal",
       "enum": [
         "distanceSinceDTCsCleared",
         "electricRange",
@@ -107,6 +109,7 @@
       ]
     },
     "pathPattern": {
+      "description": "Pattern for signal paths; organizes signals in a hierarchical structure",
       "type": "string",
       "pattern": "^(Airbags|Battery|Brakes|Climate|Clocks|Control|Cruise control|Drivetrain|Doors|DTCs|Electrical|ECU|Emissions|Engine|Fluids|Fuel|Keys|Lights|Mirrors|Monitors|Movement|OBD|Orientation|Seats|Seatbelts|Stats|Suspension|Tires|Transmission|Trips|Windows|Windshield)(\\.|$)"
     }
@@ -115,11 +118,13 @@
   "additionalProperties": false,
   "properties": {
     "diagnosticLevel": {
+      "description": "Hexadecimal diagnostic code that should be used for the vehicle.",
       "type": "string",
       "minLength": 2,
       "maxLength": 2
     },
     "commands": {
+      "description": "A collection of commands that can be executed to retrieve signal data.",
       "type": "array",
       "uniqueItems": true,
       "minItems": 0,
@@ -127,63 +132,66 @@
         "type": "object",
         "additionalProperties": false,
         "properties": {
-          "hdr": { "type": "string", "minLength": 3, "maxLength": 4 },
-          "rax": { "type": "string", "minLength": 2, "maxLength": 3 },
-          "eax": { "type": "string", "minLength": 2, "maxLength": 2 },
-          "pri": { "type": "string", "minLength": 2, "maxLength": 2 },
-          "tst": { "type": "string", "minLength": 2, "maxLength": 2 },
-          "tmo": { "type": "string", "minLength": 2, "maxLength": 2 },
-          "fcm1": { "type": "boolean" },
-          "dbg": { "type": "boolean" },
+          "hdr": { "type": "string", "description": "Header identifier for the command, hex", "minLength": 3, "maxLength": 4 },
+          "rax": { "type": "string", "description": "Receive filter address, hex", "minLength": 2, "maxLength": 3 },
+          "eax": { "type": "string", "description": "Extended address, hex", "minLength": 2, "maxLength": 2 },
+          "pri": { "type": "string", "description": "CAN priority, hex", "minLength": 2, "maxLength": 2 },
+          "tst": { "type": "string", "description": "Tester address, hex", "minLength": 2, "maxLength": 2 },
+          "tmo": { "type": "string", "description": "Timeout value, hex", "minLength": 2, "maxLength": 2 },
+          "fcm1": { "type": "boolean", "description": "Whether to enable flow control; disabled by default" },
+          "dbg": { "type": "boolean", "description": "Whether to debug the signal responses" },
           "cmd": {
             "type": "object",
+            "description": "Which service to execute the command on",
             "additionalProperties": false,
             "properties": {
-              "01": { "type": "string", "minLength": 2, "maxLength": 2 },
-              "21": { "type": "string", "minLength": 2, "maxLength": 2 },
-              "22": { "type": "string", "minLength": 4, "maxLength": 4 }
+              "01": { "type": "string", "description": "Service 01 PID", "minLength": 2, "maxLength": 2 },
+              "21": { "type": "string", "description": "Service 21 PID", "minLength": 2, "maxLength": 2 },
+              "22": { "type": "string", "description": "Service 22 PID", "minLength": 4, "maxLength": 4 }
             }
           },
-          "freq": { "type": "number", "exclusiveMinimum": 0 },
+          "freq": { "type": "number", "description": "Frequency at which to request this command, seconds", "exclusiveMinimum": 0 },
           "proto": { "enum": [
             "9141-2",
             "15765-4-11bit",
             "15765-4-29bit"
-          ]},
+          ], "description": "Communication protocol used for this command" },
           "filter": { "$ref": "#/definitions/filterObject" },
           "dbgfilter": { "$ref": "#/definitions/filterObject" },
           "signals": {
             "type": "array",
+            "description": "Signals to extract from the command response",
             "uniqueItems": true,
             "minItems": 1,
             "items": {
               "type": "object",
               "additionalProperties": false,
               "properties": {
-                "id": { "type": "string" },
-                "name": { "type": "string" },
-                "hidden": { "type": "boolean" },
-                "description": { "type": "string" },
+                "id": { "type": "string", "description": "Unique identifier for the signal" },
+                "name": { "type": "string", "description": "Human-readable name for the signal" },
+                "hidden": { "type": "boolean", "description": "Whether the signal should be hidden from UI display" },
+                "description": { "type": "string", "description": "Detailed description of what the signal represents" },
                 "fmt": {
                   "type": "object",
+                  "description": "Format specification for decoding the signal from raw bytes",
                   "additionalProperties": false,
                   "properties": {
-                    "bix": { "type": "integer" },
-                    "len": { "type": "integer" },
-                    "blsb": { "type": "boolean" },
-                    "sign": { "type": "boolean" },
-                    "min": { "type": "number" },
-                    "max": { "type": "number" },
-                    "add": { "type": "number" },
-                    "mul": { "type": "number" },
-                    "div": { "type": "number" },
-                    "unit": { "$ref": "#/definitions/unitEnum" },
-                    "nullmin": { "type": "number" },
-                    "nullmax": { "type": "number" },
-                    "omin": { "type": "number" },
-                    "omax": { "type": "number" },
-                    "oval": { "type": "number" },
-                    "map": { "type": "object" }
+                    "bix": { "type": "integer", "description": "Bit index in the response where the signal starts" },
+                    "len": { "type": "integer", "description": "Length of the signal in bits" },
+                    "blsb": { "type": "boolean", "description": "Byte is LSB (Least Significant Bit) first" },
+                    "sign": { "type": "boolean", "description": "Whether the value is signed" },
+                    "min": { "type": "number", "description": "Minimum valid scaled value for the signal" },
+                    "max": { "type": "number", "description": "Maximum valid scaled value for the signal" },
+                    "add": { "type": "number", "description": "Offset to add to the raw value" },
+                    "mul": { "type": "number", "description": "Multiplier to apply to the raw value" },
+                    "div": { "type": "number", "description": "Divisor to apply to the raw value" },
+                    "unit": { "$ref": "#/definitions/unitEnum", "description": "Unit of measurement for the signal" },
+                    "nullmin": { "type": "number", "description": "Values below or equal to this value are considered null" },
+                    "nullmax": { "type": "number", "description": "Values above or equal to this value are considered null" },
+                    "omin": { "type": "number", "description": "Optimal minimum scaled value" },
+                    "omax": { "type": "number", "description": "Optimal maximum scaled value" },
+                    "oval": { "type": "number", "description": "Optimal scaled value" },
+                    "map": { "type": "object", "description": "Enumeration of raw values (integer-keyed) to human-readable values" }
                   },
                   "required": [
                     "len"
@@ -209,6 +217,7 @@
       }
     },
     "signalGroups": {
+      "description": "Groups of related signals that should be presented together in UI or analysis",
       "type": "array",
       "uniqueItems": true,
       "minItems": 1,
@@ -216,14 +225,14 @@
         "type": "object",
         "additionalProperties": false,
         "properties": {
-          "id": { "type": "string" },
-          "path": { "type": "string" },
-          "matchingRegex": { "type": "string" },
+          "id": { "type": "string", "description": "Unique identifier for the signal group" },
+          "path": { "type": "string", "description": "Path for organizing the group in a hierarchy" },
+          "matchingRegex": { "type": "string", "description": "Regular expression pattern to match signal IDs that belong to this group" },
           "suggestedMetricGroup": { "enum": [
             "batteryModulesStateOfCharge",
             "batteryModulesVoltage"
-          ]},
-          "name": { "type": "string" }
+          ], "description": "Standardized group name for common grouped metrics" },
+          "name": { "type": "string", "description": "Human-readable name for the signal group" }
         },
         "required": [
           "id",
@@ -232,6 +241,7 @@
       }
     },
     "synthetics": {
+      "description": "Signals that are computed from the values of other signals",
       "type": "array",
       "uniqueItems": true,
       "minItems": 0,
@@ -239,24 +249,26 @@
         "type": "object",
         "additionalProperties": false,
         "properties": {
-          "id": { "type": "string" },
-          "name": { "type": "string" },
-          "path": { "$ref": "#/definitions/pathPattern" },
-          "min": { "type": "number" },
-          "max": { "type": "number" },
-          "unit": { "$ref": "#/definitions/unitEnum" },
+          "id": { "type": "string", "description": "Unique identifier for the synthetic signal" },
+          "name": { "type": "string", "description": "Human-readable name for the synthetic signal" },
+          "path": { "$ref": "#/definitions/pathPattern", "description": "Path for organizing the signal in a hierarchy" },
+          "min": { "type": "number", "description": "Minimum valid value for the synthetic signal" },
+          "max": { "type": "number", "description": "Maximum valid value for the synthetic signal" },
+          "unit": { "$ref": "#/definitions/unitEnum", "description": "Unit of measurement for the synthetic signal" },
           "suggestedMetric": { "$ref": "#/definitions/suggestedMetricEnum" },
           "formula": {
             "type": "object",
+            "description": "Formula used to compute this synthetic signal from other signals",
             "additionalProperties": false,
             "properties": {
               "op": {
                 "enum": [
                   "ratio"
-                ]
+                ],
+                "description": "Operation to perform (e.g., ratio calculates a/b)"
               },
-              "a": { "type": "string" },
-              "b": { "type": "string" }
+              "a": { "type": "string", "description": "First signal ID used in the formula" },
+              "b": { "type": "string", "description": "Second signal ID used in the formula" }
             },
             "required": [
               "op",
