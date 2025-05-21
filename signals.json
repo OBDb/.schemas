@@ -282,6 +282,7 @@
           "name",
           "path",
           "max",
+          "unit",
           "formula"
         ]
       }
