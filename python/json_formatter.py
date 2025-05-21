@@ -635,6 +635,11 @@ def format_json_data(data) -> str:
         output[-1] += ','
         output.append(format_signal_groups(data['signalGroups']))
 
+    # Handle synthetics if present
+    if 'synthetics' in data:
+        output[-1] += ','
+        output.append(format_synthetics(data['synthetics']))
+
     # Close the JSON object
     output.append('}')
 
@@ -665,3 +670,59 @@ def format_file(input_path: str, output_path: Optional[str] = None) -> str:
             f.write(formatted)
 
     return formatted
+
+def format_synthetics(synthetics: List[Dict[str, Any]]) -> str:
+    """Format synthetic signals in a human-friendly way.
+
+    Args:
+        synthetics: List of synthetic signal dictionaries to format
+
+    Returns:
+        Formatted string with synthetic signals
+    """
+    if not synthetics:
+        return ''
+
+    # Sort synthetics by their ID
+    sorted_synthetics = sorted(synthetics, key=lambda s: s['id'])
+
+    # Format each synthetic signal
+    formatted_synthetics = []
+    for synthetic in sorted_synthetics:
+        # Start with ID
+        parts = [f'  {{ "id": "{synthetic["id"]}"']
+
+        # Add required fields
+        parts.append(f', "path": "{synthetic["path"]}"')
+        parts.append(f', "name": "{synthetic["name"]}"')
+
+        # Add optional fields
+        if "max" in synthetic:
+            parts.append(f', "max": {format_number(synthetic["max"])}')
+
+        if "min" in synthetic:
+            parts.append(f', "min": {format_number(synthetic["min"])}')
+
+        parts.append(f', "unit": "{synthetic["unit"]}"')
+
+        if "suggestedMetric" in synthetic:
+            parts.append(f', "suggestedMetric": "{synthetic["suggestedMetric"]}"')
+
+        # Format formula
+        formula = synthetic["formula"]
+        formula_parts = []
+        formula_parts.append('"op": "' + formula["op"] + '"')
+        formula_parts.append('"a": "' + formula["a"] + '"')
+        formula_parts.append('"b": "' + formula["b"] + '"')
+
+        parts.append(', "formula": {')
+        parts.append('\n    ' + ', '.join(formula_parts))
+        parts.append('\n  }}')
+
+        formatted_synthetics.append(''.join(parts))
+
+    # Join all formatted synthetics with commas and newlines
+    synthetics_str = ',\n'.join(formatted_synthetics)
+
+    # Return the final formatted string
+    return f'"synthetics": [\n{synthetics_str}\n]'
