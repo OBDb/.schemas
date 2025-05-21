@@ -1,0 +1,79 @@
+{ "commands": [
+{ "hdr": "70B", "rax": "775", "fcm1": true, "cmd": {"22": "18A0"}, "freq": 5,
+  "signals": [
+    {"id": "MACANEV_TP_FR", "path": "Tires", "fmt": {"bix": 40, "len": 8, "max": 6.375, "div": 40, "nullmax": 6.37, "unit": "bars" }, "name": "Front right tire pressure", "suggestedMetric": "frontRightTirePressure"}
+  ]},
+{ "hdr": "70B", "rax": "775", "fcm1": true, "cmd": {"22": "18A1"}, "freq": 5,
+  "signals": [
+    {"id": "MACANEV_TP_FL", "path": "Tires", "fmt": {"bix": 40, "len": 8, "max": 6.375, "div": 40, "nullmax": 6.37, "unit": "bars" }, "name": "Front left tire pressure", "suggestedMetric": "frontLeftTirePressure"}
+  ]},
+{ "hdr": "70B", "rax": "775", "fcm1": true, "cmd": {"22": "18A2"}, "freq": 5,
+  "signals": [
+    {"id": "MACANEV_TP_RL", "path": "Tires", "fmt": {"bix": 40, "len": 8, "max": 6.375, "div": 40, "nullmax": 6.37, "unit": "bars" }, "name": "Rear left tire pressure", "suggestedMetric": "rearLeftTirePressure"}
+  ]},
+{ "hdr": "70B", "rax": "775", "fcm1": true, "cmd": {"22": "18A3"}, "freq": 5,
+  "signals": [
+    {"id": "MACANEV_TP_RR", "path": "Tires", "fmt": {"bix": 40, "len": 8, "max": 6.375, "div": 40, "nullmax": 6.37, "unit": "bars" }, "name": "Rear right tire pressure", "suggestedMetric": "rearRightTirePressure"}
+  ]},
+{ "hdr": "710", "rax": "77A", "fcm1": true, "cmd": {"22": "2AB2"}, "freq": 86400,
+  "signals": [
+    {"id": "MACANEV_HVBAT_CAP", "path": "Battery", "fmt": { "len": 32, "max": 3276, "div": 1310770, "unit": "kilowattHours" }, "name": "HV battery capacity", "description": "Total possible energy in the high voltage battery"}
+  ]},
+{ "hdr": "710", "rax": "77A", "fcm1": true, "cmd": {"22": "2AB6"}, "freq": 5,
+  "signals": [
+    {"id": "MACANEV_RANGE", "path": "Trips", "fmt": { "len": 16, "max": 65535, "unit": "miles" }, "name": "Range remaining", "suggestedMetric": "electricRange"}
+  ]},
+{ "hdr": "710", "rax": "77A", "fcm1": true, "cmd": {"22": "2AB7"}, "freq": 5,
+  "signals": [
+    {"id": "MACANEV_AVG_CSMP_CAT0", "path": "Trips", "fmt": {           "len": 16, "max": 6553, "div": 10, "unit": "kilowattHours" }, "name": "Average consumption (category 0)"},
+    {"id": "MACANEV_AVG_CSMP_CAT1", "path": "Trips", "fmt": {"bix": 16, "len": 16, "max": 6553, "div": 10, "unit": "kilowattHours" }, "name": "Average consumption (category 1)"},
+    {"id": "MACANEV_AVG_CSMP_CAT2", "path": "Trips", "fmt": {"bix": 32, "len": 16, "max": 6553, "div": 10, "unit": "kilowattHours" }, "name": "Average consumption (category 2)"},
+    {"id": "MACANEV_AVG_CSMP_CAT3", "path": "Trips", "fmt": {"bix": 48, "len": 16, "max": 6553, "div": 10, "unit": "kilowattHours" }, "name": "Average consumption (category 3)"},
+    {"id": "MACANEV_AVG_CSMP_CAT4", "path": "Trips", "fmt": {"bix": 64, "len": 16, "max": 6553, "div": 10, "unit": "kilowattHours" }, "name": "Average consumption (category 4)"},
+    {"id": "MACANEV_AVG_CSMP_CAT5", "path": "Trips", "fmt": {"bix": 80, "len": 16, "max": 6553, "div": 10, "unit": "kilowattHours" }, "name": "Average consumption (category 5)"},
+    {"id": "MACANEV_AVG_CSMP_CAT6", "path": "Trips", "fmt": {"bix": 96, "len": 16, "max": 6553, "div": 10, "unit": "kilowattHours" }, "name": "Average consumption (category 6)"}
+  ]},
+{ "hdr": "710", "rax": "77A", "fcm1": true, "cmd": {"22": "2AB8"}, "freq": 1,
+  "signals": [
+    {"id": "MACANEV_HVBAT_KWH", "path": "Battery", "fmt": {"bix": 16, "len": 16, "max": 1000000, "mul": 25, "unit": "watts" }, "name": "HV battery energy", "description": "Energy stored in the high voltage battery"}
+  ]},
+{ "hdr": "710", "rax": "77A", "fcm1": true, "cmd": {"22": "2AF7"}, "freq": 1,
+  "signals": [
+    {"id": "MACANEV_AUX_BAT_V",        "path": "Battery", "fmt": {            "len": 16, "max": 69,                                      "div": 1000, "add": 4,                 "unit": "volts"       }, "name": "12V battery voltage"},
+    {"id": "MACANEV_AUX_BAT_C",        "path": "Battery", "fmt": {"bix": 16,  "len": 32, "max": 1000000,  "min": -1000000, "mul": 0.001,                          "sign": true, "unit": "amps"        }, "name": "12V battery current"},
+    {"id": "MACANEV_AUX_BAT_SOC",      "path": "Battery", "fmt": {"bix": 56,  "len": 8,  "max": 100,                                                                            "unit": "percent"     }, "name": "12V battery soc"},
+    {"id": "MACANEV_AUX_BAT_T",        "path": "Battery", "fmt": {"bix": 64,  "len": 8,  "max": 215,      "min": -40,                                 "add": -40,               "unit": "celsius"     }, "name": "12V battery temperature"},
+    {"id": "MACANEV_AUX_BAT_T_S",      "path": "Battery", "fmt": {"bix": 72,  "len": 8,  "max": 215,      "min": -40,                                 "add": -40,               "unit": "celsius"     }, "name": "12V battery sensor temperature"},
+    {"id": "MACANEV_AUX_BAT_CHRG_TOT", "path": "Battery", "fmt": {"bix": 96,  "len": 32, "max": 10000000,                                "div": 10,                             "unit": "ampereHours" }, "name": "12V battery total charge"},
+    {"id": "MACANEV_AUX_BAT_DSCH_TOT", "path": "Battery", "fmt": {"bix": 128, "len": 32, "max": 10000000,                                "div": 10,                             "unit": "ampereHours" }, "name": "12V battery total discharge"},
+    {"id": "MACANEV_AUX_BAT_AGE_CAP",  "path": "Battery", "fmt": {"bix": 160, "len": 8,  "max": 100,                                                                            "unit": "percent"     }, "name": "12V battery aging by capacity"},
+    {"id": "MACANEV_AUX_BAT_AGE_POW",  "path": "Battery", "fmt": {"bix": 168, "len": 8,  "max": 100,                                                                            "unit": "percent"     }, "name": "12V battery aging by power"},
+    {"id": "MACANEV_AUX_BAT_CAP",      "path": "Battery", "fmt": {"bix": 176, "len": 8,  "max": 100,                                                                            "unit": "ampereHours" }, "name": "12V battery adapted capacity"}
+  ]},
+{ "hdr": "715", "rax": "77F", "fcm1": true, "cmd": {"22": "2353"}, "freq": 3600,
+  "signals": [
+    {"id": "MACANEV_CRASH_CNT_FRONT", "path": "Stats", "fmt": { "len": 8, "max": 255, "unit": "scalar" }, "name": "Crashes, front"}
+  ]},
+{ "hdr": "715", "rax": "77F", "cmd": {"22": "2354"}, "freq": 3600,
+  "signals": [
+    {"id": "MACANEV_CRASH_CNT_DRVR", "path": "Stats", "fmt": { "len": 8, "max": 255, "unit": "scalar" }, "name": "Crashes, driver side"}
+  ]},
+{ "hdr": "715", "rax": "77F", "cmd": {"22": "2355"}, "freq": 3600,
+  "signals": [
+    {"id": "MACANEV_CRASH_CNT_PSNGR", "path": "Stats", "fmt": { "len": 8, "max": 255, "unit": "scalar" }, "name": "Crashes, passenger side"}
+  ]},
+{ "hdr": "715", "rax": "77F", "cmd": {"22": "2356"}, "freq": 3600,
+  "signals": [
+    {"id": "MACANEV_CRASH_CNT_REAR", "path": "Stats", "fmt": { "len": 8, "max": 255, "unit": "scalar" }, "name": "Crashes, rear"}
+  ]},
+{ "hdr": "715", "rax": "77F", "cmd": {"22": "2357"}, "freq": 3600,
+  "signals": [
+    {"id": "MACANEV_CRASH_CNT_ROLL", "path": "Stats", "fmt": { "len": 8, "max": 255, "unit": "scalar" }, "name": "Crashes, rollover"}
+  ]}
+],
+"synthetics": [
+  { "id": "MACANEV_SOC_EST", "path": "Battery", "name": "State of charge (from capacity)", "max": 1, "min": 0, "unit": "normal", "suggestedMetric": "stateOfCharge", "formula": {
+    "op": "ratio", "a": "MACANEV_HVBAT_KWH", "b": "MACANEV_HVBAT_CAP"
+  }}
+]
+}

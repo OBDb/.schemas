@@ -197,7 +197,8 @@ def test_strips_duplicate_commands():
 @pytest.mark.parametrize("test_file", [
     "ford-f-150.json",
     "saej1979.json",
-    "porsche-taycan.json"
+    "porsche-taycan.json",
+    "porsche-macan-electric.json"
 ], ids=lambda x: x.split('.')[0].replace('-', '_'))  # Create readable test IDs
 def test_signal_formatting(test_file):
     """Test signal set formatting for various vehicle models."""
