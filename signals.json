@@ -133,7 +133,7 @@
         "additionalProperties": false,
         "properties": {
           "hdr": { "type": "string", "description": "Header identifier for the command, hex", "minLength": 3, "maxLength": 4 },
-          "rax": { "type": "string", "description": "Receive filter address, hex", "minLength": 2, "maxLength": 3 },
+          "rax": { "type": "string", "description": "Receive filter address, hex", "minLength": 2, "maxLength": 6 },
           "eax": { "type": "string", "description": "Extended address, hex", "minLength": 2, "maxLength": 2 },
           "pri": { "type": "string", "description": "CAN priority, hex", "minLength": 2, "maxLength": 2 },
           "tst": { "type": "string", "description": "Tester address, hex", "minLength": 2, "maxLength": 2 },
