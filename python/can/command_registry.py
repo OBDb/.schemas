@@ -75,7 +75,10 @@ class CommandResponse:
 
 class CommandRegistry:
     def __init__(self, commands: List['Command']):
+        self.commands = commands
+
         # Group commands by parameter for efficient lookup
+        self.commands_by_id: Dict[str, Command] = {}
         self.commands_by_parameter = {}
         for cmd in commands:
             # Cast cmd.parameter.type.value from a hex string to an integer
@@ -84,6 +87,7 @@ class CommandRegistry:
             if param_key not in self.commands_by_parameter:
                 self.commands_by_parameter[param_key] = []
             self.commands_by_parameter[param_key].append(cmd)
+            self.commands_by_id[cmd.id] = cmd
 
     def identify_commands(self, packet: 'CANPacket') -> List[CommandResponse]:
         """Identify and parse commands from a CAN packet."""

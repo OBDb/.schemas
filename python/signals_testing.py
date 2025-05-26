@@ -17,7 +17,7 @@ sys.path.insert(0, str(Path(__file__).parent))
 
 from can.can_frame import CANFrameScanner, CANIDFormat
 from can.command_registry import decode_obd_response, get_model_year_command_registry
-from can.signals import SignalSet
+from can.signals import Command, SignalSet
 from signalsets.loader import find_signalset_for_year, load_signalset
 
 
@@ -291,9 +291,19 @@ def obd_yaml_testrunner(
             raise ValueError(f"Could not determine model year for command file: {yaml_path}")
 
         # Get command-specific test defaults
-        default_can_format = getattr(CANIDFormat, test_data.get('can_id_format', 'ELEVEN_BIT'))
-        default_ext_addr = test_data.get('extended_addressing_enabled', None)
         test_cases = test_data.get('test_cases', [])
+
+        # Get the pre-computed registry for this model year so that we can determine the can format and extended addressing behavior
+        registry = get_model_year_command_registry(model_year)
+
+        command_id = test_data.get('command_id')
+        command: Command = registry.commands_by_id.get(command_id)
+        if command:
+            default_can_format = command.protocol
+            default_ext_addr = command.extended_address is not None
+        else:
+            default_can_format = CANIDFormat.ELEVEN_BIT
+            default_ext_addr = None
 
         for test_idx, test_case in enumerate(test_cases):
             response_hex = test_case['response']

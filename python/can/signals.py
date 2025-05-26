@@ -3,6 +3,10 @@ from enum import Enum
 from typing import Dict, Optional, Set, Union, Tuple
 import json
 
+from .can_frame import CANIDFormat
+
+ID_PROPERTY_DIVIDER = "|"
+
 class ParameterType(Enum):
     SERVICE_01 = "01"
     SERVICE_21 = "21"
@@ -258,8 +262,26 @@ class Filter:
             years=set(data['years']) if 'years' in data and data['years'] else None
         )
 
+    def to_id_string(self) -> str:
+        """Convert the filter to a string representation for use in command IDs."""
+        parts = []
+
+        if self.from_year is not None and self.to_year is not None and self.from_year < self.to_year:
+            parts.append(f"{self.from_year}-{self.to_year}")
+        else:
+            if self.from_year is not None:
+                parts.append(f"{self.from_year}-")
+            if self.to_year is not None:
+                parts.append(f"-{self.to_year}")
+
+        if self.years is not None and self.years:
+            parts.extend(str(year) for year in sorted(self.years))
+
+        return ";".join(parts)
+
 @dataclass(frozen=True)
 class Command:
+    id: str
     parameter: Parameter
     header: int
     receive_address: Optional[int]
@@ -271,6 +293,9 @@ class Command:
     force_flow_control: bool = False
     debug: bool = False
     filter: Optional[Filter] = None
+    protocol: Optional[CANIDFormat] = None
+
+    ID_PROPERTY_DIVIDER = "|"
 
     @staticmethod
     def from_json(data: Dict) -> 'Command':
@@ -287,8 +312,41 @@ class Command:
         filter_data = data.get('filter')
         command_filter = Filter.from_json(filter_data) if filter_data else None
 
+        parameter = Parameter.from_json(data['cmd'])
+
+        # Format additional properties for ID
+        extended_address = int(data['eax'], 16) if 'eax' in data else None
+        tester_address = int(data['tst'], 16) if 'tst' in data else None
+        timeout = int(data['tmo'], 16) if 'tmo' in data else None
+        force_flow_control = data.get('fcm1', False)
+        car_protocol_strategy = data.get('proto')
+        can_priority = int(data['canp'], 16) if 'canp' in data else None
+
+        id = data['hdr']
+        if data.get('rax'):
+            id += '.' + data['rax']
+        id += '.' + parameter.as_message()
+        properties_string = Command._format_properties_for_id(
+            extended_address=extended_address,
+            tester_address=tester_address,
+            timeout=timeout,
+            force_flow_control=force_flow_control,
+            filter=command_filter,
+            car_protocol_strategy=car_protocol_strategy,
+            can_priority=can_priority
+        )
+        if properties_string:
+            id += Command.ID_PROPERTY_DIVIDER + properties_string
+        if len(data['hdr']) == 3:
+            protocol = CANIDFormat.ELEVEN_BIT
+        elif len(data['hdr']) == 4:
+            protocol = CANIDFormat.TWENTY_NINE_BIT
+        else:
+            protocol = None
+
         return Command(
-            parameter=Parameter.from_json(data['cmd']),
+            id=id,
+            parameter=parameter,
             header=header,
             receive_address=receive_address,
             signals=signals,
@@ -298,8 +356,36 @@ class Command:
             timeout=int(data['tmo'], 16) if 'tmo' in data else None,
             force_flow_control=data.get('fcm1', False),
             debug=data.get('dbg', False),
-            filter=command_filter
+            filter=command_filter,
+            protocol=protocol
         )
+
+    @staticmethod
+    def _format_properties_for_id(extended_address, tester_address, timeout, force_flow_control, filter, car_protocol_strategy=None, can_priority=None):
+        parts = []
+
+        if timeout:
+            parts.append(f"t={timeout:02X}")
+
+        if extended_address:
+            parts.append(f"e={extended_address:02X}")
+
+        if tester_address:
+            parts.append(f"ta={tester_address:02X}")
+
+        if force_flow_control:
+            parts.append("fc=1")
+
+        if car_protocol_strategy == "iso9141_2":
+            parts.append("p=9141-2")
+
+        if can_priority:
+            parts.append(f"c={can_priority:02X}")
+
+        if filter:
+            parts.append(f"f={filter.to_id_string()}")
+
+        return ",".join(parts)
 
 @dataclass
 class SignalSet:
