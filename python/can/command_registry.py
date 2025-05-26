@@ -20,12 +20,20 @@ SAEJ1979_URL = "https://raw.githubusercontent.com/OBDb/SAEJ1979/refs/heads/main/
 # Global registry cache by model year
 MODEL_YEAR_REGISTRY_CACHE: Dict[int, 'CommandRegistry'] = {}
 
-def _strip_rax_values(json_data: str) -> str:
-    """Remove 'rax' fields from the JSON data before parsing."""
+def _make_signalset_generic(json_data: str, header_override: str) -> str:
+    """Remove 'rax' fields and enable agnostic protocol magtching on each command in the signalset."""
     data = json.loads(json_data)
     for command in data.get('commands', []):
         command.pop('rax', None)
+        command['hdr'] = header_override
     return json.dumps(data)
+
+def _load_sae_commands(json_data: str) -> List['Command']:
+    return (
+        SignalSet.from_json(_make_signalset_generic(json_data, header_override='7E0')).commands
+        .union(SignalSet.from_json(_make_signalset_generic(json_data, header_override='DB33')).commands)
+        .union(SignalSet.from_json(_make_signalset_generic(json_data, header_override='686A')).commands)
+    )
 
 def get_cached_saej1979_signals() -> List['Command']:
     """Fetch and cache the SAEJ1979 signal definitions."""
@@ -37,8 +45,7 @@ def get_cached_saej1979_signals() -> List['Command']:
         if cache_file.exists() and (time.time() - cache_file.stat().st_mtime) < 86400:
             with open(cache_file) as f:
                 json_data = f.read()
-                cleaned_data = _strip_rax_values(json_data)
-                return SignalSet.from_json(cleaned_data).commands
+                return _load_sae_commands(json_data)
     except Exception as e:
         print(f"Warning: Error reading cache: {e}")
 
@@ -46,20 +53,18 @@ def get_cached_saej1979_signals() -> List['Command']:
         # Fetch fresh data
         with urllib.request.urlopen(SAEJ1979_URL) as response:
             json_data = response.read().decode('utf-8')
-            cleaned_data = _strip_rax_values(json_data)
             # Cache the cleaned data
             os.makedirs(CACHE_DIR, exist_ok=True)
             with open(cache_file, 'w') as f:
-                f.write(cleaned_data)
-            return SignalSet.from_json(cleaned_data).commands
+                f.write(json_data)
+            return _load_sae_commands(json_data)
     except Exception as e:
         print(f"Warning: Could not fetch SAEJ1979 signals: {e}")
         # If we have a cache file, use it even if it's old
         if cache_file.exists():
             with open(cache_file) as f:
                 json_data = f.read()
-                cleaned_data = _strip_rax_values(json_data)
-                return SignalSet.from_json(cleaned_data).commands
+                return _load_sae_commands(json_data)
         return []
 
 class ServiceType(Enum):
