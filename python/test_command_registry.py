@@ -1,5 +1,5 @@
 import pytest
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 from can.command_registry import CommandRegistry, ServiceType
 from can.signals import Command, Signal, Scaling, Parameter, ParameterType
@@ -8,15 +8,21 @@ from can.can_frame import CANPacket
 def create_test_command(
     pid: int,
     service_type: ServiceType,
-    receive_address: str,
+    receive_address: Optional[str],
     signals: List[Signal]
 ) -> Command:
     """Helper to create a test command with specified parameters."""
+    parameter = Parameter(
+        type=ParameterType(service_type.name.replace('SERVICE_', '')),
+        value=pid
+    )
+    id = '7E0.'
+    if receive_address:
+        id += receive_address + '.'
+    id += parameter.as_message()
     return Command(
-        parameter=Parameter(
-            type=ParameterType(service_type.name.replace('SERVICE_', '')),
-            value=pid
-        ),
+        id=id,
+        parameter=parameter,
         header=0x7E0,
         receive_address=int(receive_address, 16) if receive_address else None,
         signals=tuple(signals),
