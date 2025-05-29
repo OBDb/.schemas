@@ -10,6 +10,7 @@ from typing import Dict, List, Any, Tuple, Optional
 
 from .signals_testing import CANIDFormat, CANFrameScanner
 from can.command_registry import get_model_year_command_registry
+from can.signals import Command
 
 # Custom YAML formatting for multi-line strings
 class LiteralString(str):
@@ -135,10 +136,8 @@ def process_yaml_file(yaml_path: str, model_year: int, dry_run: bool = False, ve
             print(f"Skipping {yaml_path} - no test cases found")
         return
 
-    # Extract test configuration
-    can_id_format_str = yaml_data.get('can_id_format', 'ELEVEN_BIT')
-    can_id_format = getattr(CANIDFormat, can_id_format_str)
-    ext_addressing = yaml_data.get('extended_addressing_enabled', False)
+    # Get the pre-computed registry for this model year so that we can determine the can format and extended addressing behavior
+    registry = get_model_year_command_registry(model_year)
 
     # Track changes to report
     changes_made = False
@@ -157,12 +156,21 @@ def process_yaml_file(yaml_path: str, model_year: int, dry_run: bool = False, ve
         if isinstance(response_hex, str) and '\n' in response_hex:
             test_case['response'] = LiteralString(response_hex)
 
+        command_id = yaml_data.get('command_id')
+        command: Command = registry.commands_by_id.get(command_id)
+        if command:
+            can_format = command.protocol
+            ext_addr = command.extended_address is not None
+        else:
+            can_format = CANIDFormat.ELEVEN_BIT
+            ext_addr = None
+
         # Get all actual values using current signalset
         try:
             scanner = CANFrameScanner.from_ascii_string(
                 response_hex,
-                can_id_format=can_id_format,
-                extended_addressing_enabled=ext_addressing
+                can_id_format=can_format,
+                extended_addressing_enabled=ext_addr
             )
             if not scanner:
                 if verbose:
@@ -172,9 +180,6 @@ def process_yaml_file(yaml_path: str, model_year: int, dry_run: bool = False, ve
             # Process the response with current signalset
             current_values = {}
             try:
-                # Use current signalset to decode
-                registry = get_model_year_command_registry(model_year)
-
                 for packet in scanner:
                     command_responses = registry.identify_commands(packet)
                     for response in command_responses:
