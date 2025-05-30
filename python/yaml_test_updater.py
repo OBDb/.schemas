@@ -194,6 +194,9 @@ def process_yaml_file(yaml_path: str, model_year: int, dry_run: bool = False, ve
 
             # Update expected values
             new_expected = {}
+            signals_added = set()  # Track newly added signals for reporting
+
+            # First process existing signals
             for signal_id, expected_value in original_expected.items():
                 if signal_id in current_values:
                     # Signal still exists, keep it (possibly with updated value)
@@ -203,6 +206,12 @@ def process_yaml_file(yaml_path: str, model_year: int, dry_run: bool = False, ve
                 else:
                     # Signal no longer exists
                     signals_removed.add(signal_id)
+
+            # Now add any new signals that exist in current_values but weren't in original_expected
+            for signal_id, current_value in current_values.items():
+                if signal_id not in original_expected:
+                    new_expected[signal_id] = current_value
+                    signals_added.add(signal_id)
 
             # Check if we need to update the test case
             if new_expected != original_expected:
@@ -223,6 +232,8 @@ def process_yaml_file(yaml_path: str, model_year: int, dry_run: bool = False, ve
             if signals_updated:
                 for signal_id, (old_val, new_val) in signals_updated.items():
                     print(f"  Signal {signal_id} updated: {old_val} -> {new_val}")
+            if signals_added:
+                print(f"  Signals added: {', '.join(signals_added)}")
 
         if not dry_run:
             save_yaml_file(yaml_path, yaml_data)
