@@ -6,6 +6,7 @@ from .json_formatter import (
     tabularize,
     format_command_json,
     format_file,
+    format_filter_json,
     format_json_data,
     format_number,
     format_parameter_json
@@ -299,6 +300,84 @@ def test_format_command_signals_sorted_by_bix():
     ]
 
     assert signal_order == expected_order, f"Signals not sorted by bix. Got: {signal_order}, Expected: {expected_order}"
+
+def test_format_filter_json():
+    """Test format_filter_json with various chronological ordering scenarios."""
+
+    # Test case 1: from > to and from > max(years) - from should go after years
+    filter1 = {'from': 2020, 'to': 2011, 'years': [2013, 2015, 2017]}
+    result1 = format_filter_json(filter1)
+    assert result1 == '{ "to": 2011, "years": [2013, 2015, 2017], "from": 2020 }'
+
+    # Test case 2: from < to and from < min(years) - from should go first
+    filter2 = {'from': 2004, 'to': 2011, 'years': [2013, 2015, 2017]}
+    result2 = format_filter_json(filter2)
+    assert result2 == '{ "from": 2004, "to": 2011, "years": [2013, 2015, 2017] }'
+
+    # Test case 3: from < to but from > max(years) - from should go after years
+    filter3 = {'from': 2018, 'to': 2020, 'years': [2013, 2015, 2017]}
+    result3 = format_filter_json(filter3)
+    assert result3 == '{ "to": 2020, "years": [2013, 2015, 2017], "from": 2018 }'
+
+    # Test case 4: from > to but from < max(years) - from should go after to but before years
+    filter4 = {'from': 2014, 'to': 2013, 'years': [2015, 2017, 2019]}
+    result4 = format_filter_json(filter4)
+    assert result4 == '{ "to": 2013, "from": 2014, "years": [2015, 2017, 2019] }'
+
+    # Test case 5: only from field
+    filter5 = {'from': 2015}
+    result5 = format_filter_json(filter5)
+    assert result5 == '{ "from": 2015 }'
+
+    # Test case 6: only to field
+    filter6 = {'to': 2020}
+    result6 = format_filter_json(filter6)
+    assert result6 == '{ "to": 2020 }'
+
+    # Test case 7: only years field (should be sorted)
+    filter7 = {'years': [2017, 2013, 2015]}
+    result7 = format_filter_json(filter7)
+    assert result7 == '{ "years": [2013, 2015, 2017] }'
+
+    # Test case 8: from and to only, from < to
+    filter8 = {'from': 2010, 'to': 2015}
+    result8 = format_filter_json(filter8)
+    assert result8 == '{ "from": 2010, "to": 2015 }'
+
+    # Test case 9: from and to only, from > to
+    filter9 = {'from': 2015, 'to': 2010}
+    result9 = format_filter_json(filter9)
+    assert result9 == '{ "to": 2010, "from": 2015 }'
+
+    # Test case 10: from and years only, from < min(years)
+    filter10 = {'from': 2010, 'years': [2015, 2017, 2019]}
+    result10 = format_filter_json(filter10)
+    assert result10 == '{ "from": 2010, "years": [2015, 2017, 2019] }'
+
+    # Test case 11: from and years only, from > max(years)
+    filter11 = {'from': 2020, 'years': [2015, 2017, 2019]}
+    result11 = format_filter_json(filter11)
+    assert result11 == '{ "years": [2015, 2017, 2019], "from": 2020 }'
+
+    # Test case 12: from and years only, from in middle of years range
+    filter12 = {'from': 2016, 'years': [2015, 2017, 2019]}
+    result12 = format_filter_json(filter12)
+    assert result12 == '{ "from": 2016, "years": [2015, 2017, 2019] }'
+
+    # Test case 13: to and years only
+    filter13 = {'to': 2016, 'years': [2015, 2017, 2019]}
+    result13 = format_filter_json(filter13)
+    assert result13 == '{ "to": 2016, "years": [2015, 2017, 2019] }'
+
+    # Test case 14: empty years list should be ignored
+    filter14 = {'from': 2015, 'to': 2020, 'years': []}
+    result14 = format_filter_json(filter14)
+    assert result14 == '{ "from": 2015, "to": 2020 }'
+
+    # Test case 15: empty filter object
+    filter15 = {}
+    result15 = format_filter_json(filter15)
+    assert result15 == '{  }'
 
 
 if __name__ == '__main__':

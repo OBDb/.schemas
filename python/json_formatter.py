@@ -106,14 +106,35 @@ def format_filter_json(filter_obj: Dict[str, Any]) -> str:
         Formatted JSON string for the filter object
     """
     parts = []
-    if "from" in filter_obj:
+
+    # Get values for ordering logic
+    from_val = filter_obj.get("from")
+    to_val = filter_obj.get("to")
+    years_val = filter_obj.get("years", [])
+
+    # Sort years for consistent output
+    sorted_years = sorted(list(years_val)) if years_val else []
+    max_year = max(sorted_years) if sorted_years else None
+
+    # Determine if from should be placed after to and/or years
+    from_after_to = from_val is not None and to_val is not None and from_val > to_val
+    from_after_years = from_val is not None and max_year is not None and from_val > max_year
+
+    # Add fields in chronological order
+    if "from" in filter_obj and not from_after_to and not from_after_years:
         parts.append(f'"from": {filter_obj["from"]}')
+
     if "to" in filter_obj:
         parts.append(f'"to": {filter_obj["to"]}')
+
+    if "from" in filter_obj and from_after_to and not from_after_years:
+        parts.append(f'"from": {filter_obj["from"]}')
+
     if "years" in filter_obj and filter_obj["years"]:
-        # Sort years for consistent output
-        sorted_years = sorted(list(filter_obj["years"]))
         parts.append(f'"years": {json.dumps(sorted_years)}')
+
+    if "from" in filter_obj and from_after_years:
+        parts.append(f'"from": {filter_obj["from"]}')
 
     return f'{{ {", ".join(parts)} }}'
 
@@ -536,7 +557,7 @@ def format_signal_groups(groups: List[Dict[str, Any]]) -> str:
         row_parts.append(f'"matchingRegex": "{matching_regex}",')
 
         if "filter" in group:
-            row_parts.append(f'"filter": {format_filter_json(commgroupand["filter"])}')
+            row_parts.append(f'"filter": {format_filter_json(group["filter"])}')
 
         if "dbgfilter" in group:
             row_parts.append(f'"dbgfilter": {format_filter_json(group["dbgfilter"])}')
