@@ -55,6 +55,7 @@
         "megaohms",
         "meters",
         "metersPerSecond",
+        "metersPerSecondSquared",
         "microhertz",
         "microohms",
         "miles",
