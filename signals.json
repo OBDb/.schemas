@@ -115,7 +115,7 @@
     "pathPattern": {
       "description": "Pattern for signal paths; organizes signals in a hierarchical structure",
       "type": "string",
-      "pattern": "^(Airbags|Battery|Brakes|Climate|Clocks|Control|Cruise control|Drivetrain|Doors|DTCs|Electrical|ECU|Emissions|Engine|Fluids|Fuel|Keys|Lights|Mirrors|Monitors|Movement|OBD|Orientation|Seats|Seatbelts|Stats|Suspension|Tires|Transmission|Trips|Windows|Windshield)(\\.|$)"
+      "pattern": "^(Airbags|Battery|Brakes|Climate|Clocks|Control|Cruise control|Details|Drivetrain|Doors|DTCs|Electrical|ECU|Emissions|Engine|Fluids|Fuel|Keys|Lights|Mirrors|Monitors|Movement|OBD|Orientation|Seats|Seatbelts|Stats|Suspension|Tires|Transmission|Trips|Windows|Windshield)(\\.|$)"
     }
   },
   "type": "object",
