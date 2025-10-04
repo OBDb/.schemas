@@ -320,7 +320,7 @@ class Command:
         timeout = int(data['tmo'], 16) if 'tmo' in data else None
         force_flow_control = data.get('fcm1', False)
         car_protocol_strategy = data.get('proto')
-        can_priority = int(data['canp'], 16) if 'canp' in data else None
+        can_priority = int(data['pri'], 16) if 'pri' in data else None
 
         id = data['hdr']
         if data.get('rax'):
