@@ -518,6 +518,21 @@ def _format_scaling(fmt: dict) -> list[str]:
     else:
         keys.append("")
 
+    if 'omin' in fmt:
+        keys.append(f'"omin": {format_number(fmt["omin"])},')
+    else:
+        keys.append("")
+
+    if 'oval' in fmt:
+        keys.append(f'"oval": {format_number(fmt["oval"])},')
+    else:
+        keys.append("")
+
+    if 'omax' in fmt:
+        keys.append(f'"omax": {format_number(fmt["omax"])},')
+    else:
+        keys.append("")
+
     # Add unit and close format object
     keys.append(f'"unit": "{fmt["unit"]}"')
     keys.append("},")
