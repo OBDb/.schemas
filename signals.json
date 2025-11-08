@@ -144,6 +144,8 @@
           "tmo": { "type": "string", "description": "Timeout value, hex", "minLength": 2, "maxLength": 2 },
           "fcm1": { "type": "boolean", "description": "Whether to enable flow control; disabled by default" },
           "dbg": { "type": "boolean", "description": "Whether to debug the signal responses" },
+          "din": { "type": "string", "description": "Diagnostic level the ECU must enter in order to run this command" },
+          "dout": { "type": "string", "description": "Diagnostic level the ECU should return to after running this command" },
           "cmd": {
             "type": "object",
             "description": "Which service to execute the command on",
