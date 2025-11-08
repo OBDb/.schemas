@@ -174,6 +174,12 @@ def format_command_json(command: Dict[str, Any]) -> str:
     if command.get("fcm1", False):
         preamble.append('"fcm1": true')
 
+    if "din" in command:
+        preamble.append(f'"din": "{command["din"]}"')
+
+    if "dout" in command:
+        preamble.append(f'"dout": "{command["dout"]}"')
+
     if command.get("dbg", False):
         preamble.append('"dbg": true')
 
