@@ -96,6 +96,7 @@
     "suggestedMetricEnum": {
       "description": "User interface elements that can be connected to a signal",
       "enum": [
+        "cvtDeterioration",
         "distanceSinceDTCsCleared",
         "electricRange",
         "frontLeftTirePressure",
