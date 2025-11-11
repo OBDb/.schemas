@@ -96,22 +96,32 @@
     "suggestedMetricEnum": {
       "description": "User interface elements that can be connected to a signal",
       "enum": [
+        "commandedLambda",
         "cvtDeterioration",
         "distanceSinceDTCsCleared",
         "electricRange",
+        "engineCoolantTemperature",
+        "engineLoad",
+        "engineOilTemperature",
         "frontLeftTirePressure",
         "frontRightTirePressure",
         "fuelRange",
+        "fuelRate",
         "fuelTankLevel",
         "isCharging",
+        "massAirFlow",
+        "o2Lambda",
         "odometer",
         "pluggedIn",
         "rearLeftTirePressure",
         "rearRightTirePressure",
+        "shortTermFuelTrim",
         "speed",
         "starterBatteryVoltage",
         "stateOfCharge",
-        "stateOfHealth"
+        "stateOfHealth",
+        "throttlePosition",
+        "transmissionFluidTemperature"
       ]
     },
     "pathPattern": {
