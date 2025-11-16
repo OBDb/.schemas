@@ -236,6 +236,11 @@ class Filter:
     to_year: Optional[int] = None
     years: Optional[Set[int]] = None
 
+    def __hash__(self) -> int:
+        # Convert the years set to a frozenset to make it hashable
+        years_tuple = frozenset(self.years) if self.years is not None else None
+        return hash((self.from_year, self.to_year, years_tuple))
+
     def matches(self, model_year: Optional[int]) -> bool:
         if model_year is not None:
             if self.from_year is not None and self.to_year is not None:
