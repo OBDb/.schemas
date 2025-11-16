@@ -311,8 +311,14 @@ class Command:
             key=lambda x: x.id
         ))
 
+        can_priority = int(data['pri'], 16) if 'pri' in data else None
+
         if receive_address and len(data['hdr']) == 4:
-            receive_address = 0x18DAF100 | (receive_address & 0xFF)
+            priority = (can_priority or 0x18) & 0b0001_1111
+            if receive_address <= 255:
+                receive_address = (priority << 24) | 0x00DAF100 | (receive_address & 0xFF)
+            elif can_priority is not None:
+                receive_address = (can_priority << 24) | (receive_address & 0xFFFFFF)
 
         filter_data = data.get('filter')
         command_filter = Filter.from_json(filter_data) if filter_data else None
