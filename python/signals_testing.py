@@ -467,7 +467,7 @@ class OverlappingSignalError(Exception):
     pass
 
 
-def check_overlapping_signals(signalset_json: str) -> List[Dict[str, Any]]:
+def check_overlapping_signals_no_raise(signalset_json: str) -> List[Dict[str, Any]]:
     """
     Check a signalset for overlapping signal bit definitions within commands.
 
@@ -483,9 +483,6 @@ def check_overlapping_signals(signalset_json: str) -> List[Dict[str, Any]]:
         - signal_id: the signal that caused the overlap
         - bit: the bit index that was already occupied
         - conflicting_signal_id: the signal that already occupied the bit
-
-    Raises:
-        OverlappingSignalError: If any overlapping signals are found
     """
     import json
     signalset = json.loads(signalset_json)
@@ -516,6 +513,24 @@ def check_overlapping_signals(signalset_json: str) -> List[Dict[str, Any]]:
                     # Only report the first conflicting bit per signal
                     break
                 occupied_bits[bit] = signal_id
+
+    return errors
+
+
+def check_overlapping_signals(signalset_json: str) -> List[Dict[str, Any]]:
+    """
+    Check a signalset for overlapping signal bit definitions within commands.
+
+    Args:
+        signalset_json: JSON string containing the signal set definition
+
+    Returns:
+        Empty list if no overlaps found
+
+    Raises:
+        OverlappingSignalError: If any overlapping signals are found
+    """
+    errors = check_overlapping_signals_no_raise(signalset_json)
 
     if errors:
         error_messages = []

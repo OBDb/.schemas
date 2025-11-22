@@ -1,4 +1,4 @@
-from typing import Dict, List, Any, Optional
+from typing import Dict, List, Any, Optional, Tuple, Union
 import json
 import sys
 from pathlib import Path
@@ -6,7 +6,7 @@ from pathlib import Path
 # Add the parent directory to the path so we can import modules
 sys.path.insert(0, str(Path(__file__).parent))
 
-from signals_testing import check_overlapping_signals
+from signals_testing import check_overlapping_signals, check_overlapping_signals_no_raise
 
 def format_commands(commands: List[Dict[str, Any]]) -> str:
     """Format a list of commands, sorting them by cmd parameter ID and removing duplicates.
@@ -697,18 +697,24 @@ def format_json_data(data) -> str:
 
     return formatted
 
-def format_file(input_path: str, output_path: Optional[str] = None) -> str:
+def format_file(
+    input_path: str,
+    output_path: Optional[str] = None,
+    return_overlaps: bool = False
+) -> Union[str, Tuple[str, List[Dict[str, Any]]]]:
     """Format a signal set JSON file in a human-friendly way.
 
     Args:
         input_path: Path to input JSON file
         output_path: Optional path to output file. If not specified, returns formatted string
+        return_overlaps: If True, return tuple of (formatted_string, overlap_errors) instead of raising
 
     Returns:
-        Formatted JSON string
+        If return_overlaps is False: Formatted JSON string
+        If return_overlaps is True: Tuple of (formatted_string, List[overlap_error_dicts])
 
     Raises:
-        OverlappingSignalError: If any signals within a command have overlapping bit definitions
+        OverlappingSignalError: If return_overlaps is False and signals have overlapping bit definitions
     """
     # Read and parse input JSON
     with open(input_path, 'r') as f:
@@ -716,15 +722,18 @@ def format_file(input_path: str, output_path: Optional[str] = None) -> str:
 
     formatted = format_json_data(data)
 
-    # Validate no overlapping signals after formatting (in case formatting merged commands)
-    check_overlapping_signals(formatted)
-
     # Write to output file if specified
     if output_path:
         with open(output_path, 'w') as f:
             f.write(formatted)
 
-    return formatted
+    # Validate no overlapping signals after formatting (in case formatting merged commands)
+    if return_overlaps:
+        overlaps = check_overlapping_signals_no_raise(formatted)
+        return formatted, overlaps
+    else:
+        check_overlapping_signals(formatted)
+        return formatted
 
 def format_synthetics(synthetics: List[Dict[str, Any]]) -> str:
     """Format synthetic signals in a human-friendly way.
