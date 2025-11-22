@@ -215,6 +215,10 @@
                   },
                   "required": [
                     "len"
+                  ],
+                  "anyOf": [
+                    { "required": ["map"] },
+                    { "required": ["max", "unit"] }
                   ]
                 },
                 "path": { "$ref": "#/definitions/pathPattern" },

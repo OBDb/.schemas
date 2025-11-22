@@ -9,7 +9,6 @@ It's particularly useful for validating a single test case after making changes.
 import argparse
 import os
 import sys
-import pytest
 from pathlib import Path
 
 # Add the parent directory to the path so we can import modules
