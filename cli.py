@@ -40,25 +40,43 @@ def main():
             with open(input_path, 'r') as f:
                 current_content = f.read()
 
-            # Get formatted content
-            with open(input_path, 'r') as f:
-                formatted_content = format_file(input_path)
+            # Get formatted content (with overlap checking)
+            formatted_content, overlaps = format_file(str(input_path), return_overlaps=True)
 
             # Compare and exit with appropriate status
             if current_content.strip() == formatted_content.strip():
                 print(f"✓ {args.input_file} is properly formatted")
-                sys.exit(0)
             else:
-                print(f"✗ {args.input_file} needs reformatting")
+                print(f"✗ {args.input_file} needs reformatting", file=sys.stderr)
+                sys.exit(1)
+
+            # Report overlapping signals as error
+            if overlaps:
+                for err in overlaps:
+                    print(
+                        f"✗ Signal '{err['signal_id']}' overlaps with '{err['conflicting_signal_id']}' "
+                        f"at bit {err['bit']} in command [{err['command']}]",
+                        file=sys.stderr
+                    )
                 sys.exit(1)
         else:
-            # Format the file
-            formatted_content = format_file(args.input_file, args.output)
-            
+            # Format the file (with overlap checking, write first then check)
+            formatted_content, overlaps = format_file(args.input_file, args.output, return_overlaps=True)
+
             if args.output:
                 print(f"Formatted {args.input_file} -> {args.output}")
             else:
                 print(formatted_content)
+
+            # Report overlapping signals as error after writing
+            if overlaps:
+                for err in overlaps:
+                    print(
+                        f"✗ Signal '{err['signal_id']}' overlaps with '{err['conflicting_signal_id']}' "
+                        f"at bit {err['bit']} in command [{err['command']}]",
+                        file=sys.stderr
+                    )
+                sys.exit(1)
 
     except Exception as e:
         print(f"Error: {str(e)}", file=sys.stderr)
