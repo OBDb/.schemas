@@ -1,4 +1,3 @@
-import pytest
 from typing import Any, Dict, Optional, Union
 import glob
 import os
@@ -231,6 +230,7 @@ def obd_testrunner(
         assert signal_id in actual_values, f"Signal {signal_id} not found in decoded response{line_info}"
         actual_value = actual_values[signal_id]
         if isinstance(expected_value, (int, float)):
+            import pytest
             assert pytest.approx(actual_value) == expected_value, \
                 f"Signal {signal_id} value mismatch{line_info}: got {actual_value}, expected {expected_value}"
         else:
@@ -450,6 +450,7 @@ def register_test_classes(test_files_by_year: Dict[str, List[Tuple[str, str]]],
                     try:
                         run_func(path)
                     except Exception as e:
+                        import pytest
                         pytest.fail(f"Failed to run tests from {path}: {e}")
                 return test_method
 
