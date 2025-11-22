@@ -1,0 +1,12 @@
+{ "commands": [
+{ "hdr": "720", "rax": "728", "cmd": {"22": "404C"}, "freq": 5,
+  "signals": [
+    {"id": "F150_ODO", "path": "Trips", "fmt": { "len": 24, "max": 1677721, "div": 10, "unit": "kilometers" }, "name": "Odometer (Instrument panel)", "suggestedMetric": "odometer"},
+    {"id": "F150_ODO_2", "path": "Trips", "fmt": { "len": 8, "max": 1677721, "div": 10, "unit": "kilometers" }, "name": "Odometer (Instrument panel)", "suggestedMetric": "odometer"}
+  ]},
+{ "hdr": "726", "rax": "72E", "cmd": {"22": "2813"}, "freq": 5,
+  "signals": [
+    {"id": "F150_TP_FL", "path": "Tires", "fmt": { "len": 16, "max": 3276, "div": 20, "unit": "psi" }, "name": "Front left tire pressure", "suggestedMetric": "frontLeftTirePressure"}
+  ]}
+]
+}

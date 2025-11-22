@@ -1,6 +1,8 @@
 from typing import Dict, List, Any, Optional
 import json
 
+from signals_testing import check_overlapping_signals
+
 def format_commands(commands: List[Dict[str, Any]]) -> str:
     """Format a list of commands, sorting them by cmd parameter ID and removing duplicates.
 
@@ -699,12 +701,18 @@ def format_file(input_path: str, output_path: Optional[str] = None) -> str:
 
     Returns:
         Formatted JSON string
+
+    Raises:
+        OverlappingSignalError: If any signals within a command have overlapping bit definitions
     """
     # Read and parse input JSON
     with open(input_path, 'r') as f:
         data = json.load(f)
 
     formatted = format_json_data(data)
+
+    # Validate no overlapping signals after formatting (in case formatting merged commands)
+    check_overlapping_signals(formatted)
 
     # Write to output file if specified
     if output_path:
