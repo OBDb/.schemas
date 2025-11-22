@@ -215,6 +215,16 @@
                   },
                   "required": [
                     "len"
+                  ],
+                  "anyOf": [
+                    {
+                      "properties": { "map": true },
+                      "required": ["map"]
+                    },
+                    {
+                      "properties": { "max": true, "unit": true },
+                      "required": ["max", "unit"]
+                    }
                   ]
                 },
                 "path": { "$ref": "#/definitions/pathPattern" },
