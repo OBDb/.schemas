@@ -1,3 +1,4 @@
+import pytest
 from typing import Any, Dict, Optional, Union
 import glob
 import os
@@ -230,7 +231,6 @@ def obd_testrunner(
         assert signal_id in actual_values, f"Signal {signal_id} not found in decoded response{line_info}"
         actual_value = actual_values[signal_id]
         if isinstance(expected_value, (int, float)):
-            import pytest
             assert pytest.approx(actual_value) == expected_value, \
                 f"Signal {signal_id} value mismatch{line_info}: got {actual_value}, expected {expected_value}"
         else:
@@ -450,7 +450,6 @@ def register_test_classes(test_files_by_year: Dict[str, List[Tuple[str, str]]],
                     try:
                         run_func(path)
                     except Exception as e:
-                        import pytest
                         pytest.fail(f"Failed to run tests from {path}: {e}")
                 return test_method
 
@@ -463,100 +462,10 @@ def register_test_classes(test_files_by_year: Dict[str, List[Tuple[str, str]]],
     return True
 
 
-class OverlappingSignalError(Exception):
-    """Raised when signals within a command have overlapping bit definitions."""
-    pass
-
-
-def check_overlapping_signals_no_raise(signalset_json: str) -> List[Dict[str, Any]]:
-    """
-    Check a signalset for overlapping signal bit definitions within commands.
-
-    Uses a bitset approach: for each command, track which bits are occupied.
-    If a signal tries to use a bit that's already occupied, it's an overlap.
-
-    Args:
-        signalset_json: JSON string containing the signal set definition
-
-    Returns:
-        List of overlap errors, each containing:
-        - command: command identifier (hdr/cmd)
-        - signal_id: the signal that caused the overlap
-        - bit: the bit index that was already occupied
-        - conflicting_signal_id: the signal that already occupied the bit
-    """
-    import json
-    signalset = json.loads(signalset_json)
-
-    errors = []
-
-    for command in signalset.get('commands', []):
-        # Track which bits are occupied and by which signal
-        occupied_bits: Dict[int, str] = {}
-
-        cmd_identifier = f"hdr={command.get('hdr', '?')}, cmd={command.get('cmd', '?')}"
-
-        for signal in command.get('signals', []):
-            signal_id = signal.get('id', 'unknown')
-            fmt = signal.get('fmt', {})
-
-            start_bit = fmt.get('bix', 0)
-            bit_length = fmt.get('len', 0)
-
-            for bit in range(start_bit, start_bit + bit_length):
-                if bit in occupied_bits:
-                    errors.append({
-                        'command': cmd_identifier,
-                        'signal_id': signal_id,
-                        'bit': bit,
-                        'conflicting_signal_id': occupied_bits[bit]
-                    })
-                    # Only report the first conflicting bit per signal
-                    break
-                occupied_bits[bit] = signal_id
-
-    return errors
-
-
-def check_overlapping_signals(signalset_json: str) -> List[Dict[str, Any]]:
-    """
-    Check a signalset for overlapping signal bit definitions within commands.
-
-    Args:
-        signalset_json: JSON string containing the signal set definition
-
-    Returns:
-        Empty list if no overlaps found
-
-    Raises:
-        OverlappingSignalError: If any overlapping signals are found
-    """
-    errors = check_overlapping_signals_no_raise(signalset_json)
-
-    if errors:
-        error_messages = []
-        for err in errors:
-            error_messages.append(
-                f"Signal '{err['signal_id']}' overlaps with '{err['conflicting_signal_id']}' "
-                f"at bit {err['bit']} in command [{err['command']}]"
-            )
-        raise OverlappingSignalError(
-            f"Found {len(errors)} overlapping signal(s):\n" + "\n".join(error_messages)
-        )
-
-    return errors
-
-
-def test_no_overlapping_signals(signalset_json: str):
-    """
-    Test that a signalset has no overlapping signal bit definitions.
-
-    This function can be used by other repos to validate their signalset files.
-
-    Args:
-        signalset_json: JSON string containing the signal set definition
-
-    Raises:
-        OverlappingSignalError: If any overlapping signals are found
-    """
-    check_overlapping_signals(signalset_json)
+# Re-export from overlapping_signals module for backwards compatibility
+from overlapping_signals import (
+    OverlappingSignalError,
+    check_overlapping_signals,
+    check_overlapping_signals_no_raise,
+    test_no_overlapping_signals,
+)
