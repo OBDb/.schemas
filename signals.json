@@ -123,6 +123,9 @@
         "stateOfCharge",
         "stateOfHealth",
         "throttlePosition",
+        "tractionBatteryCapacity",
+        "tractionBatteryCurrent",
+        "tractionBatteryVoltage",
         "transmissionFluidTemperature"
       ]
     },
