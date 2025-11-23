@@ -125,6 +125,7 @@
         "throttlePosition",
         "tractionBatteryCapacity",
         "tractionBatteryCurrent",
+        "tractionBatteryEfficiency",
         "tractionBatteryVoltage",
         "transmissionFluidTemperature"
       ]
