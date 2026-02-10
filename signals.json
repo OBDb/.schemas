@@ -182,6 +182,7 @@
           "freq": { "type": "number", "description": "Frequency at which to request this command, seconds", "exclusiveMinimum": 0 },
           "proto": { "enum": [
             "9141-2",
+            "14230",
             "15765-4-11bit",
             "15765-4-29bit"
           ], "description": "Communication protocol used for this command" },
