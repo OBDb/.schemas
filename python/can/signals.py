@@ -299,6 +299,8 @@ class Command:
     debug: bool = False
     filter: Optional[Filter] = None
     protocol: Optional[CANIDFormat] = None
+    diagnostic_level_in: Optional[int] = None
+    diagnostic_level_out: Optional[int] = None
 
     ID_PROPERTY_DIVIDER = "|"
 
@@ -332,6 +334,8 @@ class Command:
         force_flow_control = data.get('fcm1', False)
         car_protocol_strategy = data.get('proto')
         can_priority = int(data['pri'], 16) if 'pri' in data else None
+        diagnostic_level_in = int(data['din'], 16) if 'din' in data else None
+        diagnostic_level_out = int(data['dout'], 16) if 'dout' in data else None
 
         id = data['hdr']
         if data.get('rax'):
@@ -344,7 +348,9 @@ class Command:
             force_flow_control=force_flow_control,
             filter=command_filter,
             car_protocol_strategy=car_protocol_strategy,
-            can_priority=can_priority
+            can_priority=can_priority,
+            diagnostic_level_in=diagnostic_level_in,
+            diagnostic_level_out=diagnostic_level_out
         )
         if properties_string:
             id += Command.ID_PROPERTY_DIVIDER + properties_string
@@ -368,11 +374,13 @@ class Command:
             force_flow_control=data.get('fcm1', False),
             debug=data.get('dbg', False),
             filter=command_filter,
-            protocol=protocol
+            protocol=protocol,
+            diagnostic_level_in=diagnostic_level_in,
+            diagnostic_level_out=diagnostic_level_out
         )
 
     @staticmethod
-    def _format_properties_for_id(extended_address, tester_address, timeout, force_flow_control, filter, car_protocol_strategy=None, can_priority=None):
+    def _format_properties_for_id(extended_address, tester_address, timeout, force_flow_control, filter, car_protocol_strategy=None, can_priority=None, diagnostic_level_in=None, diagnostic_level_out=None):
         parts = []
 
         if timeout:
@@ -395,6 +403,12 @@ class Command:
 
         if filter:
             parts.append(f"f={filter.to_id_string()}")
+
+        if diagnostic_level_in is not None:
+            parts.append(f"din={diagnostic_level_in:02X}")
+
+        if diagnostic_level_out is not None:
+            parts.append(f"dout={diagnostic_level_out:02X}")
 
         return ",".join(parts)
 
