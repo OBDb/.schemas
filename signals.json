@@ -99,6 +99,7 @@
     "suggestedMetricEnum": {
       "description": "User interface elements that can be connected to a signal",
       "enum": [
+        "absoluteEngineLoad",
         "commandedLambda",
         "cvtDeterioration",
         "distanceSinceDTCsCleared",
@@ -106,6 +107,7 @@
         "engineCoolantTemperature",
         "engineLoad",
         "engineOilTemperature",
+        "engineSpeed",
         "frontLeftTirePressure",
         "frontLeftTireTemperature",
         "frontRightTirePressure",
