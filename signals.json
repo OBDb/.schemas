@@ -37,7 +37,8 @@
         "suspension",
         "telematics",
         "tpms",
-        "transmission"
+        "transmission",
+        "vehicleControl"
       ]
     },
     "ecuEntry": {
