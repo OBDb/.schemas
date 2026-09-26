@@ -668,16 +668,50 @@ def tabularize(rows: list[list[str]]) -> str:
     # Join all rows with comma and newline
     return ',\n'.join(formatted_rows)
 
+def format_ecu(entries: List[Dict[str, Any]]) -> str:
+    """Format ECU entries one per line, columns aligned, sorted by address.
+
+    Args:
+        entries: List of ECU entry dictionaries
+
+    Returns:
+        Formatted string with the entries inside their array brackets
+    """
+    def sort_key(entry: Dict[str, Any]) -> tuple:
+        return (
+            entry["hdr"],
+            entry.get("eax", ""),
+            entry.get("rax", ""),
+            format_filter_json(entry["filter"]) if "filter" in entry else "",
+            entry["type"],
+        )
+
+    rows = []
+    for entry in sorted(entries, key=sort_key):
+        rows.append([
+            f'{{ "hdr": "{entry["hdr"]}",',
+            f'"eax": "{entry["eax"]}",' if "eax" in entry else '',
+            f'"rax": "{entry["rax"]}",' if "rax" in entry else '',
+            f'"filter": {format_filter_json(entry["filter"])},' if "filter" in entry else '',
+            f'"type": "{entry["type"]}" }}',
+        ])
+    lines = tabularize(rows).split('\n')
+    return '[\n' + '\n'.join('    ' + line for line in lines) + '\n  ]'
+
 def format_json_data(data) -> str:
     # Start building the formatted output
     output = []
 
-    # Handle diagnostic level if present
+    # Top-level scalars and the ECU list come before commands, each on the
+    # line after the opening brace's.
+    header = []
+    if data.get('ecu'):
+        header.append('"ecu": ' + format_ecu(data['ecu']) + ',')
     if 'diagnosticLevel' in data:
-        output.append('{ "diagnosticLevel": "' + data['diagnosticLevel'] + '",')
-        output.append('  "commands": ' + format_commands(data['commands']))
-    else:
-        output.append('{ "commands": ' + format_commands(data['commands']))
+        header.append('"diagnosticLevel": "' + data['diagnosticLevel'] + '",')
+    header.append('"commands": ' + format_commands(data['commands']))
+    output.append('{ ' + header[0])
+    output.extend('  ' + part for part in header[1:])
 
     # Handle signal groups if present
     if 'signalGroups' in data:

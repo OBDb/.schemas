@@ -1,0 +1,30 @@
+{ "ecu": [
+    { "hdr": "6F1", "eax": "12",                                                       "type": "engine" },
+    { "hdr": "7DF",              "rax": "7ED",                                         "type": "battery" },
+    { "hdr": "7E0",                                                                    "type": "engine" },
+    { "hdr": "7E1",                                                                    "type": "transmission" },
+    { "hdr": "7E4",                            "filter": { "from": 2012, "to": 2018 }, "type": "battery" }
+  ],
+  "commands": [
+{ "hdr": "6F1", "rax": "612", "eax": "12", "fcm1": true, "cmd": {"22": "4300"}, "freq": 5,
+  "signals": [
+    {"id": "EX_ECT", "path": "Engine", "fmt": { "len": 8, "max": 215, "add": -40, "unit": "celsius" }, "name": "Engine coolant temperature", "suggestedMetric": "engineCoolantTemperature"}
+  ]},
+{ "hdr": "7DF", "rax": "7ED", "cmd": {"22": "B009"}, "freq": 1,
+  "signals": [
+    {"id": "EX_HVBAT_SOC", "path": "Battery", "fmt": { "len": 8, "max": 100, "unit": "percent" }, "name": "High voltage battery charge", "suggestedMetric": "stateOfCharge"}
+  ]},
+{ "hdr": "7E0", "rax": "7E8", "cmd": {"22": "F40D"}, "freq": 0.25,
+  "signals": [
+    {"id": "EX_VSS", "path": "Movement", "fmt": { "len": 8, "max": 255, "unit": "kilometersPerHour" }, "name": "Vehicle speed", "suggestedMetric": "speed"}
+  ]},
+{ "hdr": "7E1", "rax": "7E9", "cmd": {"22": "1E1C"}, "freq": 5,
+  "signals": [
+    {"id": "EX_TFT", "path": "Transmission", "fmt": { "len": 16, "max": 300, "div": 16, "unit": "celsius" }, "name": "Transmission fluid temperature"}
+  ]},
+{ "hdr": "7E4", "rax": "7EC", "cmd": {"22": "4801"}, "freq": 1, "filter": { "from": 2012, "to": 2018 },
+  "signals": [
+    {"id": "EX_HVBAT_V", "path": "Battery", "fmt": { "len": 16, "max": 500, "div": 100, "unit": "volts" }, "name": "High voltage battery voltage"}
+  ]}
+]
+}

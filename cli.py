@@ -1,9 +1,25 @@
 #!/usr/bin/env python3
 import argparse
+import json
 import sys
 from pathlib import Path
 
 from python.json_formatter import format_file
+from python.ecu_entries import describe_entry, find_ecu_conflicts
+
+
+def report_ecu_conflicts(input_file: str) -> bool:
+    """Print ECU entries that name different types for one command and year."""
+    with open(input_file) as f:
+        entries = json.load(f).get('ecu', [])
+    conflicts = find_ecu_conflicts(entries)
+    for conflict in conflicts:
+        print(
+            f"✗ ECU entry {describe_entry(conflict['entry'])} conflicts with "
+            f"{describe_entry(conflict['conflicting_entry'])} in model year {conflict['year']}",
+            file=sys.stderr
+        )
+    return bool(conflicts)
 
 def main():
     parser = argparse.ArgumentParser(
@@ -50,6 +66,8 @@ def main():
                 print(f"✗ {args.input_file} needs reformatting", file=sys.stderr)
                 sys.exit(1)
 
+            ecu_conflicted = report_ecu_conflicts(args.input_file)
+
             # Report overlapping signals as error
             if overlaps:
                 for err in overlaps:
@@ -58,6 +76,9 @@ def main():
                         f"at bit {err['bit']} in command [{err['command']}]",
                         file=sys.stderr
                     )
+                sys.exit(1)
+
+            if ecu_conflicted:
                 sys.exit(1)
         else:
             # Format the file (with overlap checking, write first then check)
@@ -68,6 +89,8 @@ def main():
             else:
                 print(formatted_content)
 
+            ecu_conflicted = report_ecu_conflicts(args.input_file)
+
             # Report overlapping signals as error after writing
             if overlaps:
                 for err in overlaps:
@@ -76,6 +99,9 @@ def main():
                         f"at bit {err['bit']} in command [{err['command']}]",
                         file=sys.stderr
                     )
+                sys.exit(1)
+
+            if ecu_conflicted:
                 sys.exit(1)
 
     except Exception as e:
