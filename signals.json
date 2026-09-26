@@ -10,6 +10,49 @@
         "years": { "type": "array", "description": "Specific years to include", "items": { "type": "integer" }, "uniqueItems": true }
       }
     },
+    "ecuTypeEnum": {
+      "description": "Kinds of electronic control unit. Pelican maps each to a localized name, so add a value here only alongside its string there.",
+      "enum": [
+        "abs",
+        "airbag",
+        "allWheelDrive",
+        "battery",
+        "bodyControl",
+        "charger",
+        "cluster",
+        "dcdcConverter",
+        "door",
+        "driverAssistance",
+        "engine",
+        "gateway",
+        "hvac",
+        "hybridControl",
+        "infotainment",
+        "keyless",
+        "lighting",
+        "motor",
+        "parkingAssist",
+        "seat",
+        "steering",
+        "suspension",
+        "telematics",
+        "tpms",
+        "transmission"
+      ]
+    },
+    "ecuEntry": {
+      "type": "object",
+      "description": "Names the module behind an address. An entry matches a command whose hdr equals its hdr, whose eax and rax equal its own when it sets them, and whose model year its filter matches when it has one. Of the entries matching a command, the one setting the most of eax, rax and filter wins.",
+      "additionalProperties": false,
+      "properties": {
+        "hdr": { "type": "string", "description": "Header the command is sent to, hex", "minLength": 3, "maxLength": 4 },
+        "eax": { "type": "string", "description": "Extended address the command is sent to, hex", "minLength": 2, "maxLength": 2 },
+        "rax": { "type": "string", "description": "Address the command is answered from, hex", "minLength": 2, "maxLength": 6 },
+        "filter": { "$ref": "#/definitions/filterObject" },
+        "type": { "$ref": "#/definitions/ecuTypeEnum" }
+      },
+      "required": ["hdr", "type"]
+    },
     "unitEnum": {
       "description": "Supported measurement units",
       "enum": [
@@ -146,6 +189,12 @@
   "type": "object",
   "additionalProperties": false,
   "properties": {
+    "ecu": {
+      "description": "The kind of module behind each address the commands are sent to.",
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "$ref": "#/definitions/ecuEntry" }
+    },
     "diagnosticLevel": {
       "description": "Hexadecimal diagnostic code that should be used for the vehicle.",
       "type": "string",
