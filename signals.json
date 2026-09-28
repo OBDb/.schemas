@@ -48,7 +48,7 @@
       "properties": {
         "hdr": { "type": "string", "description": "Header the command is sent to, hex", "minLength": 3, "maxLength": 4 },
         "eax": { "type": "string", "description": "Extended address the command is sent to, hex", "minLength": 2, "maxLength": 2 },
-        "rax": { "type": "string", "description": "Address the command is answered from, hex", "minLength": 2, "maxLength": 6 },
+        "rax": { "type": "string", "description": "Address the command is answered from, hex", "minLength": 2, "maxLength": 8 },
         "filter": { "$ref": "#/definitions/filterObject" },
         "type": { "$ref": "#/definitions/ecuTypeEnum" }
       },
@@ -212,7 +212,7 @@
         "additionalProperties": false,
         "properties": {
           "hdr": { "type": "string", "description": "Header identifier for the command, hex", "minLength": 3, "maxLength": 4 },
-          "rax": { "type": "string", "description": "Receive filter address, hex", "minLength": 2, "maxLength": 6 },
+          "rax": { "type": "string", "description": "Receive filter address, hex. On 29-bit CAN, up to six digits are the reply ID's low bits under the command's priority, and eight digits are the whole reply ID, for a module that answers at another priority", "minLength": 2, "maxLength": 8 },
           "eax": { "type": "string", "description": "Extended address, hex", "minLength": 2, "maxLength": 2 },
           "pri": { "type": "string", "description": "CAN priority, hex", "minLength": 2, "maxLength": 2 },
           "tst": { "type": "string", "description": "Tester address, hex", "minLength": 2, "maxLength": 2 },

@@ -317,7 +317,11 @@ class Command:
 
         if receive_address and len(data['hdr']) == 4:
             priority = (can_priority or 0x18) & 0b0001_1111
-            if receive_address <= 255:
+            if receive_address > 0xFFFFFF:
+                # Past six digits, the rax is the reply's whole ID, whose top
+                # byte need not repeat the request's priority.
+                receive_address &= 0x1FFFFFFF
+            elif receive_address <= 255:
                 receive_address = (priority << 24) | 0x00DAF100 | (receive_address & 0xFF)
             elif can_priority is not None:
                 receive_address = (can_priority << 24) | (receive_address & 0xFFFFFF)
