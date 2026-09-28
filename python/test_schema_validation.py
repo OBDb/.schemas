@@ -212,3 +212,41 @@ class TestRealWorldSignalExamples:
         }
         with pytest.raises(ValidationError):
             validate(data, schema)
+
+    def test_eight_digit_rax_names_a_whole_29_bit_reply_id(self, schema):
+        """A Volvo SPA module asked at priority 1D answers on 1EC60E80."""
+        data = {
+            'commands': [{
+                'hdr': 'D016',
+                'rax': '1EC60E80',
+                'pri': '1D',
+                'tst': '30',
+                'cmd': {'22': 'DA2C'},
+                'freq': 10,
+                'signals': [{
+                    'id': 'S60_EOT',
+                    'path': 'Engine',
+                    'fmt': {'len': 8, 'max': 255, 'unit': 'scalar'},
+                    'name': 'Engine oil temperature'
+                }]
+            }]
+        }
+        validate(data, schema)  # Should not raise
+
+    def test_rax_longer_than_eight_digits_is_invalid(self, schema):
+        data = {
+            'commands': [{
+                'hdr': 'D016',
+                'rax': '11EC60E80',
+                'cmd': {'22': 'DA2C'},
+                'freq': 10,
+                'signals': [{
+                    'id': 'S60_EOT',
+                    'path': 'Engine',
+                    'fmt': {'len': 8, 'max': 255, 'unit': 'scalar'},
+                    'name': 'Engine oil temperature'
+                }]
+            }]
+        }
+        with pytest.raises(ValidationError):
+            validate(data, schema)
