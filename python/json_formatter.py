@@ -810,8 +810,14 @@ def format_synthetics(synthetics: List[Dict[str, Any]]) -> str:
         formula = synthetic["formula"]
         formula_parts = []
         formula_parts.append('"op": "' + formula["op"] + '"')
-        formula_parts.append('"a": "' + formula["a"] + '"')
-        formula_parts.append('"b": "' + formula["b"] + '"')
+        if formula["op"] == "select":
+            formula_parts.append('"match": "' + formula["match"] + '"')
+            # Sorted by key so a re-format never reorders the cases.
+            cases = ', '.join(f'"{key}": "{value}"' for key, value in sorted(formula["cases"].items()))
+            formula_parts.append('"cases": { ' + cases + ' }')
+        else:
+            formula_parts.append('"a": "' + formula["a"] + '"')
+            formula_parts.append('"b": "' + formula["b"] + '"')
 
         parts.append(', "formula": {')
         parts.append('\n    ' + ', '.join(formula_parts))
