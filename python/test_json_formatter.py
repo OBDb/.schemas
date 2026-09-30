@@ -9,7 +9,8 @@ from .json_formatter import (
     format_filter_json,
     format_json_data,
     format_number,
-    format_parameter_json
+    format_parameter_json,
+    format_synthetics
 )
 
 REPO_ROOT = os.path.abspath(os.path.dirname(__file__))
@@ -382,3 +383,15 @@ def test_format_filter_json():
 
 if __name__ == '__main__':
     pytest.main([__file__])
+
+
+def test_format_select_synthetic():
+    """A select formula writes its match and its cases sorted by key."""
+    synthetics = [{
+        "id": "IS_TP_FL_SLOT", "path": "Tires", "name": "Front left tire pressure",
+        "max": 56.12, "min": 0, "unit": "psi", "suggestedMetric": "frontLeftTirePressure",
+        "formula": {"op": "select", "match": "FL", "cases": {"IS_TID_2": "IS_TP_2", "IS_TID_1": "IS_TP_1"}},
+    }]
+    formatted = format_synthetics(synthetics)
+    assert '"op": "select", "match": "FL", "cases": { "IS_TID_1": "IS_TP_1", "IS_TID_2": "IS_TP_2" }' in formatted
+    assert json.loads("{" + formatted + "}")["synthetics"] == synthetics

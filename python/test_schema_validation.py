@@ -250,3 +250,44 @@ class TestRealWorldSignalExamples:
         }
         with pytest.raises(ValidationError):
             validate(data, schema)
+
+
+def make_synthetic_data(formula):
+    """Helper to create a signal set with one synthetic using the given formula."""
+    data = make_signal_data({'len': 8, 'max': 255, 'unit': 'scalar'})
+    data['synthetics'] = [{
+        'id': 'TEST_SYNTHETIC',
+        'name': 'Test synthetic',
+        'path': 'Tires',
+        'max': 56.12,
+        'unit': 'psi',
+        'formula': formula,
+    }]
+    return data
+
+
+class TestSyntheticFormula:
+    """Test the ratio and select synthetic formulas."""
+
+    def test_valid_ratio(self, schema):
+        validate(make_synthetic_data({'op': 'ratio', 'a': 'A', 'b': 'B'}), schema)
+
+    def test_valid_select(self, schema):
+        validate(make_synthetic_data({
+            'op': 'select',
+            'match': 'FL',
+            'cases': {'TID_1': 'TP_1', 'TID_2': 'TP_2'},
+        }), schema)
+
+    @pytest.mark.parametrize('formula', [
+        {'op': 'select', 'match': 'FL'},
+        {'op': 'select', 'match': 'FL', 'cases': {}},
+        {'op': 'select', 'cases': {'TID_1': 'TP_1'}},
+        {'op': 'select', 'match': 'FL', 'cases': ['TID_1', 'TP_1']},
+        {'op': 'select', 'match': 'FL', 'cases': {'TID_1': 'TP_1'}, 'a': 'A'},
+        {'op': 'ratio', 'a': 'A'},
+        {'op': 'product', 'a': 'A', 'b': 'B'},
+    ])
+    def test_invalid_formula(self, schema, formula):
+        with pytest.raises(ValidationError):
+            validate(make_synthetic_data(formula), schema)

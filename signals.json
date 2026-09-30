@@ -349,23 +349,43 @@
           "unit": { "$ref": "#/definitions/unitEnum", "description": "Unit of measurement for the synthetic signal" },
           "suggestedMetric": { "$ref": "#/definitions/suggestedMetricEnum" },
           "formula": {
-            "type": "object",
             "description": "Formula used to compute this synthetic signal from other signals",
-            "additionalProperties": false,
-            "properties": {
-              "op": {
-                "enum": [
-                  "ratio"
-                ],
-                "description": "Operation to perform (e.g., ratio calculates a/b)"
+            "oneOf": [
+              {
+                "type": "object",
+                "description": "signal(a) / signal(b)",
+                "additionalProperties": false,
+                "properties": {
+                  "op": { "const": "ratio" },
+                  "a": { "type": "string", "description": "First signal ID used in the formula" },
+                  "b": { "type": "string", "description": "Second signal ID used in the formula" }
+                },
+                "required": [
+                  "op",
+                  "a",
+                  "b"
+                ]
               },
-              "a": { "type": "string", "description": "First signal ID used in the formula" },
-              "b": { "type": "string", "description": "Second signal ID used in the formula" }
-            },
-            "required": [
-              "op",
-              "a",
-              "b"
+              {
+                "type": "object",
+                "description": "The value signal of the one key signal whose enumeration value is match, such as the tire sensor slot a TPMS module's slot map puts at a corner. Empty when no key or more than one key matches. Apps that predate select drop the whole signalset when they meet one.",
+                "additionalProperties": false,
+                "properties": {
+                  "op": { "const": "select" },
+                  "match": { "type": "string", "description": "The enumeration value (a map entry's value) that selects a key" },
+                  "cases": {
+                    "type": "object",
+                    "description": "Key signal ID to the value signal ID it selects",
+                    "minProperties": 1,
+                    "additionalProperties": { "type": "string" }
+                  }
+                },
+                "required": [
+                  "op",
+                  "match",
+                  "cases"
+                ]
+              }
             ]
           }
         },
