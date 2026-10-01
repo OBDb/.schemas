@@ -1,3 +1,4 @@
+import sys
 from dataclasses import dataclass
 from enum import Enum
 from typing import Dict, Optional, Set, Union, Tuple
@@ -96,8 +97,11 @@ class Scaling:
             optimal_value=data.get('oval')
         )
 
-    def decode_value(self, data: bytes) -> float:
-        """Decode a value from bytes using the scaling parameters."""
+    def decode_value(self, data: bytes) -> Optional[float]:
+        """Decode a value from bytes using the scaling parameters.
+
+        Returns None when the value falls on a null bound, as the app does.
+        """
         raw_value = self._extract_bits(data)
         if self.signed:
             raw_value = self._twos_complement(raw_value, self.bit_length)
@@ -106,6 +110,12 @@ class Scaling:
 
         if self.max_value > self.min_value:
             value = max(self.min_value, min(value, self.max_value))
+
+        epsilon = sys.float_info.epsilon
+        if self.null_min is not None and value <= self.null_min + epsilon:
+            return None
+        if self.null_max is not None and value >= self.null_max - epsilon:
+            return None
 
         return value
 
