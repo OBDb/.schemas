@@ -428,14 +428,17 @@ class Command:
 
 @dataclass
 class SignalSet:
-    commands: Set[Command]
+    # A tuple in the file's order rather than a set: when two commands share a
+    # parameter the registry picks between them by position, and a set's order
+    # changes with the hash seed.
+    commands: Tuple[Command, ...]
     diagnostic_level: Optional[int] = None
     signal_groups: Optional[Set] = None
 
     @classmethod
     def from_json(cls, json_data: str) -> 'SignalSet':
         data = json.loads(json_data)
-        commands = {Command.from_json(cmd) for cmd in data['commands']}
+        commands = tuple(dict.fromkeys(Command.from_json(cmd) for cmd in data['commands']))
         diagnostic_level = int(data['diagnosticLevel'], 16) if 'diagnosticLevel' in data else None
 
         return cls(
