@@ -30,11 +30,11 @@ def _make_signalset_generic(json_data: str, header_override: str) -> str:
     return json.dumps(data)
 
 def _load_standard_commands(json_data: str) -> List['Command']:
-    return (
+    return tuple(dict.fromkeys(
         SignalSet.from_json(_make_signalset_generic(json_data, header_override='7E0')).commands
-        .union(SignalSet.from_json(_make_signalset_generic(json_data, header_override='DB33')).commands)
-        .union(SignalSet.from_json(_make_signalset_generic(json_data, header_override='686A')).commands)
-    )
+        + SignalSet.from_json(_make_signalset_generic(json_data, header_override='DB33')).commands
+        + SignalSet.from_json(_make_signalset_generic(json_data, header_override='686A')).commands
+    ))
 
 def get_cached_signalset(url: str, cache_name: str, signal_type: str = "generic") -> List['Command']:
     """Generic function to fetch and cache signal definitions.
@@ -372,7 +372,7 @@ def get_model_year_command_registry(model_year: int) -> 'CommandRegistry':
                 make_url = f"https://raw.githubusercontent.com/OBDb/{make}/refs/heads/main/signalsets/v3/default.json"
                 make_commands = get_cached_signalset(make_url, f"{make.lower()}_signals")
                 if make_commands:
-                    signalset = SignalSet(commands=set(make_commands))
+                    signalset = SignalSet(commands=tuple(make_commands))
                     print(f"Using {make} signals for model year {model_year}")
 
         # Add model-specific or make-specific signals to the combined commands
