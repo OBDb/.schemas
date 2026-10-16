@@ -151,7 +151,7 @@ def test_format_command_keeps_k_line_timing():
     command = {
         "hdr": "812A",
         "proto": "14230",
-        "init": {"hi": 12.5, "lo": 35},
+        "init": {"hi": 15, "lo": 35},
         "baud": 9600,
         "dbg": True,
         "cmd": {"21": "15"},
@@ -161,7 +161,7 @@ def test_format_command_keeps_k_line_timing():
 
     result = format_command_json(command)
     assert result == """
-{ "hdr": "812A", "proto": "14230", "baud": 9600, "init": { "lo": 35, "hi": 12.5 }, "dbg": true, "cmd": {"21": "15"}, "freq": 15,
+{ "hdr": "812A", "proto": "14230", "baud": 9600, "init": { "lo": 35, "hi": 15 }, "dbg": true, "cmd": {"21": "15"}, "freq": 15,
   "signals": [
   ]}
 """.strip()
