@@ -1,0 +1,1893 @@
+{
+  "schema_version": 3,
+  "purpose": "Worked examples supporting the proposed OBDb polling convention; review metadata, not signalset definitions or approved vehicle changes.",
+  "date": "2026-10-13",
+  "classification_basis": "Local decoded metadata and proposed ordinary-use rules only. Confidence rates semantic classification, not physical decoder validation or achieved cadence. Every proposal retains existing filters, debug status and routes.",
+  "tier_intervals_seconds": {
+    "Operational": 0.25,
+    "Engine control": 1,
+    "Short-term trends": 5,
+    "Thermal condition": 15,
+    "Health and environment": 60,
+    "Cumulative history": 300
+  },
+  "examples": [
+    {
+      "example_id": "F01",
+      "repository": "Hyundai-IONIQ-5",
+      "source_file": "signalsets/v3/default.json",
+      "source_commit": "9228763fe762c0ab1257578fffd4981c08eaa4fc",
+      "source_sha256": "305de2567d4852d8557479c9cc8af10e987fb31e0fcbb7b98995e3348691724a",
+      "command_pointer": "/commands/0",
+      "identity": {
+        "hdr": "730",
+        "rax": "738",
+        "cmd": {
+          "22": "F010"
+        }
+      },
+      "availability_preserve": {
+        "dbgfilter": {
+          "to": 2021,
+          "from": 2027
+        }
+      },
+      "observed_freq_seconds": 0.25,
+      "proposed_command_tier": "Operational",
+      "proposed_freq_seconds": 0.25,
+      "confidence_in_classification": "high",
+      "status": "proposed",
+      "rationale": "Wheel speed, steering angle and vehicle acceleration are immediate driving feedback. All eight fields fit Operational.",
+      "review_requirement": null,
+      "signals": [
+        {
+          "id": "IONIQ5_WHEEL_FR_VSS_HD",
+          "name": "Front right wheel speed, high resolution",
+          "intrinsic_tier": "Operational",
+          "intrinsic_interval_seconds": 0.25,
+          "inherits_faster_command_interval": false
+        },
+        {
+          "id": "IONIQ5_WHEEL_FL_VSS_HD",
+          "name": "Front left wheel speed, high resolution",
+          "intrinsic_tier": "Operational",
+          "intrinsic_interval_seconds": 0.25,
+          "inherits_faster_command_interval": false
+        },
+        {
+          "id": "IONIQ5_WHEEL_RR_VSS_HD",
+          "name": "Rear right wheel speed, high resolution",
+          "intrinsic_tier": "Operational",
+          "intrinsic_interval_seconds": 0.25,
+          "inherits_faster_command_interval": false
+        },
+        {
+          "id": "IONIQ5_WHEEL_RL_VSS_HD",
+          "name": "Rear left wheel speed, high resolution",
+          "intrinsic_tier": "Operational",
+          "intrinsic_interval_seconds": 0.25,
+          "inherits_faster_command_interval": false
+        },
+        {
+          "id": "IONIQ5_STEERING_ANGLE",
+          "name": "Steering wheel angle",
+          "intrinsic_tier": "Operational",
+          "intrinsic_interval_seconds": 0.25,
+          "inherits_faster_command_interval": false
+        },
+        {
+          "id": "IONIQ5_LATERAL_ACCELERATION",
+          "name": "Lateral acceleration",
+          "intrinsic_tier": "Operational",
+          "intrinsic_interval_seconds": 0.25,
+          "inherits_faster_command_interval": false
+        },
+        {
+          "id": "IONIQ5_LONGITUDINAL_ACCELERATION",
+          "name": "Longitudinal acceleration",
+          "intrinsic_tier": "Operational",
+          "intrinsic_interval_seconds": 0.25,
+          "inherits_faster_command_interval": false
+        },
+        {
+          "id": "IONIQ5_YAW_RATE",
+          "name": "Yaw rate",
+          "intrinsic_tier": "Operational",
+          "intrinsic_interval_seconds": 0.25,
+          "inherits_faster_command_interval": false
+        }
+      ],
+      "source_url": "https://github.com/OBDb/Hyundai-IONIQ-5/blob/9228763fe762c0ab1257578fffd4981c08eaa4fc/signalsets/v3/default.json",
+      "driving_signals": [
+        "IONIQ5_WHEEL_FR_VSS_HD",
+        "IONIQ5_WHEEL_FL_VSS_HD",
+        "IONIQ5_WHEEL_RR_VSS_HD",
+        "IONIQ5_WHEEL_RL_VSS_HD",
+        "IONIQ5_STEERING_ANGLE",
+        "IONIQ5_LATERAL_ACCELERATION",
+        "IONIQ5_LONGITUDINAL_ACCELERATION",
+        "IONIQ5_YAW_RATE"
+      ],
+      "nominal_requests_per_minute": {
+        "before": 240.0,
+        "after": 240.0
+      }
+    },
+    {
+      "example_id": "F02",
+      "repository": "Hyundai-IONIQ-5",
+      "source_file": "signalsets/v3/default.json",
+      "source_commit": "9228763fe762c0ab1257578fffd4981c08eaa4fc",
+      "source_sha256": "305de2567d4852d8557479c9cc8af10e987fb31e0fcbb7b98995e3348691724a",
+      "command_pointer": "/commands/12",
+      "identity": {
+        "hdr": "7B3",
+        "rax": "7BB",
+        "fcm1": true,
+        "cmd": {
+          "22": "0100"
+        }
+      },
+      "availability_preserve": {
+        "dbgfilter": {
+          "to": 2021,
+          "from": 2027
+        }
+      },
+      "observed_freq_seconds": 0.25,
+      "proposed_command_tier": "Operational",
+      "proposed_freq_seconds": 0.25,
+      "confidence_in_classification": "high",
+      "status": "proposed",
+      "rationale": "Vehicle speed drives the entire HVAC packet. Module name and majority of temperature fields must not slow the speed signal.",
+      "review_requirement": null,
+      "signals": [
+        {
+          "id": "IONIQ5_HVAC_IAT",
+          "name": "Interior temperature, front",
+          "intrinsic_tier": "Short-term trends",
+          "intrinsic_interval_seconds": 5,
+          "inherits_faster_command_interval": true
+        },
+        {
+          "id": "IONIQ5_HVAC_AAT",
+          "name": "Outdoor temperature",
+          "intrinsic_tier": "Health and environment",
+          "intrinsic_interval_seconds": 60,
+          "inherits_faster_command_interval": true
+        },
+        {
+          "id": "IONIQ5_HVAC_EVAPORATOR_T",
+          "name": "Evaporator temperature",
+          "intrinsic_tier": "Thermal condition",
+          "intrinsic_interval_seconds": 15,
+          "inherits_faster_command_interval": true
+        },
+        {
+          "id": "IONIQ5_HVAC_HUMIDITY_SENSOR_FOR_AUTOMATIC_DEFOGGER",
+          "name": "Humidity sensor for automatic defogger",
+          "intrinsic_tier": "Short-term trends",
+          "intrinsic_interval_seconds": 5,
+          "inherits_faster_command_interval": true
+        },
+        {
+          "id": "IONIQ5_HVAC_IAT_DRIVER_VENT",
+          "name": "Interior temperature, driver vent",
+          "intrinsic_tier": "Short-term trends",
+          "intrinsic_interval_seconds": 5,
+          "inherits_faster_command_interval": true
+        },
+        {
+          "id": "IONIQ5_HVAC_IAT_DRIVER_LEGS_VENT",
+          "name": "Interior temperature, driver legs vent",
+          "intrinsic_tier": "Short-term trends",
+          "intrinsic_interval_seconds": 5,
+          "inherits_faster_command_interval": true
+        },
+        {
+          "id": "IONIQ5_VSS",
+          "name": "Vehicle speed",
+          "intrinsic_tier": "Operational",
+          "intrinsic_interval_seconds": 0.25,
+          "inherits_faster_command_interval": false
+        }
+      ],
+      "source_url": "https://github.com/OBDb/Hyundai-IONIQ-5/blob/9228763fe762c0ab1257578fffd4981c08eaa4fc/signalsets/v3/default.json",
+      "driving_signals": [
+        "IONIQ5_VSS"
+      ],
+      "nominal_requests_per_minute": {
+        "before": 240.0,
+        "after": 240.0
+      }
+    },
+    {
+      "example_id": "F03",
+      "repository": "Hyundai-IONIQ-5",
+      "source_file": "signalsets/v3/default.json",
+      "source_commit": "9228763fe762c0ab1257578fffd4981c08eaa4fc",
+      "source_sha256": "305de2567d4852d8557479c9cc8af10e987fb31e0fcbb7b98995e3348691724a",
+      "command_pointer": "/commands/23",
+      "identity": {
+        "hdr": "7E4",
+        "rax": "7EC",
+        "fcm1": true,
+        "cmd": {
+          "22": "0101"
+        }
+      },
+      "availability_preserve": {
+        "dbgfilter": {
+          "to": 2021,
+          "from": 2027
+        }
+      },
+      "observed_freq_seconds": 1,
+      "proposed_command_tier": "Operational",
+      "proposed_freq_seconds": 0.25,
+      "confidence_in_classification": "medium",
+      "status": "needs-review",
+      "rationale": "Two drive motor speed fields drive this 32-signal battery packet if used as immediate driving feedback. Lifetime energy counters, SOC, temperature and isolation fields inherit the command interval; they do not acquire the same intrinsic meaning.",
+      "review_requirement": "Confirm motor speeds are wanted as driving feedback before adopting this faster packet. Cell extrema provisionally use 5 seconds for cell balance/dispersion trends; their cell-number indices inherit that meaning. Confirm this intended use; health-only use could justify 60 seconds. Transport cost of this long response needs later profile review.",
+      "signals": [
+        {
+          "id": "IONIQ5_HVBAT_SOC",
+          "name": "HV battery charge, dashboard",
+          "intrinsic_tier": "Health and environment",
+          "intrinsic_interval_seconds": 60,
+          "inherits_faster_command_interval": true
+        },
+        {
+          "id": "IONIQ5_HV_CHARGING",
+          "name": "Charging?",
+          "intrinsic_tier": "Short-term trends",
+          "intrinsic_interval_seconds": 5,
+          "inherits_faster_command_interval": true
+        },
+        {
+          "id": "IONIQ5_RAPID_CHARGE_PORT",
+          "name": "Rapid charge port",
+          "intrinsic_tier": "Short-term trends",
+          "intrinsic_interval_seconds": 5,
+          "inherits_faster_command_interval": true
+        },
+        {
+          "id": "IONIQ5_NORMAL_CHARGE_PORT",
+          "name": "Normal charge port",
+          "intrinsic_tier": "Short-term trends",
+          "intrinsic_interval_seconds": 5,
+          "inherits_faster_command_interval": true
+        },
+        {
+          "id": "IONIQ5_BMS_MAIN_RELAY",
+          "name": "Battery management system main relay",
+          "intrinsic_tier": "Short-term trends",
+          "intrinsic_interval_seconds": 5,
+          "inherits_faster_command_interval": true
+        },
+        {
+          "id": "IONIQ5_BATTERY_CURRENT",
+          "name": "Battery current",
+          "intrinsic_tier": "Engine control",
+          "intrinsic_interval_seconds": 1,
+          "inherits_faster_command_interval": true
+        },
+        {
+          "id": "IONIQ5_BATTERY_DC_VOLTAGE",
+          "name": "Battery DC voltage",
+          "intrinsic_tier": "Engine control",
+          "intrinsic_interval_seconds": 1,
+          "inherits_faster_command_interval": true
+        },
+        {
+          "id": "IONIQ5_BATTERY_MAX_T",
+          "name": "Battery max temperature",
+          "intrinsic_tier": "Thermal condition",
+          "intrinsic_interval_seconds": 15,
+          "inherits_faster_command_interval": true
+        },
+        {
+          "id": "IONIQ5_BATTERY_MIN_T",
+          "name": "Battery min temperature",
+          "intrinsic_tier": "Thermal condition",
+          "intrinsic_interval_seconds": 15,
+          "inherits_faster_command_interval": true
+        },
+        {
+          "id": "IONIQ5_BATTERY_PACK_B01",
+          "name": "Battery pack B01",
+          "intrinsic_tier": "Thermal condition",
+          "intrinsic_interval_seconds": 15,
+          "inherits_faster_command_interval": true
+        },
+        {
+          "id": "IONIQ5_BATTERY_PACK_B02",
+          "name": "Battery pack B02",
+          "intrinsic_tier": "Thermal condition",
+          "intrinsic_interval_seconds": 15,
+          "inherits_faster_command_interval": true
+        },
+        {
+          "id": "IONIQ5_BATTERY_PACK_B03",
+          "name": "Battery pack B03",
+          "intrinsic_tier": "Thermal condition",
+          "intrinsic_interval_seconds": 15,
+          "inherits_faster_command_interval": true
+        },
+        {
+          "id": "IONIQ5_BATTERY_PACK_B04",
+          "name": "Battery pack B04",
+          "intrinsic_tier": "Thermal condition",
+          "intrinsic_interval_seconds": 15,
+          "inherits_faster_command_interval": true
+        },
+        {
+          "id": "IONIQ5_BATTERY_PACK_B05",
+          "name": "Battery pack B05",
+          "intrinsic_tier": "Thermal condition",
+          "intrinsic_interval_seconds": 15,
+          "inherits_faster_command_interval": true
+        },
+        {
+          "id": "IONIQ5_BATTERY_INLET_T",
+          "name": "Battery inlet temperature",
+          "intrinsic_tier": "Thermal condition",
+          "intrinsic_interval_seconds": 15,
+          "inherits_faster_command_interval": true
+        },
+        {
+          "id": "IONIQ5_MAXIMUM_CELL_VOLTAGE",
+          "name": "Maximum cell voltage",
+          "intrinsic_tier": "Short-term trends",
+          "intrinsic_interval_seconds": 5,
+          "inherits_faster_command_interval": true
+        },
+        {
+          "id": "IONIQ5_MAXIMUM_CELL_VOLTAGE_NO",
+          "name": "Maximum cell voltage no",
+          "intrinsic_tier": "Short-term trends",
+          "intrinsic_interval_seconds": 5,
+          "inherits_faster_command_interval": true
+        },
+        {
+          "id": "IONIQ5_MINIMUM_CELL_VOLTAGE",
+          "name": "Minimum cell voltage",
+          "intrinsic_tier": "Short-term trends",
+          "intrinsic_interval_seconds": 5,
+          "inherits_faster_command_interval": true
+        },
+        {
+          "id": "IONIQ5_MINIMUM_CELL_VOLTAGE_NO",
+          "name": "Minimum cell voltage no",
+          "intrinsic_tier": "Short-term trends",
+          "intrinsic_interval_seconds": 5,
+          "inherits_faster_command_interval": true
+        },
+        {
+          "id": "IONIQ5_BATTERY_FAN_STATUS",
+          "name": "Battery fan status",
+          "intrinsic_tier": "Short-term trends",
+          "intrinsic_interval_seconds": 5,
+          "inherits_faster_command_interval": true
+        },
+        {
+          "id": "IONIQ5_BATTERY_FAN_FEEDBACK",
+          "name": "Battery fan feedback",
+          "intrinsic_tier": "Short-term trends",
+          "intrinsic_interval_seconds": 5,
+          "inherits_faster_command_interval": true
+        },
+        {
+          "id": "IONIQ5_AUXILLARY_BATTERY_VOLTAGE",
+          "name": "Auxiliary battery voltage",
+          "intrinsic_tier": "Short-term trends",
+          "intrinsic_interval_seconds": 5,
+          "inherits_faster_command_interval": true
+        },
+        {
+          "id": "IONIQ5_CUMULATIVE_CHARGE_CURRENT",
+          "name": "Cumulative charge current",
+          "intrinsic_tier": "Cumulative history",
+          "intrinsic_interval_seconds": 300,
+          "inherits_faster_command_interval": true
+        },
+        {
+          "id": "IONIQ5_CUMULATIVE_DISCHARGE_CURRENT",
+          "name": "Cumulative discharge current",
+          "intrinsic_tier": "Cumulative history",
+          "intrinsic_interval_seconds": 300,
+          "inherits_faster_command_interval": true
+        },
+        {
+          "id": "IONIQ5_CUMULATIVE_ENERGY_CHARGED",
+          "name": "Cumulative energy charged",
+          "intrinsic_tier": "Cumulative history",
+          "intrinsic_interval_seconds": 300,
+          "inherits_faster_command_interval": true
+        },
+        {
+          "id": "IONIQ5_CUMULATIVE_ENERGY_DISCHARGED",
+          "name": "Cumulative energy discharged",
+          "intrinsic_tier": "Cumulative history",
+          "intrinsic_interval_seconds": 300,
+          "inherits_faster_command_interval": true
+        },
+        {
+          "id": "IONIQ5_BATTERY_WORK_TIME_TOTAL_SEC",
+          "name": "Battery work time total",
+          "intrinsic_tier": "Cumulative history",
+          "intrinsic_interval_seconds": 300,
+          "inherits_faster_command_interval": true
+        },
+        {
+          "id": "IONIQ5_BMS_IGNITION",
+          "name": "Battery management system ignition",
+          "intrinsic_tier": "Short-term trends",
+          "intrinsic_interval_seconds": 5,
+          "inherits_faster_command_interval": true
+        },
+        {
+          "id": "IONIQ5_INVERTER_CAPACITOR_VOLTAGE",
+          "name": "Inverter capacitor voltage",
+          "intrinsic_tier": "Engine control",
+          "intrinsic_interval_seconds": 1,
+          "inherits_faster_command_interval": true
+        },
+        {
+          "id": "IONIQ5_DRIVE_MOTOR_SPEED_1",
+          "name": "Drive motor speed 1",
+          "intrinsic_tier": "Operational",
+          "intrinsic_interval_seconds": 0.25,
+          "inherits_faster_command_interval": false
+        },
+        {
+          "id": "IONIQ5_DRIVE_MOTOR_SPEED_2",
+          "name": "Drive motor speed 2",
+          "intrinsic_tier": "Operational",
+          "intrinsic_interval_seconds": 0.25,
+          "inherits_faster_command_interval": false
+        },
+        {
+          "id": "IONIQ5_ISOLATION_RESISTANCE",
+          "name": "Isolation resistance",
+          "intrinsic_tier": "Health and environment",
+          "intrinsic_interval_seconds": 60,
+          "inherits_faster_command_interval": true
+        }
+      ],
+      "source_url": "https://github.com/OBDb/Hyundai-IONIQ-5/blob/9228763fe762c0ab1257578fffd4981c08eaa4fc/signalsets/v3/default.json",
+      "driving_signals": [
+        "IONIQ5_DRIVE_MOTOR_SPEED_1",
+        "IONIQ5_DRIVE_MOTOR_SPEED_2"
+      ],
+      "nominal_requests_per_minute": {
+        "before": 60.0,
+        "after": 240.0
+      }
+    },
+    {
+      "example_id": "F04",
+      "repository": "Hyundai-IONIQ-5",
+      "source_file": "signalsets/v3/default.json",
+      "source_commit": "9228763fe762c0ab1257578fffd4981c08eaa4fc",
+      "source_sha256": "305de2567d4852d8557479c9cc8af10e987fb31e0fcbb7b98995e3348691724a",
+      "command_pointer": "/commands/27",
+      "identity": {
+        "hdr": "7E4",
+        "rax": "7EC",
+        "fcm1": true,
+        "cmd": {
+          "22": "0105"
+        }
+      },
+      "availability_preserve": {
+        "dbgfilter": {
+          "to": 2021,
+          "from": 2027
+        }
+      },
+      "observed_freq_seconds": 1,
+      "proposed_command_tier": "Health and environment",
+      "proposed_freq_seconds": 60,
+      "confidence_in_classification": "high",
+      "status": "proposed",
+      "rationale": "SOC/remaining energy are ordinary charge-state monitoring; SOH is degradation monitoring. None is an accumulated-history total. Three fields share 60 seconds.",
+      "review_requirement": "Use-dependent SOC exception: faster sampling requires an explicit load/charge-transition use case.",
+      "signals": [
+        {
+          "id": "IONIQ5_HVBAT_SOH",
+          "name": "HV battery state of health",
+          "intrinsic_tier": "Health and environment",
+          "intrinsic_interval_seconds": 60,
+          "inherits_faster_command_interval": false
+        },
+        {
+          "id": "IONIQ5_HVBAT_WH",
+          "name": "HV battery remaining energy",
+          "intrinsic_tier": "Health and environment",
+          "intrinsic_interval_seconds": 60,
+          "inherits_faster_command_interval": false
+        },
+        {
+          "id": "IONIQ5_HVBAT_SOC_DISP",
+          "name": "HV battery charge",
+          "intrinsic_tier": "Health and environment",
+          "intrinsic_interval_seconds": 60,
+          "inherits_faster_command_interval": false
+        }
+      ],
+      "source_url": "https://github.com/OBDb/Hyundai-IONIQ-5/blob/9228763fe762c0ab1257578fffd4981c08eaa4fc/signalsets/v3/default.json",
+      "driving_signals": [
+        "IONIQ5_HVBAT_SOH",
+        "IONIQ5_HVBAT_WH",
+        "IONIQ5_HVBAT_SOC_DISP"
+      ],
+      "nominal_requests_per_minute": {
+        "before": 60.0,
+        "after": 1.0
+      }
+    },
+    {
+      "example_id": "F05",
+      "repository": "Hyundai-IONIQ-5",
+      "source_file": "signalsets/v3/default.json",
+      "source_commit": "9228763fe762c0ab1257578fffd4981c08eaa4fc",
+      "source_sha256": "305de2567d4852d8557479c9cc8af10e987fb31e0fcbb7b98995e3348691724a",
+      "command_pointer": "/commands/4",
+      "identity": {
+        "hdr": "744",
+        "rax": "74C",
+        "cmd": {
+          "22": "E004"
+        }
+      },
+      "availability_preserve": {
+        "dbgfilter": {
+          "to": 2021,
+          "from": 2027
+        }
+      },
+      "observed_freq_seconds": 1,
+      "proposed_command_tier": "Short-term trends",
+      "proposed_freq_seconds": 5,
+      "confidence_in_classification": "high",
+      "status": "proposed",
+      "rationale": "Main/400V relay states, relay requests and socket connection are present equipment states. Inlet temperatures inherit the 5-second command interval.",
+      "review_requirement": "An application requiring faster transition acquisition needs an explicit use-case exception and review.",
+      "signals": [
+        {
+          "id": "IONIQ5_BATTERY_MAIN_RELAY_STATUS",
+          "name": "Battery main relay status",
+          "intrinsic_tier": "Short-term trends",
+          "intrinsic_interval_seconds": 5,
+          "inherits_faster_command_interval": false
+        },
+        {
+          "id": "IONIQ5_CHARGING_SOCKET_CONNECTED",
+          "name": "Charging socket connected",
+          "intrinsic_tier": "Short-term trends",
+          "intrinsic_interval_seconds": 5,
+          "inherits_faster_command_interval": false
+        },
+        {
+          "id": "IONIQ5_400V_RELAY_STATUS",
+          "name": "400V relay status",
+          "intrinsic_tier": "Short-term trends",
+          "intrinsic_interval_seconds": 5,
+          "inherits_faster_command_interval": false
+        },
+        {
+          "id": "IONIQ5_400V_RELAY_ON_OFF_REQUEST",
+          "name": "400V relay on/off request",
+          "intrinsic_tier": "Short-term trends",
+          "intrinsic_interval_seconds": 5,
+          "inherits_faster_command_interval": false
+        },
+        {
+          "id": "IONIQ5_DC_INLET_T_1",
+          "name": "DC inlet temperature 1",
+          "intrinsic_tier": "Thermal condition",
+          "intrinsic_interval_seconds": 15,
+          "inherits_faster_command_interval": true
+        },
+        {
+          "id": "IONIQ5_DC_INLET_T_2",
+          "name": "DC inlet temperature 2",
+          "intrinsic_tier": "Thermal condition",
+          "intrinsic_interval_seconds": 15,
+          "inherits_faster_command_interval": true
+        },
+        {
+          "id": "IONIQ5_AC_INLET_T_1",
+          "name": "AC inlet temperature 1",
+          "intrinsic_tier": "Thermal condition",
+          "intrinsic_interval_seconds": 15,
+          "inherits_faster_command_interval": true
+        }
+      ],
+      "source_url": "https://github.com/OBDb/Hyundai-IONIQ-5/blob/9228763fe762c0ab1257578fffd4981c08eaa4fc/signalsets/v3/default.json",
+      "driving_signals": [
+        "IONIQ5_BATTERY_MAIN_RELAY_STATUS",
+        "IONIQ5_CHARGING_SOCKET_CONNECTED",
+        "IONIQ5_400V_RELAY_STATUS",
+        "IONIQ5_400V_RELAY_ON_OFF_REQUEST"
+      ],
+      "nominal_requests_per_minute": {
+        "before": 60.0,
+        "after": 12.0
+      }
+    },
+    {
+      "example_id": "F06",
+      "repository": "Hyundai-IONIQ-5",
+      "source_file": "signalsets/v3/default.json",
+      "source_commit": "9228763fe762c0ab1257578fffd4981c08eaa4fc",
+      "source_sha256": "305de2567d4852d8557479c9cc8af10e987fb31e0fcbb7b98995e3348691724a",
+      "command_pointer": "/commands/9",
+      "identity": {
+        "hdr": "7A0",
+        "rax": "7A8",
+        "fcm1": true,
+        "cmd": {
+          "22": "B00C"
+        }
+      },
+      "availability_preserve": {
+        "dbgfilter": {
+          "to": 2021,
+          "from": 2025
+        }
+      },
+      "observed_freq_seconds": 5,
+      "proposed_command_tier": "Short-term trends",
+      "proposed_freq_seconds": 5,
+      "confidence_in_classification": "high",
+      "status": "proposed",
+      "rationale": "Heated steering-wheel on/off is a convenience state. Being a binary state does not automatically make it Operational. Both alternate decodes retain existing availability.",
+      "review_requirement": null,
+      "signals": [
+        {
+          "id": "IONIQ5_HEATED_WHEEL",
+          "name": "Heated steering wheel",
+          "intrinsic_tier": "Short-term trends",
+          "intrinsic_interval_seconds": 5,
+          "inherits_faster_command_interval": false
+        },
+        {
+          "id": "IONIQ5_HEATED_WHEEL_ALT",
+          "name": "Heated steering wheel, alternate bit",
+          "intrinsic_tier": "Short-term trends",
+          "intrinsic_interval_seconds": 5,
+          "inherits_faster_command_interval": false
+        }
+      ],
+      "source_url": "https://github.com/OBDb/Hyundai-IONIQ-5/blob/9228763fe762c0ab1257578fffd4981c08eaa4fc/signalsets/v3/default.json",
+      "driving_signals": [
+        "IONIQ5_HEATED_WHEEL",
+        "IONIQ5_HEATED_WHEEL_ALT"
+      ],
+      "nominal_requests_per_minute": {
+        "before": 12.0,
+        "after": 12.0
+      }
+    },
+    {
+      "example_id": "F07",
+      "repository": "Hyundai-IONIQ-5",
+      "source_file": "signalsets/v3/default.json",
+      "source_commit": "9228763fe762c0ab1257578fffd4981c08eaa4fc",
+      "source_sha256": "305de2567d4852d8557479c9cc8af10e987fb31e0fcbb7b98995e3348691724a",
+      "command_pointer": "/commands/10",
+      "identity": {
+        "hdr": "7A0",
+        "rax": "7A8",
+        "fcm1": true,
+        "cmd": {
+          "22": "C002"
+        }
+      },
+      "availability_preserve": {
+        "dbgfilter": {
+          "to": 2021,
+          "from": 2026
+        }
+      },
+      "observed_freq_seconds": 60,
+      "proposed_command_tier": null,
+      "proposed_freq_seconds": null,
+      "confidence_in_classification": "high",
+      "status": "discovery-review",
+      "rationale": "Tire sensor IDs are static identity/configuration, not pressure, temperature or accumulated history. The guide treats these as connection/setup discovery rather than recurring measurement polling.",
+      "review_requirement": "Use connection/setup or on-demand discovery policy. Preserve the existing 60-second interval pending a separate discovery-policy decision; no seventh tier is introduced.",
+      "signals": [
+        {
+          "id": "IONIQ5_TID_1",
+          "name": "Tire sensor 1 ID",
+          "intrinsic_tier": null,
+          "intrinsic_interval_seconds": null,
+          "inherits_faster_command_interval": false
+        },
+        {
+          "id": "IONIQ5_TID_2",
+          "name": "Tire sensor 2 ID",
+          "intrinsic_tier": null,
+          "intrinsic_interval_seconds": null,
+          "inherits_faster_command_interval": false
+        },
+        {
+          "id": "IONIQ5_TID_3",
+          "name": "Tire sensor 3 ID",
+          "intrinsic_tier": null,
+          "intrinsic_interval_seconds": null,
+          "inherits_faster_command_interval": false
+        },
+        {
+          "id": "IONIQ5_TID_4",
+          "name": "Tire sensor 4 ID",
+          "intrinsic_tier": null,
+          "intrinsic_interval_seconds": null,
+          "inherits_faster_command_interval": false
+        }
+      ],
+      "source_url": "https://github.com/OBDb/Hyundai-IONIQ-5/blob/9228763fe762c0ab1257578fffd4981c08eaa4fc/signalsets/v3/default.json",
+      "driving_signals": [],
+      "nominal_requests_per_minute": {
+        "before": 1.0,
+        "after": null
+      }
+    },
+    {
+      "example_id": "F08",
+      "repository": "Nissan-Leaf",
+      "source_file": "signalsets/v3/default.json",
+      "source_commit": "313f301b5c551ac6b2ea0dced4f01f8b69e25e4b",
+      "source_sha256": "c3c3a2d9e05c40745019375db1b7844f6c115d7b09f2865582d378f99cf2bb7d",
+      "command_pointer": "/commands/28",
+      "identity": {
+        "hdr": "797",
+        "rax": "79A",
+        "cmd": {
+          "22": "1248"
+        }
+      },
+      "availability_preserve": {
+        "dbgfilter": {
+          "to": 2017,
+          "from": 2019
+        }
+      },
+      "observed_freq_seconds": 1,
+      "proposed_command_tier": "Engine control",
+      "proposed_freq_seconds": 1,
+      "confidence_in_classification": "high",
+      "status": "proposed",
+      "rationale": "Live traction-battery current follows acceleration/regeneration power demand. Electrical does not always mean Short-term trends.",
+      "review_requirement": null,
+      "signals": [
+        {
+          "id": "LEAF_HVBAT_I",
+          "name": "HV battery current",
+          "intrinsic_tier": "Engine control",
+          "intrinsic_interval_seconds": 1,
+          "inherits_faster_command_interval": false
+        }
+      ],
+      "source_url": "https://github.com/OBDb/Nissan-Leaf/blob/313f301b5c551ac6b2ea0dced4f01f8b69e25e4b/signalsets/v3/default.json",
+      "driving_signals": [
+        "LEAF_HVBAT_I"
+      ],
+      "nominal_requests_per_minute": {
+        "before": 60.0,
+        "after": 60.0
+      }
+    },
+    {
+      "example_id": "F09",
+      "repository": "Nissan-Leaf",
+      "source_file": "signalsets/v3/default.json",
+      "source_commit": "313f301b5c551ac6b2ea0dced4f01f8b69e25e4b",
+      "source_sha256": "c3c3a2d9e05c40745019375db1b7844f6c115d7b09f2865582d378f99cf2bb7d",
+      "command_pointer": "/commands/42",
+      "identity": {
+        "hdr": "79B",
+        "rax": "7BB",
+        "fcm1": true,
+        "cmd": {
+          "21": "61"
+        }
+      },
+      "availability_preserve": {
+        "dbgfilter": {
+          "to": 2011,
+          "years": [
+            2014,
+            2016,
+            2020,
+            2023
+          ],
+          "from": 2025
+        }
+      },
+      "observed_freq_seconds": 3600,
+      "proposed_command_tier": "Health and environment",
+      "proposed_freq_seconds": 60,
+      "confidence_in_classification": "high",
+      "status": "needs-review",
+      "rationale": "Standalone SOH describes degradation/condition, not charge level or historical total. The observed 3,600-second interval would become 60 seconds under strict interval standardization.",
+      "review_requirement": "This is 60 times as many nominal requests; explicitly review whether strict uniformity should override a justified slower health refresh.",
+      "signals": [
+        {
+          "id": "LEAF_HVBAT_SOH",
+          "name": "High voltage battery health",
+          "intrinsic_tier": "Health and environment",
+          "intrinsic_interval_seconds": 60,
+          "inherits_faster_command_interval": false
+        }
+      ],
+      "source_url": "https://github.com/OBDb/Nissan-Leaf/blob/313f301b5c551ac6b2ea0dced4f01f8b69e25e4b/signalsets/v3/default.json",
+      "driving_signals": [
+        "LEAF_HVBAT_SOH"
+      ],
+      "nominal_requests_per_minute": {
+        "before": 0.016666666666666666,
+        "after": 1.0
+      }
+    },
+    {
+      "example_id": "F10",
+      "repository": "Nissan-Leaf",
+      "source_file": "signalsets/v3/default.json",
+      "source_commit": "313f301b5c551ac6b2ea0dced4f01f8b69e25e4b",
+      "source_sha256": "c3c3a2d9e05c40745019375db1b7844f6c115d7b09f2865582d378f99cf2bb7d",
+      "command_pointer": "/commands/3",
+      "identity": {
+        "hdr": "743",
+        "rax": "763",
+        "fcm1": true,
+        "cmd": {
+          "22": "0E01"
+        }
+      },
+      "availability_preserve": {
+        "filter": {
+          "from": 2018
+        },
+        "dbgfilter": {
+          "years": [
+            2020,
+            2023
+          ],
+          "from": 2025
+        }
+      },
+      "observed_freq_seconds": 1,
+      "proposed_command_tier": "Cumulative history",
+      "proposed_freq_seconds": 300,
+      "confidence_in_classification": "high",
+      "status": "proposed",
+      "rationale": "Standalone odometer is a persistent accumulated distance total; being displayed live does not make it Operational.",
+      "review_requirement": null,
+      "signals": [
+        {
+          "id": "LEAF_ODO",
+          "name": "Odometer",
+          "intrinsic_tier": "Cumulative history",
+          "intrinsic_interval_seconds": 300,
+          "inherits_faster_command_interval": false
+        }
+      ],
+      "source_url": "https://github.com/OBDb/Nissan-Leaf/blob/313f301b5c551ac6b2ea0dced4f01f8b69e25e4b/signalsets/v3/default.json",
+      "driving_signals": [
+        "LEAF_ODO"
+      ],
+      "nominal_requests_per_minute": {
+        "before": 60.0,
+        "after": 0.2
+      }
+    },
+    {
+      "example_id": "F11",
+      "repository": "Toyota-Prius",
+      "source_file": "signalsets/v3/default.json",
+      "source_commit": "167b2308585bb00cdfa0bc3c3b7854466cae91c8",
+      "source_sha256": "fdcfd6d19d444b09e277e51f69df1480bdd9d16df24b831bcbff4da985d99b7e",
+      "command_pointer": "/commands/207",
+      "identity": {
+        "hdr": "7E0",
+        "rax": "7E8",
+        "cmd": {
+          "21": "01"
+        }
+      },
+      "availability_preserve": {
+        "dbgfilter": {
+          "to": 2008,
+          "years": [
+            2010,
+            2011,
+            2012
+          ],
+          "from": 2014
+        }
+      },
+      "observed_freq_seconds": 1,
+      "proposed_command_tier": "Operational",
+      "proposed_freq_seconds": 0.25,
+      "confidence_in_classification": "high",
+      "status": "needs-review",
+      "rationale": "RPM and road speed drive a packet also containing load, airflow, intake temperature, coolant and barometer.",
+      "review_requirement": "Classification is clear, but the proposed packet requests four times the current nominal traffic. Review transport capacity before adoption.",
+      "signals": [
+        {
+          "id": "PRIUS_LOAD",
+          "name": "Calculated load",
+          "intrinsic_tier": "Engine control",
+          "intrinsic_interval_seconds": 1,
+          "inherits_faster_command_interval": true
+        },
+        {
+          "id": "PRIUS_MAF",
+          "name": "Mass air flow",
+          "intrinsic_tier": "Engine control",
+          "intrinsic_interval_seconds": 1,
+          "inherits_faster_command_interval": true
+        },
+        {
+          "id": "PRIUS_IAT",
+          "name": "Intake air temperature",
+          "intrinsic_tier": "Short-term trends",
+          "intrinsic_interval_seconds": 5,
+          "inherits_faster_command_interval": true
+        },
+        {
+          "id": "PRIUS_BARO",
+          "name": "Barometric pressure",
+          "intrinsic_tier": "Health and environment",
+          "intrinsic_interval_seconds": 60,
+          "inherits_faster_command_interval": true
+        },
+        {
+          "id": "PRIUS_ECT_7E0",
+          "name": "Engine coolant temperature",
+          "intrinsic_tier": "Thermal condition",
+          "intrinsic_interval_seconds": 15,
+          "inherits_faster_command_interval": true
+        },
+        {
+          "id": "PRIUS_RPM_7E0",
+          "name": "Engine speed",
+          "intrinsic_tier": "Operational",
+          "intrinsic_interval_seconds": 0.25,
+          "inherits_faster_command_interval": false
+        },
+        {
+          "id": "PRIUS_VSS_7E0",
+          "name": "Vehicle speed",
+          "intrinsic_tier": "Operational",
+          "intrinsic_interval_seconds": 0.25,
+          "inherits_faster_command_interval": false
+        }
+      ],
+      "source_url": "https://github.com/OBDb/Toyota-Prius/blob/167b2308585bb00cdfa0bc3c3b7854466cae91c8/signalsets/v3/default.json",
+      "driving_signals": [
+        "PRIUS_RPM_7E0",
+        "PRIUS_VSS_7E0"
+      ],
+      "nominal_requests_per_minute": {
+        "before": 60.0,
+        "after": 240.0
+      }
+    },
+    {
+      "example_id": "F12",
+      "repository": "Toyota-Prius",
+      "source_file": "signalsets/v3/default.json",
+      "source_commit": "167b2308585bb00cdfa0bc3c3b7854466cae91c8",
+      "source_sha256": "fdcfd6d19d444b09e277e51f69df1480bdd9d16df24b831bcbff4da985d99b7e",
+      "command_pointer": "/commands/236",
+      "identity": {
+        "hdr": "7E0",
+        "rax": "7E8",
+        "cmd": {
+          "21": "51"
+        }
+      },
+      "availability_preserve": {
+        "filter": {
+          "to": 2003,
+          "from": 2009
+        },
+        "dbgfilter": {
+          "to": 2011,
+          "years": [
+            2013,
+            2014,
+            2015
+          ],
+          "from": 2017
+        }
+      },
+      "observed_freq_seconds": 1,
+      "proposed_command_tier": "Thermal condition",
+      "proposed_freq_seconds": 15,
+      "confidence_in_classification": "high",
+      "status": "proposed",
+      "rationale": "Current oil temperatures drive a packet whose previous-trip distance is a historical snapshot.",
+      "review_requirement": null,
+      "signals": [
+        {
+          "id": "PRIUS_PREV_TRIP_DST",
+          "name": "Previous trip distance",
+          "intrinsic_tier": "Cumulative history",
+          "intrinsic_interval_seconds": 300,
+          "inherits_faster_command_interval": true
+        },
+        {
+          "id": "PRIUS_VVTOT",
+          "name": "Variable valve timing oil temperature",
+          "intrinsic_tier": "Thermal condition",
+          "intrinsic_interval_seconds": 15,
+          "inherits_faster_command_interval": false
+        },
+        {
+          "id": "PRIUS_EOT",
+          "name": "Engine oil temperature",
+          "intrinsic_tier": "Thermal condition",
+          "intrinsic_interval_seconds": 15,
+          "inherits_faster_command_interval": false
+        }
+      ],
+      "source_url": "https://github.com/OBDb/Toyota-Prius/blob/167b2308585bb00cdfa0bc3c3b7854466cae91c8/signalsets/v3/default.json",
+      "driving_signals": [
+        "PRIUS_VVTOT",
+        "PRIUS_EOT"
+      ],
+      "nominal_requests_per_minute": {
+        "before": 60.0,
+        "after": 4.0
+      }
+    },
+    {
+      "example_id": "F13",
+      "repository": "Toyota-Prius-Prime",
+      "source_file": "signalsets/v3/default.json",
+      "source_commit": "39f1863e0740b2311872f945993323c952084540",
+      "source_sha256": "f5d9999963f72e8a5755155023af3cddb6afb1ee5b0794e1e3b29ebf27997cd1",
+      "command_pointer": "/commands/97",
+      "identity": {
+        "hdr": "747",
+        "rax": "74F",
+        "cmd": {
+          "22": "180B"
+        }
+      },
+      "availability_preserve": {
+        "filter": {
+          "from": 2017
+        },
+        "dbgfilter": {
+          "to": 2019,
+          "from": 2021
+        }
+      },
+      "observed_freq_seconds": 5,
+      "proposed_command_tier": "Thermal condition",
+      "proposed_freq_seconds": 15,
+      "confidence_in_classification": "high",
+      "status": "proposed",
+      "rationale": "Battery cooling inlet temperature concerns thermal conditioning, unlike combustion intake-air temperature at 5 seconds. The word intake alone is insufficient.",
+      "review_requirement": null,
+      "signals": [
+        {
+          "id": "PRIUSPRIME_HYBRID_BAT_IAT_1",
+          "name": "Hybrid battery intake air temperature 1",
+          "intrinsic_tier": "Thermal condition",
+          "intrinsic_interval_seconds": 15,
+          "inherits_faster_command_interval": false
+        },
+        {
+          "id": "PRIUSPRIME_HYBRID_BAT_IAT_2",
+          "name": "Hybrid battery intake air temperature 2",
+          "intrinsic_tier": "Thermal condition",
+          "intrinsic_interval_seconds": 15,
+          "inherits_faster_command_interval": false
+        }
+      ],
+      "source_url": "https://github.com/OBDb/Toyota-Prius-Prime/blob/39f1863e0740b2311872f945993323c952084540/signalsets/v3/default.json",
+      "driving_signals": [
+        "PRIUSPRIME_HYBRID_BAT_IAT_1",
+        "PRIUSPRIME_HYBRID_BAT_IAT_2"
+      ],
+      "nominal_requests_per_minute": {
+        "before": 12.0,
+        "after": 4.0
+      }
+    },
+    {
+      "example_id": "F14",
+      "repository": "Toyota-Prius-Prime",
+      "source_file": "signalsets/v3/default.json",
+      "source_commit": "39f1863e0740b2311872f945993323c952084540",
+      "source_sha256": "f5d9999963f72e8a5755155023af3cddb6afb1ee5b0794e1e3b29ebf27997cd1",
+      "command_pointer": "/commands/108",
+      "identity": {
+        "hdr": "750",
+        "rax": "758",
+        "eax": "2A",
+        "tst": "2A",
+        "fcm1": true,
+        "cmd": {
+          "21": "30"
+        }
+      },
+      "availability_preserve": {
+        "dbgfilter": {
+          "to": 2019,
+          "from": 2021
+        }
+      },
+      "observed_freq_seconds": 2.5,
+      "proposed_command_tier": "Health and environment",
+      "proposed_freq_seconds": 60,
+      "confidence_in_classification": "high",
+      "status": "proposed",
+      "rationale": "Numeric tire pressure is periodic condition monitoring. Preserve extended address eax 2A, tester address tst 2A, response address and flow-control flag.",
+      "review_requirement": null,
+      "signals": [
+        {
+          "id": "PRIUSPRIME_TP_FL",
+          "name": "Front left tire pressure",
+          "intrinsic_tier": "Health and environment",
+          "intrinsic_interval_seconds": 60,
+          "inherits_faster_command_interval": false
+        },
+        {
+          "id": "PRIUSPRIME_TP_FR",
+          "name": "Front right tire pressure",
+          "intrinsic_tier": "Health and environment",
+          "intrinsic_interval_seconds": 60,
+          "inherits_faster_command_interval": false
+        },
+        {
+          "id": "PRIUSPRIME_TP_RL",
+          "name": "Rear left tire pressure",
+          "intrinsic_tier": "Health and environment",
+          "intrinsic_interval_seconds": 60,
+          "inherits_faster_command_interval": false
+        },
+        {
+          "id": "PRIUSPRIME_TP_RR",
+          "name": "Rear right tire pressure",
+          "intrinsic_tier": "Health and environment",
+          "intrinsic_interval_seconds": 60,
+          "inherits_faster_command_interval": false
+        },
+        {
+          "id": "PRIUSPRIME_TP_SPARE",
+          "name": "Spare tire pressure",
+          "intrinsic_tier": "Health and environment",
+          "intrinsic_interval_seconds": 60,
+          "inherits_faster_command_interval": false
+        }
+      ],
+      "source_url": "https://github.com/OBDb/Toyota-Prius-Prime/blob/39f1863e0740b2311872f945993323c952084540/signalsets/v3/default.json",
+      "driving_signals": [
+        "PRIUSPRIME_TP_FL",
+        "PRIUSPRIME_TP_FR",
+        "PRIUSPRIME_TP_RL",
+        "PRIUSPRIME_TP_RR",
+        "PRIUSPRIME_TP_SPARE"
+      ],
+      "nominal_requests_per_minute": {
+        "before": 24.0,
+        "after": 1.0
+      }
+    },
+    {
+      "example_id": "F15",
+      "repository": "Toyota-Prius-Prime",
+      "source_file": "signalsets/v3/default.json",
+      "source_commit": "39f1863e0740b2311872f945993323c952084540",
+      "source_sha256": "f5d9999963f72e8a5755155023af3cddb6afb1ee5b0794e1e3b29ebf27997cd1",
+      "command_pointer": "/commands/211",
+      "identity": {
+        "hdr": "7D2",
+        "rax": "7DA",
+        "fcm1": true,
+        "cmd": {
+          "22": "1F5B"
+        }
+      },
+      "availability_preserve": {
+        "dbgfilter": {
+          "to": 2016,
+          "years": [
+            2018,
+            2019
+          ],
+          "from": 2027
+        }
+      },
+      "observed_freq_seconds": 1,
+      "proposed_command_tier": "Health and environment",
+      "proposed_freq_seconds": 60,
+      "confidence_in_classification": "medium",
+      "status": "needs-review",
+      "rationale": "Standalone displayed/estimated SOC fits periodic remaining-charge monitoring under the proposed default.",
+      "review_requirement": "Hybrid SOC can be materially useful at 5 or 1 seconds for energy-management transitions; establish intended ordinary use rather than assuming every percent signal belongs at 60 seconds.",
+      "signals": [
+        {
+          "id": "PRIUSPRIME_SOC",
+          "name": "State of charge",
+          "intrinsic_tier": "Health and environment",
+          "intrinsic_interval_seconds": 60,
+          "inherits_faster_command_interval": false
+        }
+      ],
+      "source_url": "https://github.com/OBDb/Toyota-Prius-Prime/blob/39f1863e0740b2311872f945993323c952084540/signalsets/v3/default.json",
+      "driving_signals": [
+        "PRIUSPRIME_SOC"
+      ],
+      "nominal_requests_per_minute": {
+        "before": 60.0,
+        "after": 1.0
+      }
+    },
+    {
+      "example_id": "F16",
+      "repository": "Ford-F-150",
+      "source_file": "signalsets/v3/default.json",
+      "source_commit": "b96346eb4ff04ddef4bc00da9ec639e69265f1c2",
+      "source_sha256": "97883ac5a14830424151fcaa3362d27895c84bfdec7375e9ceb8d24b7bcd03f2",
+      "command_pointer": "/commands/101",
+      "identity": {
+        "hdr": "7E0",
+        "rax": "7E8",
+        "cmd": {
+          "22": "F406"
+        }
+      },
+      "availability_preserve": {
+        "filter": {
+          "from": 2009
+        },
+        "dbgfilter": {
+          "to": 2009,
+          "from": 2027
+        }
+      },
+      "observed_freq_seconds": 0.25,
+      "proposed_command_tier": "Engine control",
+      "proposed_freq_seconds": 1,
+      "confidence_in_classification": "high",
+      "status": "proposed",
+      "rationale": "Short-term fuel trim is a live combustion correction. The phrase short term must not be mistaken for the Short-term trends tier.",
+      "review_requirement": null,
+      "signals": [
+        {
+          "id": "F150_STFT",
+          "name": "Fuel trim, short term",
+          "intrinsic_tier": "Engine control",
+          "intrinsic_interval_seconds": 1,
+          "inherits_faster_command_interval": false
+        }
+      ],
+      "source_url": "https://github.com/OBDb/Ford-F-150/blob/b96346eb4ff04ddef4bc00da9ec639e69265f1c2/signalsets/v3/default.json",
+      "driving_signals": [
+        "F150_STFT"
+      ],
+      "nominal_requests_per_minute": {
+        "before": 240.0,
+        "after": 60.0
+      }
+    },
+    {
+      "example_id": "F17",
+      "repository": "Ford-F-150",
+      "source_file": "signalsets/v3/default.json",
+      "source_commit": "b96346eb4ff04ddef4bc00da9ec639e69265f1c2",
+      "source_sha256": "97883ac5a14830424151fcaa3362d27895c84bfdec7375e9ceb8d24b7bcd03f2",
+      "command_pointer": "/commands/106",
+      "identity": {
+        "hdr": "7E0",
+        "rax": "7E8",
+        "cmd": {
+          "22": "F40F"
+        }
+      },
+      "availability_preserve": {
+        "filter": {
+          "from": 2009
+        },
+        "dbgfilter": {
+          "to": 2009,
+          "from": 2027
+        }
+      },
+      "observed_freq_seconds": 2,
+      "proposed_command_tier": "Short-term trends",
+      "proposed_freq_seconds": 5,
+      "confidence_in_classification": "high",
+      "status": "proposed",
+      "rationale": "Combustion intake-air temperature is an intake trend, matching the BMW baseline exception to bulk Thermal condition.",
+      "review_requirement": null,
+      "signals": [
+        {
+          "id": "F150_IAT_ALT2",
+          "name": "Intake temperature, alternate",
+          "intrinsic_tier": "Short-term trends",
+          "intrinsic_interval_seconds": 5,
+          "inherits_faster_command_interval": false
+        }
+      ],
+      "source_url": "https://github.com/OBDb/Ford-F-150/blob/b96346eb4ff04ddef4bc00da9ec639e69265f1c2/signalsets/v3/default.json",
+      "driving_signals": [
+        "F150_IAT_ALT2"
+      ],
+      "nominal_requests_per_minute": {
+        "before": 30.0,
+        "after": 12.0
+      }
+    },
+    {
+      "example_id": "F18",
+      "repository": "Ford-F-150",
+      "source_file": "signalsets/v3/default.json",
+      "source_commit": "b96346eb4ff04ddef4bc00da9ec639e69265f1c2",
+      "source_sha256": "97883ac5a14830424151fcaa3362d27895c84bfdec7375e9ceb8d24b7bcd03f2",
+      "command_pointer": "/commands/48",
+      "identity": {
+        "hdr": "7E0",
+        "rax": "7E8",
+        "cmd": {
+          "22": "038F"
+        }
+      },
+      "availability_preserve": {
+        "filter": {
+          "from": 2009
+        },
+        "dbgfilter": {
+          "to": 2009,
+          "from": 2027
+        }
+      },
+      "observed_freq_seconds": 2,
+      "proposed_command_tier": "Thermal condition",
+      "proposed_freq_seconds": 15,
+      "confidence_in_classification": "high",
+      "status": "proposed",
+      "rationale": "Engine coolant tracks warm-up and sustained thermal state.",
+      "review_requirement": null,
+      "signals": [
+        {
+          "id": "F150_ECT",
+          "name": "Coolant temperature",
+          "intrinsic_tier": "Thermal condition",
+          "intrinsic_interval_seconds": 15,
+          "inherits_faster_command_interval": false
+        }
+      ],
+      "source_url": "https://github.com/OBDb/Ford-F-150/blob/b96346eb4ff04ddef4bc00da9ec639e69265f1c2/signalsets/v3/default.json",
+      "driving_signals": [
+        "F150_ECT"
+      ],
+      "nominal_requests_per_minute": {
+        "before": 30.0,
+        "after": 4.0
+      }
+    },
+    {
+      "example_id": "F19",
+      "repository": "Ford-F-150",
+      "source_file": "signalsets/v3/default.json",
+      "source_commit": "b96346eb4ff04ddef4bc00da9ec639e69265f1c2",
+      "source_sha256": "97883ac5a14830424151fcaa3362d27895c84bfdec7375e9ceb8d24b7bcd03f2",
+      "command_pointer": "/commands/39",
+      "identity": {
+        "hdr": "7E0",
+        "rax": "7E8",
+        "cmd": {
+          "22": "0353"
+        }
+      },
+      "availability_preserve": {
+        "filter": {
+          "from": 2009
+        },
+        "dbgfilter": {
+          "to": 2009,
+          "from": 2027
+        }
+      },
+      "observed_freq_seconds": 5,
+      "proposed_command_tier": "Health and environment",
+      "proposed_freq_seconds": 60,
+      "confidence_in_classification": "high",
+      "status": "proposed",
+      "rationale": "Atmospheric pressure is environment; pressure units do not imply fuel/boost response at 1 second.",
+      "review_requirement": null,
+      "signals": [
+        {
+          "id": "F150_BARO",
+          "name": "Barometric pressure",
+          "intrinsic_tier": "Health and environment",
+          "intrinsic_interval_seconds": 60,
+          "inherits_faster_command_interval": false
+        }
+      ],
+      "source_url": "https://github.com/OBDb/Ford-F-150/blob/b96346eb4ff04ddef4bc00da9ec639e69265f1c2/signalsets/v3/default.json",
+      "driving_signals": [
+        "F150_BARO"
+      ],
+      "nominal_requests_per_minute": {
+        "before": 12.0,
+        "after": 1.0
+      }
+    },
+    {
+      "example_id": "F20",
+      "repository": "Ford-F-150",
+      "source_file": "signalsets/v3/default.json",
+      "source_commit": "b96346eb4ff04ddef4bc00da9ec639e69265f1c2",
+      "source_sha256": "97883ac5a14830424151fcaa3362d27895c84bfdec7375e9ceb8d24b7bcd03f2",
+      "command_pointer": "/commands/38",
+      "identity": {
+        "hdr": "7E0",
+        "rax": "7E8",
+        "cmd": {
+          "22": "0345"
+        }
+      },
+      "availability_preserve": {
+        "filter": {
+          "from": 2009
+        },
+        "dbgfilter": {
+          "to": 2009,
+          "from": 2027
+        }
+      },
+      "observed_freq_seconds": 1,
+      "proposed_command_tier": null,
+      "proposed_freq_seconds": null,
+      "confidence_in_classification": "low",
+      "status": "needs-review",
+      "rationale": "Latest cycle could mean a short combustion window or a completed drive cycle. The name does not establish temporal semantics, so no ordinary category is proposed.",
+      "review_requirement": "Preserve the observed 1-second interval. Establish the counting window, reset behavior and intended use: live event acquisition could warrant Engine control at 1 second, while a completed-cycle historical total could fit Cumulative history at 300 seconds.",
+      "signals": [
+        {
+          "id": "F150_PCM_MISF_EVENTS_LATEST_CYC",
+          "name": "Misfire events, latest cycle",
+          "intrinsic_tier": null,
+          "intrinsic_interval_seconds": null,
+          "inherits_faster_command_interval": false
+        }
+      ],
+      "source_url": "https://github.com/OBDb/Ford-F-150/blob/b96346eb4ff04ddef4bc00da9ec639e69265f1c2/signalsets/v3/default.json",
+      "driving_signals": [],
+      "nominal_requests_per_minute": {
+        "before": 60.0,
+        "after": null
+      }
+    },
+    {
+      "example_id": "F21",
+      "repository": "Audi-Q7",
+      "source_file": "signalsets/v3/default.json",
+      "source_commit": "1c1a7f86b268685258f6ba74d722f69428d2036d",
+      "source_sha256": "16f562f9a46ea2ac6d1909f744c3ce53dabae72c771d027920f504ea0d3243ea",
+      "command_pointer": "/commands/54",
+      "identity": {
+        "hdr": "7E0",
+        "din": "03",
+        "cmd": {
+          "22": "10F3"
+        }
+      },
+      "availability_preserve": {
+        "dbgfilter": {
+          "to": 2014,
+          "years": [
+            2016
+          ],
+          "from": 2021
+        }
+      },
+      "observed_freq_seconds": 1,
+      "proposed_command_tier": "Engine control",
+      "proposed_freq_seconds": 1,
+      "confidence_in_classification": "medium",
+      "status": "needs-review",
+      "rationale": "DPF differential pressure varies with exhaust flow/load, fitting powertrain-response observation.",
+      "review_requirement": "Meaning is named but unit is unknown; retain debug-year handling and require decoding evidence before ordinary promotion. Absent rax must stay absent.",
+      "signals": [
+        {
+          "id": "Q7_PQ35_DPF_DIFF_P_2",
+          "name": "Diesel particulate filter differential pressure variant 2",
+          "intrinsic_tier": "Engine control",
+          "intrinsic_interval_seconds": 1,
+          "inherits_faster_command_interval": false
+        }
+      ],
+      "source_url": "https://github.com/OBDb/Audi-Q7/blob/1c1a7f86b268685258f6ba74d722f69428d2036d/signalsets/v3/default.json",
+      "driving_signals": [
+        "Q7_PQ35_DPF_DIFF_P_2"
+      ],
+      "nominal_requests_per_minute": {
+        "before": 60.0,
+        "after": 60.0
+      }
+    },
+    {
+      "example_id": "F22",
+      "repository": "Audi-Q7",
+      "source_file": "signalsets/v3/default.json",
+      "source_commit": "1c1a7f86b268685258f6ba74d722f69428d2036d",
+      "source_sha256": "16f562f9a46ea2ac6d1909f744c3ce53dabae72c771d027920f504ea0d3243ea",
+      "command_pointer": "/commands/156",
+      "identity": {
+        "hdr": "7E0",
+        "rax": "7E8",
+        "cmd": {
+          "22": "10F9"
+        }
+      },
+      "availability_preserve": {
+        "dbgfilter": {
+          "to": 2014,
+          "years": [
+            2016,
+            2017,
+            2019
+          ],
+          "from": 2021
+        }
+      },
+      "observed_freq_seconds": 5,
+      "proposed_command_tier": "Thermal condition",
+      "proposed_freq_seconds": 15,
+      "confidence_in_classification": "medium",
+      "status": "proposed",
+      "rationale": "DPF outlet temperature fits ordinary thermal condition; a focused regeneration diagnostic profile could request faster sampling.",
+      "review_requirement": "Do not assert 15 seconds captures all exhaust transients; the chosen ordinary use must be explicit.",
+      "signals": [
+        {
+          "id": "Q7_PQ35_DPF_OUT_T",
+          "name": "Diesel particulate filter outlet temperature",
+          "intrinsic_tier": "Thermal condition",
+          "intrinsic_interval_seconds": 15,
+          "inherits_faster_command_interval": false
+        }
+      ],
+      "source_url": "https://github.com/OBDb/Audi-Q7/blob/1c1a7f86b268685258f6ba74d722f69428d2036d/signalsets/v3/default.json",
+      "driving_signals": [
+        "Q7_PQ35_DPF_OUT_T"
+      ],
+      "nominal_requests_per_minute": {
+        "before": 12.0,
+        "after": 4.0
+      }
+    },
+    {
+      "example_id": "F23",
+      "repository": "Audi-Q7",
+      "source_file": "signalsets/v3/default.json",
+      "source_commit": "1c1a7f86b268685258f6ba74d722f69428d2036d",
+      "source_sha256": "16f562f9a46ea2ac6d1909f744c3ce53dabae72c771d027920f504ea0d3243ea",
+      "command_pointer": "/commands/199",
+      "identity": {
+        "hdr": "7E0",
+        "rax": "7E8",
+        "din": "03",
+        "cmd": {
+          "22": "1156"
+        }
+      },
+      "availability_preserve": {
+        "dbgfilter": {
+          "to": 2014,
+          "years": [
+            2016,
+            2017,
+            2019
+          ],
+          "from": 2021
+        }
+      },
+      "observed_freq_seconds": 30,
+      "proposed_command_tier": "Cumulative history",
+      "proposed_freq_seconds": 300,
+      "confidence_in_classification": "medium",
+      "status": "proposed",
+      "rationale": "Distance since regeneration accumulates between reset events and fits history. A resettable total is not necessarily fast.",
+      "review_requirement": "If the actual desired use is detecting regeneration completion, use an explicit event/state signal or a documented override; 300 seconds may miss reset timing.",
+      "signals": [
+        {
+          "id": "Q7_PQ35_DIST_LAST_REGEN",
+          "name": "Distance since last regeneration",
+          "intrinsic_tier": "Cumulative history",
+          "intrinsic_interval_seconds": 300,
+          "inherits_faster_command_interval": false
+        }
+      ],
+      "source_url": "https://github.com/OBDb/Audi-Q7/blob/1c1a7f86b268685258f6ba74d722f69428d2036d/signalsets/v3/default.json",
+      "driving_signals": [
+        "Q7_PQ35_DIST_LAST_REGEN"
+      ],
+      "nominal_requests_per_minute": {
+        "before": 2.0,
+        "after": 0.2
+      }
+    },
+    {
+      "example_id": "F24",
+      "repository": "Volkswagen-Golf",
+      "source_file": "signalsets/v3/default.json",
+      "source_commit": "471d1d72c733bf4e220926d607a96262ef005fc2",
+      "source_sha256": "a75512181a6c91c84fdf6a9ad6910c766070bb96ab2988c12ec659e2a7cfaa6f",
+      "command_pointer": "/commands/18",
+      "identity": {
+        "hdr": "713",
+        "rax": "77D",
+        "fcm1": true,
+        "cmd": {
+          "22": "18B6"
+        }
+      },
+      "availability_preserve": {
+        "dbgfilter": {
+          "to": 2014,
+          "from": 2021
+        }
+      },
+      "observed_freq_seconds": 900,
+      "proposed_command_tier": null,
+      "proposed_freq_seconds": null,
+      "confidence_in_classification": "low",
+      "status": "needs-review",
+      "rationale": "The packet mixes a counter-steering active bit, steering torque, and odometer at last activation. Current versus captured-event semantics of torque/state are unclear; the current 900-second interval cannot establish meaning.",
+      "review_requirement": "Do not accelerate from 900 to 0.25 seconds based on steering keyword. Decode/document whether fields are live or stored snapshots; then current driving feedback could drive 0.25 seconds, while historical capture could be 300 seconds.",
+      "signals": [
+        {
+          "id": "GOLF_CNT_STEER_SUPPORT_ACTIVE",
+          "name": "Counter steer support",
+          "intrinsic_tier": null,
+          "intrinsic_interval_seconds": null,
+          "inherits_faster_command_interval": false
+        },
+        {
+          "id": "GOLF_CNT_STEER_SUPPORT_ODO_RDG_OF_LAST_ACT",
+          "name": "Counter steer support, odometer, last activated",
+          "intrinsic_tier": null,
+          "intrinsic_interval_seconds": null,
+          "inherits_faster_command_interval": false
+        },
+        {
+          "id": "GOLF_CNT_STEER_SUPPORT_STEERING_TRQ",
+          "name": "Counter steer support, steering torque",
+          "intrinsic_tier": null,
+          "intrinsic_interval_seconds": null,
+          "inherits_faster_command_interval": false
+        }
+      ],
+      "source_url": "https://github.com/OBDb/Volkswagen-Golf/blob/471d1d72c733bf4e220926d607a96262ef005fc2/signalsets/v3/default.json",
+      "driving_signals": [],
+      "nominal_requests_per_minute": {
+        "before": 0.06666666666666667,
+        "after": null
+      }
+    },
+    {
+      "example_id": "F25",
+      "repository": "Audi-Q7",
+      "source_file": "signalsets/v3/default.json",
+      "source_commit": "1c1a7f86b268685258f6ba74d722f69428d2036d",
+      "source_sha256": "16f562f9a46ea2ac6d1909f744c3ce53dabae72c771d027920f504ea0d3243ea",
+      "command_pointer": "/commands/60",
+      "identity": {
+        "hdr": "7E0",
+        "cmd": {
+          "22": "115E"
+        }
+      },
+      "availability_preserve": {
+        "dbgfilter": {
+          "to": 2014,
+          "years": [
+            2016,
+            2017,
+            2019
+          ],
+          "from": 2021
+        }
+      },
+      "observed_freq_seconds": 1,
+      "proposed_command_tier": null,
+      "proposed_freq_seconds": null,
+      "confidence_in_classification": "low",
+      "status": "needs-review",
+      "rationale": "Time since last regeneration sounds cumulative, but a 32-bit field divided by 10066666667 and max 0.426 minutes is a concrete decoding inconsistency to review.",
+      "review_requirement": "Resolve identity/scaling first; retain the current 1-second interval and all availability flags. Do not normalize a plausible label into a claim of validated decoding.",
+      "signals": [
+        {
+          "id": "Q7_PQ35_TIME_LAST_REGEN",
+          "name": "Time since last regeneration",
+          "intrinsic_tier": null,
+          "intrinsic_interval_seconds": null,
+          "inherits_faster_command_interval": false
+        }
+      ],
+      "source_url": "https://github.com/OBDb/Audi-Q7/blob/1c1a7f86b268685258f6ba74d722f69428d2036d/signalsets/v3/default.json",
+      "driving_signals": [],
+      "nominal_requests_per_minute": {
+        "before": 60.0,
+        "after": null
+      }
+    },
+    {
+      "example_id": "F26",
+      "repository": "Toyota-Prius-Prime",
+      "source_file": "signalsets/v3/default.json",
+      "source_commit": "39f1863e0740b2311872f945993323c952084540",
+      "source_sha256": "f5d9999963f72e8a5755155023af3cddb6afb1ee5b0794e1e3b29ebf27997cd1",
+      "command_pointer": "/commands/71",
+      "identity": {
+        "hdr": "700",
+        "rax": "708",
+        "cmd": {
+          "22": "1F6D"
+        }
+      },
+      "availability_preserve": {
+        "dbgfilter": {
+          "to": 2022,
+          "years": [
+            2024
+          ],
+          "from": 2026
+        }
+      },
+      "observed_freq_seconds": 1,
+      "proposed_command_tier": "Engine control",
+      "proposed_freq_seconds": 1,
+      "confidence_in_classification": "high",
+      "status": "proposed",
+      "rationale": "Target/actual high fuel pressure and low fuel pressure track changing engine load and remain Engine control.",
+      "review_requirement": null,
+      "signals": [
+        {
+          "id": "PRIUSPRIME_HFP_TARGET",
+          "name": "High fuel pressure, target",
+          "intrinsic_tier": "Engine control",
+          "intrinsic_interval_seconds": 1,
+          "inherits_faster_command_interval": false
+        },
+        {
+          "id": "PRIUSPRIME_HFP_ACTUAL",
+          "name": "High fuel pressure, actual",
+          "intrinsic_tier": "Engine control",
+          "intrinsic_interval_seconds": 1,
+          "inherits_faster_command_interval": false
+        },
+        {
+          "id": "PRIUSPRIME_LOW_FUEL_PRESSURE",
+          "name": "Low fuel pressure",
+          "intrinsic_tier": "Engine control",
+          "intrinsic_interval_seconds": 1,
+          "inherits_faster_command_interval": false
+        }
+      ],
+      "source_url": "https://github.com/OBDb/Toyota-Prius-Prime/blob/39f1863e0740b2311872f945993323c952084540/signalsets/v3/default.json",
+      "driving_signals": [
+        "PRIUSPRIME_HFP_TARGET",
+        "PRIUSPRIME_HFP_ACTUAL",
+        "PRIUSPRIME_LOW_FUEL_PRESSURE"
+      ],
+      "nominal_requests_per_minute": {
+        "before": 60.0,
+        "after": 60.0
+      }
+    },
+    {
+      "example_id": "F27",
+      "repository": "Audi-Q7",
+      "source_file": "signalsets/v3/default.json",
+      "source_commit": "1c1a7f86b268685258f6ba74d722f69428d2036d",
+      "source_sha256": "16f562f9a46ea2ac6d1909f744c3ce53dabae72c771d027920f504ea0d3243ea",
+      "command_pointer": "/commands/56",
+      "identity": {
+        "hdr": "7E0",
+        "din": "03",
+        "cmd": {
+          "22": "114E"
+        }
+      },
+      "availability_preserve": {
+        "dbgfilter": {
+          "to": 2014,
+          "years": [
+            2016,
+            2017,
+            2019
+          ],
+          "from": 2021
+        }
+      },
+      "observed_freq_seconds": 1,
+      "proposed_command_tier": "Health and environment",
+      "proposed_freq_seconds": 60,
+      "confidence_in_classification": "medium",
+      "status": "needs-review",
+      "rationale": "Measured soot mass is periodic filter loading/condition, unlike instantaneous differential pressure or regeneration-state transitions.",
+      "review_requirement": "Unit is unknown; verify semantics/units before rollout and retain all availability flags.",
+      "signals": [
+        {
+          "id": "Q7_PQ35_SOOT_MASS_MEAS",
+          "name": "Soot mass measured",
+          "intrinsic_tier": "Health and environment",
+          "intrinsic_interval_seconds": 60,
+          "inherits_faster_command_interval": false
+        }
+      ],
+      "source_url": "https://github.com/OBDb/Audi-Q7/blob/1c1a7f86b268685258f6ba74d722f69428d2036d/signalsets/v3/default.json",
+      "driving_signals": [
+        "Q7_PQ35_SOOT_MASS_MEAS"
+      ],
+      "nominal_requests_per_minute": {
+        "before": 60.0,
+        "after": 1.0
+      }
+    },
+    {
+      "example_id": "F28",
+      "repository": "Toyota-Prius-Prime",
+      "source_file": "signalsets/v3/default.json",
+      "source_commit": "39f1863e0740b2311872f945993323c952084540",
+      "source_sha256": "f5d9999963f72e8a5755155023af3cddb6afb1ee5b0794e1e3b29ebf27997cd1",
+      "command_pointer": "/commands/14",
+      "identity": {
+        "hdr": "700",
+        "rax": "708",
+        "cmd": {
+          "22": "106C"
+        }
+      },
+      "availability_preserve": {
+        "dbgfilter": {
+          "to": 2019,
+          "years": [
+            2021,
+            2022,
+            2024
+          ],
+          "from": 2026
+        }
+      },
+      "observed_freq_seconds": 30,
+      "proposed_command_tier": "Cumulative history",
+      "proposed_freq_seconds": 300,
+      "confidence_in_classification": "high",
+      "status": "proposed",
+      "rationale": "Distance since battery cable disconnection accumulates over a resettable maintenance epoch. It remains history despite a possible reset.",
+      "review_requirement": null,
+      "signals": [
+        {
+          "id": "PRIUSPRIME_DIST_SINCE_BAT_DISC",
+          "name": "Distance since last battery cable disconnection",
+          "intrinsic_tier": "Cumulative history",
+          "intrinsic_interval_seconds": 300,
+          "inherits_faster_command_interval": false
+        }
+      ],
+      "source_url": "https://github.com/OBDb/Toyota-Prius-Prime/blob/39f1863e0740b2311872f945993323c952084540/signalsets/v3/default.json",
+      "driving_signals": [
+        "PRIUSPRIME_DIST_SINCE_BAT_DISC"
+      ],
+      "nominal_requests_per_minute": {
+        "before": 2.0,
+        "after": 0.2
+      }
+    }
+  ]
+}
