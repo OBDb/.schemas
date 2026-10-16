@@ -214,11 +214,11 @@
         "additionalProperties": false,
         "allOf": [
           {
-            "if": { "required": ["baud"] },
+            "if": { "properties": { "baud": true }, "required": ["baud"] },
             "then": { "required": ["proto"], "properties": { "proto": { "enum": ["9141-2", "14230"] } } }
           },
           {
-            "if": { "required": ["init"] },
+            "if": { "properties": { "init": true }, "required": ["init"] },
             "then": { "required": ["proto"], "properties": { "proto": { "const": "14230" } } }
           }
         ],
