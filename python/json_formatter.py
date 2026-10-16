@@ -166,6 +166,13 @@ def format_command_json(command: Dict[str, Any]) -> str:
     if "proto" in command:
         preamble.append(f'"proto": "{command["proto"]}"')
 
+    if "baud" in command:
+        preamble.append(f'"baud": {command["baud"]}')
+
+    if "init" in command:
+        init = command["init"]
+        preamble.append(f'"init": {{ "lo": {format_number(init["lo"])}, "hi": {format_number(init["hi"])} }}')
+
     if "eax" in command:
         preamble.append(f'"eax": "{command["eax"]}"')
 

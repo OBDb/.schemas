@@ -147,6 +147,25 @@ def test_format_command_with_optional_fields():
   ]}
 """.strip()
 
+def test_format_command_keeps_k_line_timing():
+    command = {
+        "hdr": "812A",
+        "proto": "14230",
+        "init": {"hi": 12.5, "lo": 35},
+        "baud": 9600,
+        "dbg": True,
+        "cmd": {"21": "15"},
+        "freq": 15,
+        "signals": []
+    }
+
+    result = format_command_json(command)
+    assert result == """
+{ "hdr": "812A", "proto": "14230", "baud": 9600, "init": { "lo": 35, "hi": 12.5 }, "dbg": true, "cmd": {"21": "15"}, "freq": 15,
+  "signals": [
+  ]}
+""".strip()
+
 def test_strips_duplicate_commands():
     with_duplicates = """
 { "commands": [
