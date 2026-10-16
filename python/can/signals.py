@@ -311,6 +311,8 @@ class Command:
     protocol: Optional[CANIDFormat] = None
     diagnostic_level_in: Optional[int] = None
     diagnostic_level_out: Optional[int] = None
+    iso_baud_rate: Optional[int] = None
+    fast_init_ms: Optional[Tuple[float, float]] = None
 
     ID_PROPERTY_DIVIDER = "|"
 
@@ -350,6 +352,8 @@ class Command:
         can_priority = int(data['pri'], 16) if 'pri' in data else None
         diagnostic_level_in = int(data['din'], 16) if 'din' in data else None
         diagnostic_level_out = int(data['dout'], 16) if 'dout' in data else None
+        iso_baud_rate = data.get('baud')
+        fast_init_ms = (data['init']['lo'], data['init']['hi']) if 'init' in data else None
 
         id = data['hdr']
         if data.get('rax'):
@@ -364,7 +368,9 @@ class Command:
             car_protocol_strategy=car_protocol_strategy,
             can_priority=can_priority,
             diagnostic_level_in=diagnostic_level_in,
-            diagnostic_level_out=diagnostic_level_out
+            diagnostic_level_out=diagnostic_level_out,
+            iso_baud_rate=iso_baud_rate,
+            fast_init_ms=fast_init_ms
         )
         if properties_string:
             id += Command.ID_PROPERTY_DIVIDER + properties_string
@@ -390,11 +396,13 @@ class Command:
             filter=command_filter,
             protocol=protocol,
             diagnostic_level_in=diagnostic_level_in,
-            diagnostic_level_out=diagnostic_level_out
+            diagnostic_level_out=diagnostic_level_out,
+            iso_baud_rate=iso_baud_rate,
+            fast_init_ms=fast_init_ms
         )
 
     @staticmethod
-    def _format_properties_for_id(extended_address, tester_address, timeout, force_flow_control, filter, car_protocol_strategy=None, can_priority=None, diagnostic_level_in=None, diagnostic_level_out=None):
+    def _format_properties_for_id(extended_address, tester_address, timeout, force_flow_control, filter, car_protocol_strategy=None, can_priority=None, diagnostic_level_in=None, diagnostic_level_out=None, iso_baud_rate=None, fast_init_ms=None):
         parts = []
 
         if timeout:
@@ -423,6 +431,13 @@ class Command:
 
         if diagnostic_level_out is not None:
             parts.append(f"dout={diagnostic_level_out:02X}")
+
+        if iso_baud_rate is not None:
+            parts.append(f"b={iso_baud_rate}")
+
+        # A dash, not a slash: command IDs name fixture files.
+        if fast_init_ms is not None:
+            parts.append("fi=" + "-".join(f"{ms:g}" for ms in fast_init_ms))
 
         return ",".join(parts)
 
