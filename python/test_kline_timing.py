@@ -32,11 +32,6 @@ def test_baud_and_init_join_the_command_id():
     assert command.fast_init_ms == (35, 15)
 
 
-def test_fractional_init_times_keep_their_decimals():
-    command = Command.from_json(command_json(proto="14230", init={"lo": 37.5, "hi": 12.5}))
-    assert command.id == "812A.2115|fi=37.5-12.5"
-
-
 def test_a_command_without_them_keeps_its_id():
     assert Command.from_json(command_json(proto="14230")).id == "812A.2115"
 
@@ -66,6 +61,10 @@ def test_schema_accepts_baud_on_a_9141_command(schema):
     {"proto": "14230", "baud": 19200},
     # Both times are needed to describe the wake-up pattern.
     {"proto": "14230", "init": {"lo": 35}},
+    # Clients send whole milliseconds, so a fraction would be lost.
+    {"proto": "14230", "init": {"lo": 37.5, "hi": 15}},
+    {"proto": "14230", "init": {"lo": 0, "hi": 15}},
+    {"proto": "14230", "init": {"lo": 35, "hi": 251}},
 ])
 def test_schema_rejects_timing_outside_a_k_line_command(schema, fields):
     with pytest.raises(ValidationError):

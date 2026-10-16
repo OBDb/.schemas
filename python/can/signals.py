@@ -312,7 +312,7 @@ class Command:
     diagnostic_level_in: Optional[int] = None
     diagnostic_level_out: Optional[int] = None
     iso_baud_rate: Optional[int] = None
-    fast_init_ms: Optional[Tuple[float, float]] = None
+    fast_init_ms: Optional[Tuple[int, int]] = None
 
     ID_PROPERTY_DIVIDER = "|"
 
@@ -437,7 +437,7 @@ class Command:
 
         # A dash, not a slash: command IDs name fixture files.
         if fast_init_ms is not None:
-            parts.append("fi=" + "-".join(f"{ms:g}" for ms in fast_init_ms))
+            parts.append("fi=" + "-".join(str(int(ms)) for ms in fast_init_ms))
 
         return ",".join(parts)
 
