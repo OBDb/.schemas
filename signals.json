@@ -250,8 +250,8 @@
             "description": "Fast-init wake-up timing in milliseconds, for a 14230 command whose module answers only to non-standard timing. Without it the adapter's own init applies, 25 ms low then 25 ms high",
             "additionalProperties": false,
             "properties": {
-              "lo": { "type": "integer", "description": "Time the K-line is held low, ms, whole", "minimum": 1, "maximum": 250 },
-              "hi": { "type": "integer", "description": "Time the K-line is then held high before the StartCommunication request, ms, whole", "minimum": 1, "maximum": 250 }
+              "lo": { "type": "integer", "description": "Time the K-line is held low, ms, in 5 ms steps", "multipleOf": 5, "minimum": 5, "maximum": 250 },
+              "hi": { "type": "integer", "description": "Time the K-line is then held high before the StartCommunication request, ms, in 5 ms steps", "multipleOf": 5, "minimum": 5, "maximum": 250 }
             },
             "required": ["lo", "hi"]
           },

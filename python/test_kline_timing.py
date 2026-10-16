@@ -61,10 +61,11 @@ def test_schema_accepts_baud_on_a_9141_command(schema):
     {"proto": "14230", "baud": 19200},
     # Both times are needed to describe the wake-up pattern.
     {"proto": "14230", "init": {"lo": 35}},
-    # Clients send whole milliseconds, so a fraction would be lost.
+    # Clients pack the timing in 5 ms steps, so anything finer would be lost.
     {"proto": "14230", "init": {"lo": 37.5, "hi": 15}},
+    {"proto": "14230", "init": {"lo": 36, "hi": 15}},
     {"proto": "14230", "init": {"lo": 0, "hi": 15}},
-    {"proto": "14230", "init": {"lo": 35, "hi": 251}},
+    {"proto": "14230", "init": {"lo": 35, "hi": 255}},
 ])
 def test_schema_rejects_timing_outside_a_k_line_command(schema, fields):
     with pytest.raises(ValidationError):
