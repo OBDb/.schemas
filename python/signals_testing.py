@@ -19,6 +19,7 @@ from can.can_frame import CANFrameScanner, CANIDFormat
 from can.command_registry import decode_obd_response, get_model_year_command_registry
 from can.signals import Command, SignalSet
 from signalsets.loader import find_signalset_for_year, load_signalset
+from vin import contains_vin
 
 
 # Global cache for CommandRegistry instances by model year
@@ -254,6 +255,13 @@ def obd_yaml_testrunner(
     """
     with open(yaml_path, 'r') as f:
         test_data = yaml.safe_load(f)
+
+    # Test cases are published, so a VIN captured into one identifies the car. The message names
+    # the case but not the response, which would repeat the VIN in the CI log.
+    for test_idx, test_case in enumerate(test_data.get('test_cases') or []):
+        if isinstance(test_case, dict) and contains_vin(str(test_case.get('response', ''))):
+            raise AssertionError(
+                f"{yaml_path} test case {test_idx} has a VIN in its response; remove the test case")
 
     # Extract line numbers for each signal ID in each test case
     signal_line_numbers = find_signal_line_numbers(yaml_path)
