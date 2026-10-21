@@ -291,3 +291,19 @@ class TestSyntheticFormula:
     def test_invalid_formula(self, schema, formula):
         with pytest.raises(ValidationError):
             validate(make_synthetic_data(formula), schema)
+
+
+class TestVinReadsRefused:
+    """A command that reads the VIN would publish it in the captured test cases."""
+
+    @pytest.mark.parametrize('did', ['F190', 'f190'])
+    def test_service22_f190_refused(self, schema, did):
+        data = make_signal_data({'len': 8, 'max': 255, 'unit': 'scalar'})
+        data['commands'][0]['cmd'] = {'22': did}
+        with pytest.raises(ValidationError):
+            validate(data, schema)
+
+    def test_neighboring_identification_did_allowed(self, schema):
+        data = make_signal_data({'len': 8, 'max': 255, 'unit': 'scalar'})
+        data['commands'][0]['cmd'] = {'22': 'F181'}
+        validate(data, schema)
