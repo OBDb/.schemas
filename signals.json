@@ -404,7 +404,7 @@
             "properties": {
               "01": { "type": "string", "description": "Service 01 PID", "minLength": 2, "maxLength": 2 },
               "21": { "type": "string", "description": "Service 21 PID", "minLength": 2, "maxLength": 2 },
-              "22": { "type": "string", "description": "Service 22 PID", "minLength": 4, "maxLength": 4 }
+              "22": { "type": "string", "description": "Service 22 PID. F190 is refused because it replies with the VIN, which must never reach a published test case", "minLength": 4, "maxLength": 4, "not": { "pattern": "^[Ff]190$" } }
             }
           },
           "freq": { "type": "number", "description": "Frequency at which to request this command, seconds", "exclusiveMinimum": 0 },
