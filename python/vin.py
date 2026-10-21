@@ -32,22 +32,33 @@ def _plausible(vin: str) -> bool:
     return vin[9] not in '0UZ' and len(set(vin)) >= 7 and _check_digit_valid(vin)
 
 
+def _header_length(line: str):
+    # Data is whole bytes, so an odd-length line has a three-digit 11-bit ID and an even one a
+    # two-byte 11-bit ID (07E8) or a 29-bit ID (18DAF110).
+    if len(line) <= 4 or not re.fullmatch(r'[0-9A-Fa-f]+', line):
+        return None
+    if len(line) % 2:
+        return 3
+    return 8 if line[:2] == '18' and len(line) > 10 else 4
+
+
 def _payloads(response: str) -> Iterable[bytes]:
-    by_header = defaultdict(bytearray)
+    # Each line is read both without and with an extended address byte before the PCI, since a
+    # capture can mix modules of each kind.
+    by_module = defaultdict(bytearray)
     for line in response.splitlines():
-        line = line.strip().replace(' ', '')
-        if not re.fullmatch(r'[0-9A-Fa-f]+', line):
+        line = ''.join(line.split())
+        header = _header_length(line)
+        if header is None:
             continue
-        header_length = 8 if len(line) > 10 and line[:2] == '18' else 3
-        header, frame = line[:header_length], line[header_length:]
-        if len(frame) % 2:
-            frame = frame[:-1]
-        if not frame:
-            continue
-        data = bytes.fromhex(frame)
-        kind = data[0] >> 4
-        by_header[header] += data[2:] if kind == 1 else data[1:]
-    return [bytes(p) for p in by_header.values()]
+        data = bytes.fromhex(line[header:])
+        for address_bytes in (0, 1):
+            if len(data) <= address_bytes:
+                continue
+            pci = data[address_bytes]
+            module = (line[:header], address_bytes, data[:address_bytes])
+            by_module[module] += data[address_bytes + (2 if pci >> 4 == 1 else 1):]
+    return [bytes(p) for p in by_module.values()]
 
 
 def contains_vin(response: str) -> bool:

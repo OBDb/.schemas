@@ -35,6 +35,14 @@ def test_vin_reply_without_a_check_digit_found():
     assert contains_vin(frames('7E8', b'\x49\x02\x01' + b'WVWZZZ1KZAW000001'))
 
 
+def test_vin_behind_two_byte_eleven_bit_id_found():
+    assert contains_vin('07 E8 10 14 49 02 01 31 4D 38\n07 E8 21 47 44 4D 39 41 58 4B\n07 E8 22 50 30 34 32 37 38 38')
+
+
+def test_vin_in_extended_addressed_frames_found():
+    assert contains_vin('7E8F11014490201314D\n7E8F1213847444D3941\n7E8F122584B50303432\n7E8F123373838000000')
+
+
 def test_vin_mixed_into_another_reply_found():
     response = frames('7E8', b'\x41\x05\x4e') + '\n' + frames('7E8', b'\x00\x00' + SAMPLE.encode())
     assert contains_vin(response)
