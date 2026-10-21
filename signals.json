@@ -147,7 +147,9 @@
         "checkEngineLightOn",
         "commandedLambda",
         "cvtDeterioration",
+        "daysToService",
         "distanceSinceDTCsCleared",
+        "distanceToService",
         "electricRange",
         "engineCoolantTemperature",
         "engineLoad",
@@ -181,6 +183,168 @@
         "tractionBatteryEfficiency",
         "tractionBatteryVoltage",
         "transmissionFluidTemperature"
+      ],
+      "oneOf": [
+        {
+          "const": "absoluteEngineLoad",
+          "description": "Engine load relative to the theoretical maximum air intake."
+        },
+        {
+          "const": "checkEngineLightOn",
+          "description": "Whether the check engine light is on."
+        },
+        {
+          "const": "commandedLambda",
+          "description": "The commanded air-fuel ratio relative to the stoichiometric ratio."
+        },
+        {
+          "const": "cvtDeterioration",
+          "description": "The deterioration counter for continuously variable transmission fluid."
+        },
+        {
+          "const": "daysToService",
+          "description": "Days remaining until the next service."
+        },
+        {
+          "const": "distanceSinceDTCsCleared",
+          "description": "Distance traveled since diagnostic trouble codes were cleared."
+        },
+        {
+          "const": "distanceToService",
+          "description": "Distance remaining until the next service."
+        },
+        {
+          "const": "electricRange",
+          "description": "Estimated remaining driving distance on battery power."
+        },
+        {
+          "const": "engineCoolantTemperature",
+          "description": "Engine coolant temperature."
+        },
+        {
+          "const": "engineLoad",
+          "description": "Calculated engine load."
+        },
+        {
+          "const": "engineOilTemperature",
+          "description": "Engine oil temperature."
+        },
+        {
+          "const": "engineSpeed",
+          "description": "Engine revolutions per minute."
+        },
+        {
+          "const": "frontLeftTirePressure",
+          "description": "Front left tire pressure."
+        },
+        {
+          "const": "frontLeftTireTemperature",
+          "description": "Front left tire temperature."
+        },
+        {
+          "const": "frontRightTirePressure",
+          "description": "Front right tire pressure."
+        },
+        {
+          "const": "frontRightTireTemperature",
+          "description": "Front right tire temperature."
+        },
+        {
+          "const": "fuelRange",
+          "description": "Estimated remaining driving distance on fuel."
+        },
+        {
+          "const": "fuelRate",
+          "description": "Fuel consumed per unit of time."
+        },
+        {
+          "const": "fuelTankLevel",
+          "description": "Fuel remaining as a percentage of tank capacity."
+        },
+        {
+          "const": "isCharging",
+          "description": "Whether the traction battery is charging."
+        },
+        {
+          "const": "massAirFlow",
+          "description": "Mass of air entering the engine per unit of time."
+        },
+        {
+          "const": "o2Lambda",
+          "description": "The measured air-fuel ratio relative to the stoichiometric ratio."
+        },
+        {
+          "const": "odometer",
+          "description": "Total distance traveled by the car."
+        },
+        {
+          "const": "pluggedIn",
+          "description": "Whether a charging cable is connected."
+        },
+        {
+          "const": "rearLeftTirePressure",
+          "description": "Rear left tire pressure."
+        },
+        {
+          "const": "rearLeftTireTemperature",
+          "description": "Rear left tire temperature."
+        },
+        {
+          "const": "rearRightTirePressure",
+          "description": "Rear right tire pressure."
+        },
+        {
+          "const": "rearRightTireTemperature",
+          "description": "Rear right tire temperature."
+        },
+        {
+          "const": "shortTermFuelTrim",
+          "description": "The short-term adjustment to fuel delivery."
+        },
+        {
+          "const": "speed",
+          "description": "The speed of the car."
+        },
+        {
+          "const": "starterBatteryVoltage",
+          "description": "Starter battery voltage."
+        },
+        {
+          "const": "stateOfCharge",
+          "description": "Traction battery charge as a percentage of its capacity."
+        },
+        {
+          "const": "stateOfHealth",
+          "description": "Traction battery health as a percentage of its original capacity."
+        },
+        {
+          "const": "storedDTCCount",
+          "description": "The number of stored diagnostic trouble codes."
+        },
+        {
+          "const": "throttlePosition",
+          "description": "Throttle position."
+        },
+        {
+          "const": "tractionBatteryCapacity",
+          "description": "The energy capacity of the traction battery."
+        },
+        {
+          "const": "tractionBatteryCurrent",
+          "description": "Current flowing through the traction battery."
+        },
+        {
+          "const": "tractionBatteryEfficiency",
+          "description": "Traction battery energy consumed per unit of distance."
+        },
+        {
+          "const": "tractionBatteryVoltage",
+          "description": "Traction battery voltage."
+        },
+        {
+          "const": "transmissionFluidTemperature",
+          "description": "Transmission fluid temperature."
+        }
       ]
     },
     "pathPattern": {
@@ -343,10 +507,23 @@
           "id": { "type": "string", "description": "Unique identifier for the signal group" },
           "path": { "type": "string", "description": "Path for organizing the group in a hierarchy" },
           "matchingRegex": { "type": "string", "description": "Regular expression pattern to match signal IDs that belong to this group" },
-          "suggestedMetricGroup": { "enum": [
-            "batteryModulesStateOfCharge",
-            "batteryModulesVoltage"
-          ], "description": "Standardized group name for common grouped metrics" },
+          "suggestedMetricGroup": {
+            "enum": [
+              "batteryModulesStateOfCharge",
+              "batteryModulesVoltage"
+            ],
+            "description": "Standardized group name for common grouped metrics",
+            "oneOf": [
+              {
+                "const": "batteryModulesStateOfCharge",
+                "description": "State of charge readings for individual battery modules."
+              },
+              {
+                "const": "batteryModulesVoltage",
+                "description": "Voltage readings for individual battery modules."
+              }
+            ]
+          },
           "name": { "type": "string", "description": "Human-readable name for the signal group" }
         },
         "required": [
