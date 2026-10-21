@@ -51,6 +51,8 @@ def test_vin_split_across_interleaved_modules_found():
     frames('18DAF110', b'\x62\x20\x28' + b'J4JJ4JJ4JJ4JJ4JJ4J' * 2),
     frames('18DAF110', b'\x62\xf1\x81' + b'37805-5PA-A530'),
     frames('7E8', b'\x62\x10\x00' + b'1' * 17),
+    # Text whose run starts before the check-digit-valid window.
+    frames('18DAF110', b'\x62\x20\x28' + b'XX' + SAMPLE.encode()),
 ])
 def test_other_replies_not_found(response):
     assert not contains_vin(response)

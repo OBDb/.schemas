@@ -10,7 +10,7 @@ import re
 from collections import defaultdict
 from typing import Iterable
 
-_VIN = re.compile(rb'[A-HJ-NPR-Z0-9]{17}')
+_VIN = re.compile(rb'[A-HJ-NPR-Z0-9]{17,}')
 _VIN_REPLY = re.compile(rb'(?:\x49\x02\x01?|\x62\xf1\x90|\x5a\x90)[\x00-\x20]*([A-HJ-NPR-Z0-9]{17})')
 _TRANSLITERATION = {
     **{str(i): i for i in range(10)},
@@ -55,6 +55,8 @@ def contains_vin(response: str) -> bool:
     for payload in _payloads(response):
         if _VIN_REPLY.search(payload):
             return True
-        if any(_plausible(m.decode()) for m in _VIN.findall(payload)):
+        # Only a run's first 17 characters: about one window in eleven passes the check digit,
+        # so trying every window of a long run of text would find one sooner or later.
+        if any(_plausible(m[:17].decode()) for m in _VIN.findall(payload)):
             return True
     return False
