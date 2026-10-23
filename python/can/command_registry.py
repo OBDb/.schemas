@@ -160,7 +160,7 @@ class CommandRegistry:
         generic_commands = []
 
         for cmd in commands:
-            if cmd.receive_address is not None and f"{cmd.receive_address:X}" == can_id:
+            if cmd.answers_on(can_id):
                 matching_commands.append(cmd)
             elif cmd.receive_address is None:
                 generic_commands.append(cmd)
@@ -207,7 +207,7 @@ class CommandRegistry:
         generic_commands = []
 
         for cmd in commands:
-            if cmd.receive_address is not None and f"{cmd.receive_address:X}" == can_id:
+            if cmd.answers_on(can_id):
                 matching_commands.append(cmd)
             elif cmd.receive_address is None:
                 generic_commands.append(cmd)
@@ -255,7 +255,7 @@ class CommandRegistry:
         generic_commands = []
 
         for cmd in commands:
-            if cmd.receive_address is not None and f"{cmd.receive_address:X}" == can_id:
+            if cmd.answers_on(can_id):
                 matching_commands.append(cmd)
             elif cmd.receive_address is None:
                 generic_commands.append(cmd)

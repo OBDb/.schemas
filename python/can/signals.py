@@ -313,8 +313,18 @@ class Command:
     diagnostic_level_out: Optional[int] = None
     iso_baud_rate: Optional[int] = None
     fast_init_ms: Optional[Tuple[int, int]] = None
+    # The bits of the reply's ID the rax names; None compares the whole ID.
+    receive_address_mask: Optional[int] = None
 
     ID_PROPERTY_DIVIDER = "|"
+
+    def answers_on(self, can_id: str) -> bool:
+        if self.receive_address is None:
+            return False
+        mask = self.receive_address_mask
+        if mask is None:
+            return f"{self.receive_address:X}" == can_id
+        return int(can_id, 16) & mask == self.receive_address
 
     @staticmethod
     def from_json(data: Dict) -> 'Command':
@@ -327,6 +337,7 @@ class Command:
 
         can_priority = int(data['pri'], 16) if 'pri' in data else None
 
+        receive_address_mask = None
         if receive_address and len(data['hdr']) == 4:
             priority = (can_priority or 0x18) & 0b0001_1111
             if receive_address > 0xFFFFFF:
@@ -337,6 +348,10 @@ class Command:
                 receive_address = (priority << 24) | 0x00DAF100 | (receive_address & 0xFF)
             elif can_priority is not None:
                 receive_address = (can_priority << 24) | (receive_address & 0xFFFFFF)
+            else:
+                # Without a priority, six digits match the reply at any
+                # priority, as the app matches them.
+                receive_address_mask = 0xFFFFFF
 
         filter_data = data.get('filter')
         command_filter = Filter.from_json(filter_data) if filter_data else None
@@ -386,6 +401,7 @@ class Command:
             parameter=parameter,
             header=header,
             receive_address=receive_address,
+            receive_address_mask=receive_address_mask,
             signals=signals,
             update_frequency=data['freq'],
             extended_address=int(data['eax'], 16) if 'eax' in data else None,
