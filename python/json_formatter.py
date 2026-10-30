@@ -822,6 +822,12 @@ def format_synthetics(synthetics: List[Dict[str, Any]]) -> str:
             # Sorted by key so a re-format never reorders the cases.
             cases = ', '.join(f'"{key}": "{value}"' for key, value in sorted(formula["cases"].items()))
             formula_parts.append('"cases": { ' + cases + ' }')
+        elif formula["op"] == "unit":
+            formula_parts.append('"value": "' + formula["value"] + '"')
+            formula_parts.append('"key": "' + formula["key"] + '"')
+            # Sorted by key so a re-format never reorders the units.
+            units = ', '.join(f'"{key}": "{value}"' for key, value in sorted(formula["units"].items()))
+            formula_parts.append('"units": { ' + units + ' }')
         else:
             formula_parts.append('"a": "' + formula["a"] + '"')
             formula_parts.append('"b": "' + formula["b"] + '"')

@@ -279,7 +279,20 @@ class TestSyntheticFormula:
             'cases': {'TID_1': 'TP_1', 'TID_2': 'TP_2'},
         }), schema)
 
+    def test_valid_unit(self, schema):
+        validate(make_synthetic_data({
+            'op': 'unit',
+            'value': 'RANGE_RAW',
+            'key': 'RANGE_UNIT',
+            'units': {'KM': 'kilometers', 'MI': 'miles'},
+        }), schema)
+
     @pytest.mark.parametrize('formula', [
+        {'op': 'unit', 'value': 'V', 'key': 'K', 'units': {}},
+        {'op': 'unit', 'value': 'V', 'key': 'K', 'units': {'MI': 'furlongs'}},
+        {'op': 'unit', 'value': 'V', 'units': {'MI': 'miles'}},
+        {'op': 'unit', 'key': 'K', 'units': {'MI': 'miles'}},
+        {'op': 'unit', 'value': 'V', 'key': 'K', 'units': {'MI': 'miles'}, 'match': 'MI'},
         {'op': 'select', 'match': 'FL'},
         {'op': 'select', 'match': 'FL', 'cases': {}},
         {'op': 'select', 'cases': {'TID_1': 'TP_1'}},
