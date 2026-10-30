@@ -414,3 +414,17 @@ def test_format_select_synthetic():
     formatted = format_synthetics(synthetics)
     assert '"op": "select", "match": "FL", "cases": { "IS_TID_1": "IS_TP_1", "IS_TID_2": "IS_TP_2" }' in formatted
     assert json.loads("{" + formatted + "}")["synthetics"] == synthetics
+
+
+def test_format_unit_synthetic():
+    """A unit formula writes its value, key and units sorted by key."""
+    synthetics = [{
+        "id": "A3_RANGE_TOTAL", "path": "Trips", "name": "Total range",
+        "max": 2044, "min": 0, "unit": "kilometers", "suggestedMetric": "fuelRange",
+        "formula": {"op": "unit", "value": "A3_RANGE_V2", "key": "A3_RANGE_UNIT",
+                    "units": {"MI": "miles", "KM": "kilometers"}},
+    }]
+    formatted = format_synthetics(synthetics)
+    assert ('"op": "unit", "value": "A3_RANGE_V2", "key": "A3_RANGE_UNIT", '
+            '"units": { "KM": "kilometers", "MI": "miles" }') in formatted
+    assert json.loads("{" + formatted + "}")["synthetics"] == synthetics

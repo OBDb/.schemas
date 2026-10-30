@@ -585,6 +585,28 @@
                   "match",
                   "cases"
                 ]
+              },
+              {
+                "type": "object",
+                "description": "The value signal's number in the unit that the key signal's enumeration value names, such as a range a module reports in whichever unit the instrument cluster displays. The number is relabeled, not converted. Empty when the key's value names no unit. Apps before Pelican 5.1.1 drop the whole signalset when they meet one; later apps that predate unit drop only the synthetic.",
+                "additionalProperties": false,
+                "properties": {
+                  "op": { "const": "unit" },
+                  "value": { "type": "string", "description": "Signal ID whose number is relabeled" },
+                  "key": { "type": "string", "description": "Signal ID of the enumeration that says which unit value is in" },
+                  "units": {
+                    "type": "object",
+                    "description": "The key's enumeration value (a map entry's value) to the unit it means",
+                    "minProperties": 1,
+                    "additionalProperties": { "$ref": "#/definitions/unitEnum" }
+                  }
+                },
+                "required": [
+                  "op",
+                  "value",
+                  "key",
+                  "units"
+                ]
               }
             ]
           }
