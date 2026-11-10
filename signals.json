@@ -143,13 +143,19 @@
     "suggestedMetricEnum": {
       "description": "User interface elements that can be connected to a signal",
       "enum": [
+        "absoluteBoostPressure",
         "absoluteEngineLoad",
+        "barometricPressure",
+        "boostPressure",
         "checkEngineLightOn",
         "commandedLambda",
+        "cruiseActive",
+        "cruiseSetSpeed",
         "cvtDeterioration",
         "daysToService",
         "distanceSinceDTCsCleared",
         "distanceToService",
+        "driveMode",
         "electricRange",
         "engineCoolantTemperature",
         "engineLoad",
@@ -162,6 +168,8 @@
         "fuelRange",
         "fuelRate",
         "fuelTankLevel",
+        "gear",
+        "gearSelector",
         "isCharging",
         "massAirFlow",
         "o2Lambda",
@@ -186,8 +194,20 @@
       ],
       "oneOf": [
         {
+          "const": "absoluteBoostPressure",
+          "description": "Boost or intake manifold pressure as an absolute pressure. The app subtracts barometric pressure to give boostPressure."
+        },
+        {
           "const": "absoluteEngineLoad",
           "description": "Engine load relative to the theoretical maximum air intake."
+        },
+        {
+          "const": "barometricPressure",
+          "description": "Atmospheric pressure around the car."
+        },
+        {
+          "const": "boostPressure",
+          "description": "Boost pressure relative to atmospheric pressure, negative under vacuum."
         },
         {
           "const": "checkEngineLightOn",
@@ -196,6 +216,14 @@
         {
           "const": "commandedLambda",
           "description": "The commanded air-fuel ratio relative to the stoichiometric ratio."
+        },
+        {
+          "const": "cruiseActive",
+          "description": "Whether cruise control is engaged."
+        },
+        {
+          "const": "cruiseSetSpeed",
+          "description": "The speed cruise control is set to hold."
         },
         {
           "const": "cvtDeterioration",
@@ -212,6 +240,10 @@
         {
           "const": "distanceToService",
           "description": "Distance remaining until the next service."
+        },
+        {
+          "const": "driveMode",
+          "description": "The selected drive mode. Map values use the canonical names NORMAL, ECO, SPORT, SPORT_PLUS, COMFORT, SNOW, OFF_ROAD, INDIVIDUAL and ELECTRIC where one fits, and the make's own name otherwise."
         },
         {
           "const": "electricRange",
@@ -260,6 +292,14 @@
         {
           "const": "fuelTankLevel",
           "description": "Fuel remaining as a percentage of tank capacity."
+        },
+        {
+          "const": "gear",
+          "description": "The engaged forward gear number, starting at 1."
+        },
+        {
+          "const": "gearSelector",
+          "description": "The gear selector position. Map values use PARK, REVERSE, NEUTRAL, DRIVE, SPORT, MANUAL or LOW."
         },
         {
           "const": "isCharging",
