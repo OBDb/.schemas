@@ -171,6 +171,8 @@
         "gear",
         "gearSelector",
         "isCharging",
+        "lateralAcceleration",
+        "longitudinalAcceleration",
         "massAirFlow",
         "o2Lambda",
         "odometer",
@@ -304,6 +306,14 @@
         {
           "const": "isCharging",
           "description": "Whether the traction battery is charging."
+        },
+        {
+          "const": "lateralAcceleration",
+          "description": "The car's sideways acceleration, positive to the left (ISO 8855). A left turn reads positive."
+        },
+        {
+          "const": "longitudinalAcceleration",
+          "description": "The car's acceleration along its length, positive forward (ISO 8855). Braking reads negative."
         },
         {
           "const": "massAirFlow",
