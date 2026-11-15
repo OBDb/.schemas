@@ -170,6 +170,7 @@
         "fuelTankLevel",
         "gear",
         "gearSelector",
+        "intakeAirTemperature",
         "isCharging",
         "lateralAcceleration",
         "longitudinalAcceleration",
@@ -302,6 +303,10 @@
         {
           "const": "gearSelector",
           "description": "The gear selector position. Map values use PARK, REVERSE, NEUTRAL, DRIVE, SPORT, MANUAL or LOW."
+        },
+        {
+          "const": "intakeAirTemperature",
+          "description": "Temperature of the air entering the engine's intake."
         },
         {
           "const": "isCharging",
