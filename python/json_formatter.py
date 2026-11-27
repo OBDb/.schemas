@@ -709,9 +709,12 @@ def format_json_data(data) -> str:
     # Start building the formatted output
     output = []
 
-    # Top-level scalars and the ECU list come before commands, each on the
+    # The notice comes first, so anyone opening the file reads it before the
+    # data. Top-level scalars and the ECU list come before commands, each on the
     # line after the opening brace's.
     header = []
+    if 'notice' in data:
+        header.append('"notice": ' + json.dumps(data['notice'], ensure_ascii=False) + ',')
     if data.get('ecu'):
         header.append('"ecu": ' + format_ecu(data['ecu']) + ',')
     if 'diagnosticLevel' in data:
