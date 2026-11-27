@@ -127,3 +127,11 @@ def test_formatter_round_trips_ecu_with_diagnostic_level():
 def test_formatter_leaves_signalsets_without_ecu_unchanged():
     assert format_json_data({'commands': [COMMAND]}).startswith('{ "commands": [\n')
     assert format_json_data({'ecu': [], 'commands': [COMMAND]}).startswith('{ "commands": [\n')
+
+
+def test_notice_comes_first_and_round_trips():
+    data = {'commands': [COMMAND], 'notice': 'Email "us" at support@example.com.'}
+    formatted = format_json_data(data)
+    assert formatted.startswith('{ "notice": "Email \\"us\\" at support@example.com.",\n  "commands": [\n')
+    assert json.loads(formatted) == data
+    assert format_json_data(json.loads(formatted)) == formatted

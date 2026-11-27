@@ -411,6 +411,11 @@
   "type": "object",
   "additionalProperties": false,
   "properties": {
+    "notice": {
+      "description": "A message to anyone reading the signalset, such as how to reach the OBDb's maintainers. The app ignores it, and tools that bundle signalsets can strip it.",
+      "type": "string",
+      "minLength": 1
+    },
     "ecu": {
       "description": "The kind of module behind each address the commands are sent to.",
       "type": "array",
